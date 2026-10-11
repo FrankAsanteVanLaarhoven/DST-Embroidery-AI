@@ -1,0 +1,34 @@
+{
+  "schema": "embroideryos-capability-audit/0.3",
+  "structural_audit": "PASS",
+  "findings": [],
+  "records": 210,
+  "inherited": 54,
+  "new_or_expanded": 156,
+  "implementation_status": {
+    "UNQUALIFIED": 64,
+    "CANDIDATE_SUBSET": 3,
+    "PLANNED": 138,
+    "REFERENCE_UTILITY": 1,
+    "LIBRARY_SUBSET": 4
+  },
+  "acceptance_status": {
+    "NOT_RUN": 210
+  },
+  "scope_origin": {
+    "inherited_0.2": 54,
+    "engineering_gate": 5,
+    "user_feature": 136,
+    "proposed_extension": 15
+  },
+  "accepted_scopes": 0,
+  "line_groups": 9,
+  "region_families": 14,
+  "source_conflicts": 6,
+  "workbook_sha256": "d1cd2147c9a282d36a9e0ff6fc812bf9f5a775bb2bac6cf92360c7f82ca32128",
+  "inherited_snapshot_sha256": "829295f1095ff5080b454e6b2a8a0893da531d300ad07e790e7383caac687db6",
+  "authenticates_evidence": false,
+  "machine_release_allowed": false,
+  "iso_certification": false,
+  "qualifies_platform": false
+}

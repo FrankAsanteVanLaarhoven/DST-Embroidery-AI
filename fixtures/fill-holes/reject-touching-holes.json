@@ -1,0 +1,65 @@
+{
+  "name": "reject-touching-holes",
+  "expect": "reject",
+  "outer": [
+    {
+      "x": 0,
+      "y": 0
+    },
+    {
+      "x": 30,
+      "y": 0
+    },
+    {
+      "x": 30,
+      "y": 30
+    },
+    {
+      "x": 0,
+      "y": 30
+    }
+  ],
+  "holes": [
+    [
+      {
+        "x": 4,
+        "y": 4
+      },
+      {
+        "x": 10,
+        "y": 4
+      },
+      {
+        "x": 10,
+        "y": 10
+      },
+      {
+        "x": 4,
+        "y": 10
+      }
+    ],
+    [
+      {
+        "x": 10,
+        "y": 4
+      },
+      {
+        "x": 16,
+        "y": 4
+      },
+      {
+        "x": 16,
+        "y": 10
+      },
+      {
+        "x": 10,
+        "y": 10
+      }
+    ]
+  ],
+  "angle_degrees": 0,
+  "row_spacing_mm": 2,
+  "max_stitch_length_mm": 5,
+  "underlay_spacing_mm": 0,
+  "reject_contains": "touches"
+}

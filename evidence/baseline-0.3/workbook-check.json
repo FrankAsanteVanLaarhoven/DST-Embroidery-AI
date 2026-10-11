@@ -1,0 +1,29 @@
+{
+  "schema": "embroideryos-workbook-check/0.3",
+  "sheet_names": [
+    "Dashboard",
+    "Requirements",
+    "Acceptance",
+    "Sources",
+    "Source Conflicts",
+    "Stitch Families",
+    "Delivery Gates"
+  ],
+  "requirement_rows": 210,
+  "formula_cache": {
+    "B8": "210",
+    "E8": "138",
+    "B9": "54",
+    "E9": "64",
+    "B10": "156",
+    "E10": "4",
+    "B11": "0",
+    "E11": "3",
+    "B12": "210",
+    "E12": "1",
+    "B20": "9",
+    "B21": "14"
+  },
+  "spreadsheet_errors": [],
+  "rendered_in_spreadsheet_application": false
+}

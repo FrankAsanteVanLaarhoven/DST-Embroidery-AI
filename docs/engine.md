@@ -98,7 +98,7 @@ The `wasm` feature exports `compileDst`, `validatePlan`, and `scorePlan` through
 
 These are the next production steps. They are not implemented:
 
-- Robust polygon clipping, hole-aware fill, and medial-axis extraction.
+- General polygon clipping, offsets, and medial-axis extraction. A fill may carry one simple outer ring and up to 32 simple holes that sit strictly inside it, without touching, overlapping, or nesting. Perpendicular underlay uses that same region. See [m2-g1-holes.md](m2-g1-holes.md).
 - Variable-width satin, short-stitch corners, and automatic density by fabric and thread.
 - A fabric simulator and a defect taxonomy grounded in stitch-outs.
 - PES, EXP, JEF, and VP3 writers.

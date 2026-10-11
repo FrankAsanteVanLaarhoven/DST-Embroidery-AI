@@ -3,7 +3,7 @@ import {MachineScene} from './scene.mjs';
 import {bindingMatches,drawCompare,filenameRoute,mmPerPixel,placementValid} from './compare.mjs';
 const $=id=>document.getElementById(id);
 const clock=new Playback();
-let design=null,selected=1,vertex=0,bundle=null,session=null,serial=0,dirty=true,redraw=true,compileTimer=null,history=[],future=[],dark=false,scene=null,cameraIndex=0;
+let design=null,selected=1,vertex=0,ring=0,bundle=null,session=null,serial=0,dirty=true,redraw=true,compileTimer=null,history=[],future=[],dark=false,scene=null,cameraIndex=0;
 let original=null,originalImage=null,proof=null,proofBusy=false,compareView='original',compareCamera={panX:0,panY:0,zoom:null},overlay={opacity:.55,wipe:1,independent:false,colour:'all',flicker:false},colourKey='';
 const copy=value=>JSON.parse(JSON.stringify(value));
 const rgbToHex=rgb=>'#'+rgb.map(v=>v.toString(16).padStart(2,'0')).join('');
@@ -40,8 +40,8 @@ function renderObjects(){
  for(const o of design.objects){const b=document.createElement('button');b.className='object'+(o.id===selected?' selected':'');b.setAttribute('aria-pressed',String(o.id===selected));b.dataset.objectId=o.id;
   const swatch=document.createElement('span');swatch.className='swatch';swatch.style.background=rgbToHex(o.rgb);
   const label=document.createElement('span');label.className='object-title';label.textContent=o.label;
-  const kind=document.createElement('span');kind.className='object-kind';kind.textContent=`${o.kind} · ${o.points.length} points`;label.append(kind);b.append(swatch,label);
-  b.onclick=()=>{selected=o.id;vertex=0;renderObjects();renderInspector();redraw=true;};fragment.append(b);
+  const kind=document.createElement('span');kind.className='object-kind';kind.textContent=`${o.kind} · ${o.points.length} points${o.holes?.length?` · ${o.holes.length} hole${o.holes.length===1?'':'s'}`:''}`;label.append(kind);b.append(swatch,label);
+  b.onclick=()=>{selected=o.id;vertex=0;ring=0;renderObjects();renderInspector();redraw=true;};fragment.append(b);
  }
  $('objects').replaceChildren(fragment);updateControls();
 }
@@ -53,8 +53,20 @@ function field(label,type,value,onChange,{min,max,step,id}={}){
  const read=()=>type==='number'?Number(input.value):input.value;let committed=read();
  input.addEventListener('change',()=>{const next=read();if(Object.is(next,committed))return;committed=next;onChange(next);});wrap.append(input);return wrap;
 }
+function activeRing(object=current()){
+ const holes=object.holes||[];
+ if(ring>holes.length)ring=0;
+ return ring>0?holes[ring-1]:object.points;
+}
+function insetHole(points){
+ let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+ for(const point of points){minX=Math.min(minX,point.x);minY=Math.min(minY,point.y);maxX=Math.max(maxX,point.x);maxY=Math.max(maxY,point.y);}
+ const cx=(minX+maxX)/2,cy=(minY+maxY)/2,radius=Math.min(Math.max(1,(maxX-minX)*0.12),Math.max(1,(maxY-minY)*0.12),6);
+ const place=value=>Math.round(clamp(value,-60,60)*10)/10;
+ return [{x:place(cx-radius),y:place(cy-radius)},{x:place(cx+radius),y:place(cy-radius)},{x:place(cx+radius),y:place(cy+radius)},{x:place(cx-radius),y:place(cy+radius)}];
+}
 function renderInspector(){
- const o=current();vertex=clamp(vertex,0,o.points.length-1);const grid=document.createElement('div');grid.className='inspector-grid';
+ const o=current();const pts=activeRing(o);vertex=clamp(vertex,0,pts.length-1);const grid=document.createElement('div');grid.className='inspector-grid';
  const label=field('Object label','text',o.label,v=>edit(()=>current().label=v));label.classList.add('full');grid.append(label);
  grid.append(field('Thread colour','color',rgbToHex(o.rgb),v=>edit(()=>current().rgb=hexToRgb(v)),{id:'object-color'}));
  grid.append(field('Max stitch · mm','number',o.max_stitch_mm,v=>edit(()=>current().max_stitch_mm=v),{min:.5,max:10,step:.1,id:'max-stitch'}));
@@ -62,10 +74,22 @@ function renderInspector(){
  if(o.kind==='fill')grid.append(field('Fill angle · °','number',o.angle_degrees,v=>edit(()=>current().angle_degrees=v),{min:-360,max:360,step:5,id:'angle'}));
  if(o.kind==='satin')grid.append(field('Column width · mm','number',o.width_mm,v=>edit(()=>current().width_mm=v),{min:.5,max:10,step:.1,id:'width'}));
  if(o.kind!=='running')grid.append(field('Underlay · mm; 0 off','number',o.underlay_mm,v=>edit(()=>current().underlay_mm=v),{min:0,max:10,step:.2,id:'underlay'}));
- const pointLabel=document.createElement('label');pointLabel.className='field full';pointLabel.textContent='Control point';const pointSelect=document.createElement('select');pointSelect.id='vertex';
- o.points.forEach((_,i)=>{const option=new Option(`Point ${i+1}`,String(i));option.selected=i===vertex;pointSelect.append(option);});pointSelect.onchange=()=>{vertex=Number(pointSelect.value);renderInspector();redraw=true;};pointLabel.append(pointSelect);grid.append(pointLabel);
- grid.append(field('X · mm','number',o.points[vertex].x,v=>edit(()=>current().points[vertex].x=v),{min:-60,max:60,step:1,id:'point-x'}));
- grid.append(field('Y · mm','number',o.points[vertex].y,v=>edit(()=>current().points[vertex].y=v),{min:-60,max:60,step:1,id:'point-y'}));
+ if(o.kind==='fill'){
+  const ringLabel=document.createElement('label');ringLabel.className='field full';ringLabel.textContent='Geometry ring';
+  const ringSelect=document.createElement('select');ringSelect.id='ring';ringSelect.append(new Option('Outer boundary','0'));
+  (o.holes||[]).forEach((_,index)=>ringSelect.append(new Option(`Hole ${index+1}`,String(index+1))));
+  ringSelect.value=String(Math.min(ring,(o.holes||[]).length));ringSelect.onchange=()=>{ring=Number(ringSelect.value);vertex=0;renderInspector();redraw=true;};ringLabel.append(ringSelect);grid.append(ringLabel);
+  const actions=document.createElement('div');actions.className='hole-actions';
+  const add=document.createElement('button');add.id='add-hole';add.type='button';add.textContent='Add hole';
+  add.onclick=()=>{const host=current();if((host.holes||[]).length>=8){message('This increment allows at most 8 holes on one fill.',true);return;}const created=insetHole(host.points);edit(()=>{const next=current();next.holes=[...(next.holes||[]),created];});ring=(current().holes||[]).length;vertex=0;renderInspector();redraw=true;};
+  const remove=document.createElement('button');remove.id='remove-hole';remove.type='button';remove.textContent='Remove hole';remove.disabled=ring===0;
+  remove.onclick=()=>{if(ring===0)return;const index=ring-1;edit(()=>{const next=current();next.holes.splice(index,1);if(!next.holes.length)delete next.holes;});ring=0;vertex=0;renderInspector();redraw=true;};
+  actions.append(add,remove);grid.append(actions);
+ }
+ const pointLabel=document.createElement('label');pointLabel.className='field full';pointLabel.textContent=ring>0?`Hole ${ring} point`:'Control point';const pointSelect=document.createElement('select');pointSelect.id='vertex';
+ pts.forEach((_,i)=>{const option=new Option(`Point ${i+1}`,String(i));option.selected=i===vertex;pointSelect.append(option);});pointSelect.onchange=()=>{vertex=Number(pointSelect.value);renderInspector();redraw=true;};pointLabel.append(pointSelect);grid.append(pointLabel);
+ grid.append(field('X · mm','number',pts[vertex].x,v=>edit(()=>{activeRing()[vertex].x=v;}),{min:-60,max:60,step:1,id:'point-x'}));
+ grid.append(field('Y · mm','number',pts[vertex].y,v=>edit(()=>{activeRing()[vertex].y=v;}),{min:-60,max:60,step:1,id:'point-y'}));
  $('inspector').replaceChildren(grid);
 }
 async function digest(bytes){const hash=await crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -101,12 +125,13 @@ function draw2D(state){
  for(let n=-60;n<=60;n+=10){ctx.strokeStyle=n===0?(dark?'#526178':'#bcc9dc'):(dark?'#303b4a':'#dfe5ef');ctx.lineWidth=n===0?1:.6;ctx.beginPath();ctx.moveTo(cx+n*scale,cy-60*scale);ctx.lineTo(cx+n*scale,cy+60*scale);ctx.moveTo(cx-60*scale,cy+n*scale);ctx.lineTo(cx+60*scale,cy+n*scale);ctx.stroke();}
  ctx.strokeStyle=dark?'#8295ae':'#99abc2';ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.strokeRect(cx-60*scale,cy-60*scale,120*scale,120*scale);ctx.setLineDash([]);
  ctx.font='8px -apple-system, sans-serif';ctx.fillStyle=dark?'#a9b5c8':'#708199';for(const n of [-60,-30,0,30,60]){ctx.fillText(String(n),cx+n*scale-4,cy-60*scale-6);ctx.fillText(String(n),cx-60*scale-21,cy+n*scale+3);}
- for(const o of design.objects){ctx.beginPath();o.points.forEach((p,i)=>{const q=at([p.x,p.y]);i?ctx.lineTo(...q):ctx.moveTo(...q);});if(o.kind==='fill'){ctx.closePath();ctx.fillStyle=rgbToHex(o.rgb)+(bundle?'0c':'25');ctx.fill();}ctx.strokeStyle=rgbToHex(o.rgb);ctx.globalAlpha=bundle?.5:.9;ctx.lineWidth=o.id===selected?1.5:1;ctx.stroke();ctx.globalAlpha=1;}
+ const traceRing=(points)=>{points.forEach((p,i)=>{const q=at([p.x,p.y]);i?ctx.lineTo(...q):ctx.moveTo(...q);});ctx.closePath();};
+ for(const o of design.objects){ctx.beginPath();traceRing(o.points);for(const hole of o.holes||[])traceRing(hole);if(o.kind==='fill'){ctx.fillStyle=rgbToHex(o.rgb)+(bundle?'0c':'25');ctx.fill('evenodd');}ctx.strokeStyle=rgbToHex(o.rgb);ctx.globalAlpha=bundle?.5:.9;ctx.lineWidth=o.id===selected?1.5:1;ctx.stroke();ctx.globalAlpha=1;}
  if(bundle){
   let sewn=0;for(const e of bundle.trace.events){if(e.kind!=='stitch')continue;const complete=sewn<state.completed_stitches;sewn++;ctx.strokeStyle=rgbToHex(bundle.palette[e.color_index].rgb);ctx.globalAlpha=complete?.94:.13;ctx.lineWidth=complete?1.1:.6;ctx.beginPath();ctx.moveTo(...at(e.from_units.map(n=>n/10)));ctx.lineTo(...at(e.to_units.map(n=>n/10)));ctx.stroke();}ctx.globalAlpha=1;
   const p=at(state.position_mm);ctx.strokeStyle=dark?'#f6f9ff':'#1a2a41';ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(...p,5,0,Math.PI*2);ctx.moveTo(p[0]-9,p[1]);ctx.lineTo(p[0]+9,p[1]);ctx.moveTo(p[0],p[1]-9);ctx.lineTo(p[0],p[1]+9);ctx.stroke();
  }
- const o=current();for(let i=0;i<o.points.length;i++){const p=at([o.points[i].x,o.points[i].y]);ctx.beginPath();ctx.arc(...p,i===vertex?4:3,0,Math.PI*2);ctx.fillStyle=i===vertex?'#2464da':(dark?'#20252e':'#fff');ctx.fill();ctx.strokeStyle='#2464da';ctx.lineWidth=1.1;ctx.stroke();}
+ const o=current();[o.points,...(o.holes||[])].forEach((pts,ringIndex)=>{for(let i=0;i<pts.length;i++){const p=at([pts[i].x,pts[i].y]),active=ringIndex===ring&&i===vertex;ctx.beginPath();ctx.arc(...p,active?4:3,0,Math.PI*2);ctx.fillStyle=active?'#2464da':(dark?'#20252e':'#fff');ctx.fill();ctx.strokeStyle=ringIndex?'#9a5b12':'#2464da';ctx.lineWidth=1.1;ctx.stroke();}});
  canvas.dataset.eventIndex=String(state.event_index);canvas.dataset.completedStitches=String(state.completed_stitches);
 }
 function paint(state){
@@ -155,7 +180,7 @@ function renderCompare(){
  stage('original',original?'Retained':'None',!!original);
  stage('proof',current?'Bound':'None',current);
  const list=$('editable-list');
- list.replaceChildren(...design.objects.map(object=>{const item=document.createElement('li');item.textContent=`${object.label} · ${object.kind} · ${object.points.length} points · colour ${object.rgb.join(',')}`;return item;}));
+ list.replaceChildren(...design.objects.map(object=>{const item=document.createElement('li');const holes=object.holes?.length?` · ${object.holes.length} holes`:'';item.textContent=`${object.label} · ${object.kind} · ${object.points.length} points${holes} · colour ${object.rgb.join(',')}`;return item;}));
  if(!bundle||dirty){
   $('machine-summary').textContent='Compile this revision to decode its DST. A previous export is not the current machine file.';
   $('machine-window').textContent='No current machine file.';
@@ -258,12 +283,12 @@ async function downloadProof(){
 }
 function wireUI(){
  $('compile').onclick=compileDesign;$('name').onchange=()=>edit(()=>design.name=$('name').value);
- for(const kind of ['fill','satin','running'])$('add-'+kind).onclick=()=>edit(()=>{const id=Math.max(...design.objects.map(o=>o.id))+1;design.objects.push({id,label:`New ${kind}`,kind,points:kind==='fill'?[{x:-15,y:-15},{x:15,y:-15},{x:15,y:15},{x:-15,y:15}]:[{x:-20,y:0},{x:20,y:0}],rgb:[55,112,211],spacing_mm:.6,angle_degrees:30,max_stitch_mm:3,width_mm:3,compensation_mm:.1,underlay_mm:0});selected=id;vertex=0;});
- $('remove').onclick=()=>edit(()=>{design.objects=design.objects.filter(o=>o.id!==selected);selected=design.objects[0].id;vertex=0;});
+ for(const kind of ['fill','satin','running'])$('add-'+kind).onclick=()=>edit(()=>{const id=Math.max(...design.objects.map(o=>o.id))+1;design.objects.push({id,label:`New ${kind}`,kind,points:kind==='fill'?[{x:-15,y:-15},{x:15,y:-15},{x:15,y:15},{x:-15,y:15}]:[{x:-20,y:0},{x:20,y:0}],rgb:[55,112,211],spacing_mm:.6,angle_degrees:30,max_stitch_mm:3,width_mm:3,compensation_mm:.1,underlay_mm:0});selected=id;vertex=0;ring=0;});
+ $('remove').onclick=()=>edit(()=>{design.objects=design.objects.filter(o=>o.id!==selected);selected=design.objects[0].id;vertex=0;ring=0;});
  for(const [id,offset] of [['up',-1],['down',1]])$(id).onclick=()=>{const i=design.objects.findIndex(o=>o.id===selected),j=i+offset;if(j>=0&&j<design.objects.length)edit(()=>{[design.objects[i],design.objects[j]]=[design.objects[j],design.objects[i]];});};
- for(const [id,source,target] of [['undo',history,future],['redo',future,history]])$(id).onclick=()=>{const from=id==='undo'?history:future,to=id==='undo'?future:history;if(!from.length)return;const rev=design.revision;to.push(copy(design));design=from.pop();design.revision=rev+1;selected=design.objects[0].id;vertex=0;invalidate();renderObjects();renderInspector();persist();};
+ for(const [id,source,target] of [['undo',history,future],['redo',future,history]])$(id).onclick=()=>{const from=id==='undo'?history:future,to=id==='undo'?future:history;if(!from.length)return;const rev=design.revision;to.push(copy(design));design=from.pop();design.revision=rev+1;selected=design.objects[0].id;vertex=0;ring=0;invalidate();renderObjects();renderInspector();persist();};
  $('save').onclick=()=>saveFile(`${design.name}.json`,JSON.stringify(design,null,2),'application/json');$('open').onclick=()=>$('file-input').click();
- $('file-input').onchange=async()=>{try{const file=$('file-input').files[0];if(!file)return;if(file.size>262144)throw new Error('Native project exceeds 256 KiB.');const d=JSON.parse(await file.text());if(d.schema_version!==1||!Array.isArray(d.objects)||!d.objects.length||d.objects.length>16||!d.objects.every(o=>Array.isArray(o.points)&&o.points.length>=2&&o.points.length<=256&&o.points.every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y))&&Array.isArray(o.rgb)&&o.rgb.length===3&&o.rgb.every(n=>Number.isInteger(n)&&n>=0&&n<=255)))throw new Error('Invalid native design. SVG, image and machine-file import are not part of M1.');history.push(copy(design));future=[];design=d;selected=d.objects[0].id;vertex=0;invalidate();renderObjects();renderInspector();persist();}catch(e){message(e.message,true);}finally{$('file-input').value='';}};
+ $('file-input').onchange=async()=>{try{const file=$('file-input').files[0];if(!file)return;if(file.size>262144)throw new Error('Native project exceeds 256 KiB.');const d=JSON.parse(await file.text());if(!validDesign(d))throw new Error('Invalid native design. SVG, image and machine-file import are not part of M1.');for(const object of d.objects)if(!object.holes||!object.holes.length)delete object.holes;history.push(copy(design));future=[];design=d;selected=d.objects[0].id;vertex=0;ring=0;invalidate();renderObjects();renderInspector();persist();}catch(e){message(e.message,true);}finally{$('file-input').value='';}};
  $('play').onclick=()=>{if(!bundle)return;if(clock.time>=bundle.trace.duration_ms)clock.seek(0);clock.playing=!clock.playing;clock.last=null;redraw=true;updateControls();};
  $('start').onclick=()=>{clock.playing=false;clock.seek(0);redraw=true;};$('back').onclick=()=>{clock.step(-1);redraw=true;};$('next').onclick=()=>{clock.step(1);redraw=true;};
  $('scrub').oninput=()=>{clock.playing=false;clock.seek(Number($('scrub').value));redraw=true;};$('speed').onchange=()=>clock.speed=Number($('speed').value);
@@ -277,15 +302,15 @@ function wireUI(){
  new ResizeObserver(()=>redraw=true).observe($('viewports'));
  let drag=null;const canvas=$('design-canvas');
  const position=e=>{const r=canvas.getBoundingClientRect(),t=canvasTransform();return [(e.clientX-r.left-t.cx)/t.scale,(e.clientY-r.top-t.cy)/t.scale];};
- canvas.onpointerdown=e=>{const p=position(e),t=canvasTransform();let hit=null;for(const o of design.objects)for(let i=0;i<o.points.length;i++){const q=o.points[i];if(Math.hypot(q.x-p[0],q.y-p[1])*t.scale<9)hit=[o.id,i];}if(!hit)return;history.push(copy(design));future=[];selected=hit[0];vertex=hit[1];drag=true;canvas.setPointerCapture(e.pointerId);clearTimeout(compileTimer);invalidate();clearTimeout(compileTimer);renderObjects();renderInspector();};
- canvas.onpointermove=e=>{if(!drag)return;const p=position(e);const q=current().points[vertex];q.x=Math.round(clamp(p[0],-60,60)*10)/10;q.y=Math.round(clamp(p[1],-60,60)*10)/10;redraw=true;};
+ canvas.onpointerdown=e=>{const p=position(e),t=canvasTransform();let hit=null,best=9;for(const o of design.objects){[o.points,...(o.holes||[])].forEach((pts,ringIndex)=>{pts.forEach((q,i)=>{const distance=Math.hypot(q.x-p[0],q.y-p[1])*t.scale;if(distance<best){best=distance;hit={id:o.id,ring:ringIndex,vertex:i};}});});}if(!hit)return;history.push(copy(design));future=[];selected=hit.id;ring=hit.ring;vertex=hit.vertex;drag=true;canvas.setPointerCapture(e.pointerId);clearTimeout(compileTimer);invalidate();clearTimeout(compileTimer);renderObjects();renderInspector();};
+ canvas.onpointermove=e=>{if(!drag)return;const p=position(e);const q=activeRing()[vertex];q.x=Math.round(clamp(p[0],-60,60)*10)/10;q.y=Math.round(clamp(p[1],-60,60)*10)/10;redraw=true;};
  const finish=()=>{if(!drag)return;drag=null;design.revision++;invalidate();renderInspector();renderObjects();persist();};canvas.onpointerup=finish;canvas.onpointercancel=finish;
  document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;if(e.code==='Space'){e.preventDefault();$('play').click();}if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();$(e.shiftKey?'redo':'undo').click();}});
  $('proof-generate').onclick=generateProof;$('proof-reopen').onclick=reopenProof;$('proof-download').onclick=downloadProof;
  $('choose-original').onclick=()=>$('original-input').click();
  $('original-input').onchange=async()=>{try{const file=$('original-input').files[0];if(!file)return;await adoptOriginal(file.name,new Uint8Array(await file.arrayBuffer()));message(original.route.route==='unrecognised'?original.route.action:'Original retained. Later crops and redraws stay separate from these bytes. Confirm the physical width before a proof.');}catch(error){message(error.message,true);}finally{$('original-input').value='';}};
  $('attach-reference').onclick=async()=>{try{const response=await fetch('/reference-square.png');if(!response.ok)throw new Error('Engineering reference did not load.');await adoptOriginal('reference-square.png',new Uint8Array(await response.arrayBuffer()));$('source-width').value='14';$('source-x').value='-2';$('source-y').value='-2';$('scale-confirm').checked=false;renderCompare();redraw=true;message(design?.name==='Square'?'14 mm test reference attached at -2, -2 mm. It is a constructed fixture. Confirm the width before a proof.':'14 mm test reference attached. It is a constructed fixture, and it is not evidence that it produced the open design. Confirm the width before a proof.');}catch(error){message(error.message,true);}};
- $('open-square').onclick=async()=>{try{const response=await fetch('/square.json');if(!response.ok)throw new Error('Engineering square did not load.');const next=await response.json();history.push(copy(design));future=[];design=next;selected=next.objects[0].id;vertex=0;invalidate();renderObjects();renderInspector();persist();message('Engineering square opened. Rust must compile it before the machine file, PDF, or twin can bind to this revision.');}catch(error){message(error.message,true);}};
+ $('open-square').onclick=async()=>{try{const response=await fetch('/square.json');if(!response.ok)throw new Error('Engineering square did not load.');const next=await response.json();history.push(copy(design));future=[];design=next;selected=next.objects[0].id;vertex=0;ring=0;invalidate();renderObjects();renderInspector();persist();message('Engineering square opened. Rust must compile it before the machine file, PDF, or twin can bind to this revision.');}catch(error){message(error.message,true);}};
  document.querySelectorAll('[data-compare]').forEach(button=>button.onclick=()=>showCompare(button.dataset.compare));
  $('compare-tabs').addEventListener('keydown',event=>{if(event.key!=='ArrowRight'&&event.key!=='ArrowLeft')return;const buttons=[...$('compare-tabs').querySelectorAll('[role="tab"]')];const index=Math.max(0,buttons.findIndex(button=>button.dataset.compare===compareView));const next=(index+(event.key==='ArrowRight'?1:-1)+buttons.length)%buttons.length;event.preventDefault();buttons[next].focus();showCompare(buttons[next].dataset.compare);});
  for(const id of ['source-width','source-x','source-y','source-page','source-dpi'])$(id).addEventListener('input',()=>{renderCompare();redraw=true;});
@@ -301,6 +326,19 @@ function wireUI(){
  overlayCanvas.onpointermove=event=>{if(!comparePan)return;const scale=Number(overlayCanvas.dataset.pxPerMm)||1;compareCamera.panX+=(event.clientX-comparePan.x)/scale;compareCamera.panY+=(event.clientY-comparePan.y)/scale;comparePan={x:event.clientX,y:event.clientY};redraw=true;};
  const endPan=()=>{comparePan=null;};overlayCanvas.onpointerup=endPan;overlayCanvas.onpointercancel=endPan;
  overlayCanvas.addEventListener('wheel',event=>{event.preventDefault();const current=compareCamera.zoom||Number(overlayCanvas.dataset.pxPerMm)||1;compareCamera.zoom=clamp(current*(event.deltaY<0?1.12:0.89),0.15,40);redraw=true;},{passive:false});
+}
+function finitePoint(point){return point&&Number.isFinite(point.x)&&Number.isFinite(point.y);}
+function validDesign(value){
+ if(value?.schema_version!==1||!Array.isArray(value.objects)||!value.objects.length||value.objects.length>16)return false;
+ return value.objects.every(object=>{
+  if(!Array.isArray(object.points)||object.points.length<2||object.points.length>256||!object.points.every(finitePoint))return false;
+  if(!Array.isArray(object.rgb)||object.rgb.length!==3||!object.rgb.every(n=>Number.isInteger(n)&&n>=0&&n<=255))return false;
+  if(object.holes===undefined)return true;
+  if(!Array.isArray(object.holes)||(object.kind!=='fill'&&object.holes.length>0)||object.holes.length>8)return false;
+  let total=object.points.length;
+  for(const hole of object.holes){if(!Array.isArray(hole)||hole.length<3||hole.length>64||!hole.every(finitePoint))return false;total+=hole.length;}
+  return total<=256;
+ });
 }
 async function init(){
  try{design=await(await fetch('/example.json')).json();

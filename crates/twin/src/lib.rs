@@ -1,8 +1,9 @@
 //! Design -> existing Rust generators -> exact DST bytes -> raw decoded events.
 //! This is a bounded generic-machine demonstration, not a machine controller.
 use embroidery_core::{
-    generate_fill, generate_running, generate_satin, validate, ColorStop, FillConfig, Point,
-    RunningConfig, SatinConfig, Stitch, StitchKind, StitchPlan, ThreadSpec,
+    generate_fill, generate_fill_with_holes, generate_running, generate_satin, validate,
+    validate_fill_region, ColorStop, FillConfig, Point, RunningConfig, SatinConfig, Stitch,
+    StitchKind, StitchPlan, ThreadSpec,
 };
 use embroidery_dst::{
     compile_to_vec, decode_record, encode_record, read_dst_with, ReadOptions, RecordCommand,
@@ -21,6 +22,9 @@ pub struct DesignObject {
     pub label: String,
     pub kind: String,
     pub points: Vec<Point>,
+    /// Explicit hole rings. Omitted when empty so older designs stay unchanged.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub holes: Vec<Vec<Point>>,
     pub rgb: [u8; 3],
     pub spacing_mm: f64,
     pub angle_degrees: f64,
@@ -80,7 +84,8 @@ fn in_range(v: f64, lo: f64, hi: f64, field: &str) -> Result<(), String> {
     Ok(())
 }
 
-// Simple-ring admission guard. This is not polygon repair or hole-aware fill.
+// Simple-ring admission guard. This is not polygon repair.
+// Hole topology is checked separately and only when a fill carries holes.
 fn orientation(a: Point, b: Point, c: Point) -> f64 {
     (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)
 }
@@ -179,6 +184,39 @@ fn check_design(d: &Design) -> Result<(), String> {
         }
         if o.kind == "fill" {
             check_ring(&o.points)?;
+        }
+        if !o.holes.is_empty() {
+            if o.kind != "fill" {
+                return Err(format!(
+                    "Object {} is {} and has holes. Holes belong only on a fill. Remove them or change the object to fill.",
+                    o.id, o.kind
+                ));
+            }
+            if o.holes.len() > 8 {
+                return Err(
+                    "This increment allows at most 8 holes on one fill. Remove some holes and generate again.".into(),
+                );
+            }
+            let mut total = o.points.len();
+            for (index, hole) in o.holes.iter().enumerate() {
+                if !(3..=64).contains(&hole.len()) {
+                    return Err(format!(
+                        "Hole {} needs 3–64 points. Redraw that ring and generate again.",
+                        index + 1
+                    ));
+                }
+                total += hole.len();
+                for p in hole {
+                    in_range(p.x, -60.0, 60.0, "Hole X")?;
+                    in_range(p.y, -60.0, 60.0, "Hole Y")?;
+                }
+            }
+            if total > 256 {
+                return Err(
+                    "Outline and holes together exceed 256 points. Simplify the region and generate again.".into(),
+                );
+            }
+            validate_fill_region(&o.points, &o.holes).map_err(|error| error.to_string())?;
         }
         threads.insert(o.rgb);
     }
@@ -380,18 +418,26 @@ pub fn compile_design(request: Request) -> Result<serde_json::Value, String> {
                     underlay_running_stitch_mm: o.underlay_mm,
                 },
             ),
-            "fill" => generate_fill(
-                &mut plan,
-                o.id,
-                color_index,
-                &o.points,
-                &FillConfig {
+            "fill" => {
+                let config = FillConfig {
                     angle_degrees: o.angle_degrees,
                     row_spacing_mm: o.spacing_mm,
                     max_stitch_length_mm: o.max_stitch_mm,
                     underlay_spacing_mm: o.underlay_mm,
-                },
-            ),
+                };
+                if o.holes.is_empty() {
+                    generate_fill(&mut plan, o.id, color_index, &o.points, &config)
+                } else {
+                    generate_fill_with_holes(
+                        &mut plan,
+                        o.id,
+                        color_index,
+                        &o.points,
+                        &o.holes,
+                        &config,
+                    )
+                }
+            }
             _ => unreachable!(),
         }
         .map_err(|e| format!("Object {}: {e}", o.id))?;
@@ -456,6 +502,7 @@ mod tests {
                 Point::new(20.0, 10.0),
                 Point::new(-20.0, 10.0),
             ],
+            holes: Vec::new(),
             rgb: [30, 90, 200],
             spacing_mm: 0.5,
             angle_degrees: 30.0,
@@ -556,7 +603,47 @@ mod tests {
     fn self_intersecting_fill_is_rejected() {
         let mut r = req("fill");
         r.design.objects[0].points.swap(1, 2);
-        assert!(compile_design(r).is_err());
+        let error = compile_design(r).unwrap_err();
+        assert_eq!(
+            error,
+            "Fill self-intersects. Repair its outline before generation."
+        );
+    }
+    #[test]
+    fn a_design_without_holes_still_compiles_and_a_hole_is_deterministic() {
+        let missing = r#"{"schema_version":1,"name":"Plain","revision":1,"objects":[{"id":1,"label":"Field","kind":"fill","points":[{"x":-15.0,"y":-15.0},{"x":15.0,"y":-15.0},{"x":15.0,"y":15.0},{"x":-15.0,"y":15.0}],"rgb":[30,90,200],"spacing_mm":2.0,"angle_degrees":0.0,"max_stitch_mm":4.0,"width_mm":3.0,"compensation_mm":0.0,"underlay_mm":0.0}]}"#;
+        let parsed: Request = serde_json::from_str(&format!(
+            r#"{{"profile_id":"{PROFILE_ID}","design":{missing}}}"#
+        ))
+        .unwrap();
+        assert!(parsed.design.objects[0].holes.is_empty());
+        let plain = compile_design(parsed).unwrap();
+        assert!(!plain.to_string().contains("\"holes\""));
+
+        let mut holed = req("fill");
+        holed.design.objects[0].points = vec![
+            Point::new(-15.0, -15.0),
+            Point::new(15.0, -15.0),
+            Point::new(15.0, 15.0),
+            Point::new(-15.0, 15.0),
+        ];
+        holed.design.objects[0].spacing_mm = 2.0;
+        holed.design.objects[0].angle_degrees = 0.0;
+        holed.design.objects[0].underlay_mm = 2.0;
+        holed.design.objects[0].holes = vec![vec![
+            Point::new(-4.0, -4.0),
+            Point::new(4.0, -4.0),
+            Point::new(4.0, 4.0),
+            Point::new(-4.0, 4.0),
+        ]];
+        let first = bytes(&compile_design(holed.clone()).unwrap());
+        let second = bytes(&compile_design(holed.clone()).unwrap());
+        assert_eq!(first, second);
+        assert_ne!(first, bytes(&plain));
+
+        holed.design.objects[0].kind = "running".into();
+        let error = compile_design(holed).unwrap_err();
+        assert!(error.contains("Holes belong only on a fill"));
     }
     #[test]
     fn empty_and_excessive_documents_are_rejected() {

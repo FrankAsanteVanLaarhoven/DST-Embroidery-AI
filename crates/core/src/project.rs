@@ -11,7 +11,8 @@ use std::collections::BTreeSet;
 use crate::capabilities::check_request;
 use crate::error::PlanError;
 use crate::generators::{
-    generate_fill, generate_running, generate_satin, FillConfig, RunningConfig, SatinConfig,
+    generate_fill, generate_fill_with_holes, generate_running, generate_satin, FillConfig,
+    RunningConfig, SatinConfig,
 };
 use crate::model::{ColorStop, Point, Stitch, StitchKind, StitchPlan};
 use crate::sha256::sha256_hex;
@@ -43,6 +44,9 @@ pub struct DesignObject {
     pub label: String,
     pub kind: String,
     pub points: Vec<Point>,
+    /// Closed rings subtracted from a fill. Absent on older projects.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub holes: Vec<Vec<Point>>,
     pub angle_degrees: f64,
     pub density_mm: f64,
     pub column_width_mm: f64,
@@ -204,6 +208,12 @@ pub fn generate_project(project: &ProjectDocument) -> Result<Generation, PlanErr
             &object.kind,
             &object.underlay,
         )?;
+        if !object.holes.is_empty() && object.kind != "fill" {
+            return Err(PlanError::new(format!(
+                "Object {} is a {} and carries holes. Holes are supported only on a fill region. Remove the holes or change the object to fill, then generate again.",
+                object.object_id, object.kind
+            )));
+        }
         check_numbers(object)?;
         ensure_inside_source(project, object)?;
         ensure_color(&mut plan, object.color_index, object.object_id);
@@ -247,18 +257,30 @@ pub fn generate_project(project: &ProjectDocument) -> Result<Generation, PlanErr
                 } else {
                     object.underlay_spacing_mm
                 };
-                generate_fill(
-                    &mut plan,
-                    object.object_id,
-                    object.color_index,
-                    &object.points,
-                    &FillConfig {
-                        angle_degrees: object.angle_degrees,
-                        row_spacing_mm: object.density_mm,
-                        max_stitch_length_mm: object.max_stitch_mm,
-                        underlay_spacing_mm: underlay,
-                    },
-                )?;
+                let config = FillConfig {
+                    angle_degrees: object.angle_degrees,
+                    row_spacing_mm: object.density_mm,
+                    max_stitch_length_mm: object.max_stitch_mm,
+                    underlay_spacing_mm: underlay,
+                };
+                if object.holes.is_empty() {
+                    generate_fill(
+                        &mut plan,
+                        object.object_id,
+                        object.color_index,
+                        &object.points,
+                        &config,
+                    )?;
+                } else {
+                    generate_fill_with_holes(
+                        &mut plan,
+                        object.object_id,
+                        object.color_index,
+                        &object.points,
+                        &object.holes,
+                        &config,
+                    )?;
+                }
                 generators.push("fill".to_string());
             }
             _ => {
@@ -389,7 +411,9 @@ fn check_numbers(object: &DesignObject) -> Result<(), PlanError> {
 }
 
 fn ensure_inside_source(project: &ProjectDocument, object: &DesignObject) -> Result<(), PlanError> {
-    for point in &object.points {
+    let mut points = object.points.iter();
+    let holes = object.holes.iter().flatten();
+    for point in points.by_ref().chain(holes) {
         if !inside(*point, project.hoop_width_mm, project.hoop_height_mm) {
             return Err(PlanError::new(format!(
                 "Object {} ({}) has a point at ({:.2}, {:.2}) mm outside the {:.1} by {:.1} mm hoop. Move the object inside the hoop and generate again.",
@@ -478,6 +502,7 @@ mod tests {
                 label: "Outline".to_string(),
                 kind: "running".to_string(),
                 points: vec![Point::new(10.0, 20.0), Point::new(80.0, 20.0)],
+                holes: Vec::new(),
                 angle_degrees: 0.0,
                 density_mm: 2.5,
                 column_width_mm: 2.0,
@@ -549,5 +574,51 @@ mod tests {
         let bare = revision_of(&project);
         stamp_geometry_review(&mut project, "Ada").unwrap();
         assert_eq!(revision_of(&project), bare);
+    }
+
+    #[test]
+    fn projects_without_holes_keep_the_locked_revision() {
+        assert_eq!(
+            revision_of(&line_project()),
+            "daaf1d0fed513d354da2cc305c3eafeffeeb7a6028f379b5e18074d128542580"
+        );
+        let mut value = serde_json::to_value(line_project()).unwrap();
+        value.as_object_mut().unwrap().remove("review");
+        let canonical = serde_json::to_string(&value).unwrap();
+        assert!(!canonical.contains("holes"));
+    }
+
+    #[test]
+    fn a_missing_holes_field_still_parses_and_a_hole_round_trips() {
+        let bare = parse_project(
+            r#"{"format":"embroidery-project","format_version":"1","name":"Square","hoop_width_mm":40.0,"hoop_height_mm":40.0,"objects":[{"object_id":1,"label":"Field","kind":"fill","points":[{"x":2.0,"y":2.0},{"x":30.0,"y":2.0},{"x":30.0,"y":30.0},{"x":2.0,"y":30.0}],"angle_degrees":0.0,"density_mm":4.0,"column_width_mm":2.0,"max_stitch_mm":8.0,"underlay_spacing_mm":0.0,"underlay":[],"pull_compensation_mm":0.0,"color_index":0}],"review":null}"#,
+        )
+        .unwrap();
+        assert!(bare.objects[0].holes.is_empty());
+        let mut with_hole = bare.clone();
+        with_hole.objects[0].holes.push(vec![
+            Point::new(10.0, 10.0),
+            Point::new(18.0, 10.0),
+            Point::new(18.0, 18.0),
+            Point::new(10.0, 18.0),
+        ]);
+        let text = serde_json::to_string(&with_hole).unwrap();
+        assert!(text.contains("holes"));
+        let parsed = parse_project(&text).unwrap();
+        assert_eq!(parsed.objects[0].holes.len(), 1);
+        let generation = generate_project(&parsed).unwrap();
+        assert!(generation.plan.sewing_stitch_count() > 0);
+        assert!(!generation.readiness.machine_release_allowed);
+        let before = revision_of(&parsed);
+        let mut moved = parsed.clone();
+        moved.objects[0].holes[0][0].x += 1.0;
+        assert_ne!(revision_of(&moved), before);
+
+        let mut running = with_hole.clone();
+        running.objects[0].kind = "running".to_string();
+        let error = generate_project(&running).unwrap_err();
+        assert!(error
+            .message()
+            .contains("Holes are supported only on a fill"));
     }
 }

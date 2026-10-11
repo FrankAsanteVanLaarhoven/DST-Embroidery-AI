@@ -53,8 +53,8 @@ fn serve(port: u16) -> ExitCode {
             Ok(stream) => stream,
             Err(_) => continue,
         };
-        let _ = stream.set_read_timeout(Some(Duration::from_secs(5)));
-        let _ = stream.set_write_timeout(Some(Duration::from_secs(5)));
+        let _ = stream.set_read_timeout(Some(Duration::from_secs(20)));
+        let _ = stream.set_write_timeout(Some(Duration::from_secs(20)));
         let mut raw = Vec::new();
         let mut buffer = [0u8; 8192];
         loop {

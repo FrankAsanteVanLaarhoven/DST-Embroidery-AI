@@ -19,7 +19,8 @@ pub use capabilities::{
 };
 pub use error::PlanError;
 pub use generators::{
-    generate_fill, generate_running, generate_satin, FillConfig, RunningConfig, SatinConfig,
+    generate_fill, generate_fill_with_holes, generate_running, generate_satin,
+    validate_fill_region, FillConfig, RunningConfig, SatinConfig,
 };
 pub use model::{
     mm_to_units, units_to_mm, ColorStop, Point, Stitch, StitchKind, StitchPlan, ThreadSpec,

@@ -50,5 +50,9 @@
     "file": "12_invalid_wide_satin.json",
     "expect": "error",
     "contains": "12.1"
+  },
+  {
+    "file": "13_alpine_club.json",
+    "expect": "ok"
   }
 ]

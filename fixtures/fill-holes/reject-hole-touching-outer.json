@@ -1,0 +1,47 @@
+{
+  "name": "reject-hole-touching-outer",
+  "expect": "reject",
+  "outer": [
+    {
+      "x": 0,
+      "y": 0
+    },
+    {
+      "x": 10,
+      "y": 0
+    },
+    {
+      "x": 10,
+      "y": 10
+    },
+    {
+      "x": 0,
+      "y": 10
+    }
+  ],
+  "holes": [
+    [
+      {
+        "x": 0,
+        "y": 2
+      },
+      {
+        "x": 4,
+        "y": 2
+      },
+      {
+        "x": 4,
+        "y": 6
+      },
+      {
+        "x": 0,
+        "y": 6
+      }
+    ]
+  ],
+  "angle_degrees": 0,
+  "row_spacing_mm": 2,
+  "max_stitch_length_mm": 5,
+  "underlay_spacing_mm": 0,
+  "reject_contains": "touches the outer boundary"
+}

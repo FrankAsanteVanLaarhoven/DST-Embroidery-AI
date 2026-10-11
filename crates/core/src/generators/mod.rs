@@ -2,7 +2,7 @@ mod fill;
 mod running;
 mod satin;
 
-pub use fill::{generate_fill, FillConfig};
+pub use fill::{generate_fill, generate_fill_with_holes, validate_fill_region, FillConfig};
 pub use running::{generate_running, RunningConfig};
 pub use satin::{generate_satin, SatinConfig};
 

@@ -1,0 +1,46 @@
+{
+  "name": "rotated-30",
+  "expect": "ok",
+  "outer": [
+    {
+      "x": 0,
+      "y": 0
+    },
+    {
+      "x": 20,
+      "y": 0
+    },
+    {
+      "x": 20,
+      "y": 20
+    },
+    {
+      "x": 0,
+      "y": 20
+    }
+  ],
+  "holes": [
+    [
+      {
+        "x": 6,
+        "y": 6
+      },
+      {
+        "x": 14,
+        "y": 6
+      },
+      {
+        "x": 14,
+        "y": 14
+      },
+      {
+        "x": 6,
+        "y": 14
+      }
+    ]
+  ],
+  "angle_degrees": 30,
+  "row_spacing_mm": 1.5,
+  "max_stitch_length_mm": 4,
+  "underlay_spacing_mm": 0
+}

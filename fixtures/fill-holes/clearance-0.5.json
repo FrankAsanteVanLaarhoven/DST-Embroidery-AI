@@ -1,0 +1,46 @@
+{
+  "name": "clearance-0.5",
+  "expect": "ok",
+  "outer": [
+    {
+      "x": 0,
+      "y": 0
+    },
+    {
+      "x": 20,
+      "y": 0
+    },
+    {
+      "x": 20,
+      "y": 20
+    },
+    {
+      "x": 0,
+      "y": 20
+    }
+  ],
+  "holes": [
+    [
+      {
+        "x": 0.5,
+        "y": 0.5
+      },
+      {
+        "x": 19.5,
+        "y": 0.5
+      },
+      {
+        "x": 19.5,
+        "y": 19.5
+      },
+      {
+        "x": 0.5,
+        "y": 19.5
+      }
+    ]
+  ],
+  "angle_degrees": 0,
+  "row_spacing_mm": 0.25,
+  "max_stitch_length_mm": 5,
+  "underlay_spacing_mm": 0
+}

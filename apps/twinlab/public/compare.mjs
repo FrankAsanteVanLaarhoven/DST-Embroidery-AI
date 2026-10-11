@@ -47,7 +47,10 @@ function add(xs, ys, x, y) { xs.push(x); ys.push(y); }
 
 function boundsOf(model) {
   const xs = [], ys = [];
-  if (model.showDesign && model.design) for (const object of model.design.objects) for (const point of object.points) add(xs, ys, point.x, point.y);
+  if (model.showDesign && model.design) for (const object of model.design.objects) {
+    for (const point of object.points) add(xs, ys, point.x, point.y);
+    for (const hole of object.holes || []) for (const point of hole) add(xs, ys, point.x, point.y);
+  }
   if (model.showTrace && model.bundle) for (const event of model.bundle.trace.events) {
     add(xs, ys, event.from_units[0] / 10, event.from_units[1] / 10);
     add(xs, ys, event.to_units[0] / 10, event.to_units[1] / 10);
@@ -100,12 +103,19 @@ export function drawCompare(canvas, model) {
   if (model.showDesign && model.design) {
     for (const object of model.design.objects) {
       context.beginPath();
-      object.points.forEach((point, index) => {
-        const mapped = at(point.x, point.y);
-        index ? context.lineTo(...mapped) : context.moveTo(...mapped);
-      });
-      if (object.kind === 'fill') context.closePath();
-      context.strokeStyle = '#' + object.rgb.map(value => value.toString(16).padStart(2, '0')).join('');
+      for (const ring of [object.points, ...(object.holes || [])]) {
+        ring.forEach((point, index) => {
+          const mapped = at(point.x, point.y);
+          index ? context.lineTo(...mapped) : context.moveTo(...mapped);
+        });
+        context.closePath();
+      }
+      const colour = '#' + object.rgb.map(value => value.toString(16).padStart(2, '0')).join('');
+      if (object.kind === 'fill') {
+        context.fillStyle = colour + '22';
+        context.fill('evenodd');
+      }
+      context.strokeStyle = colour;
       context.lineWidth = 1.4;
       context.stroke();
     }

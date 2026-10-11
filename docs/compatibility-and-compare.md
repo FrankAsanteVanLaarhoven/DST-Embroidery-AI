@@ -109,7 +109,7 @@ Files enter a bounded conversion worker with content validation, decompression/p
 
 ## 8. AI-platform interoperability
 
-Use versioned HTTP/tool contracts and provider adapters, not screen automation of every chat product. Candidate providers include OpenAI, Anthropic, Google, xAI and local model runtimes; no provider is integrated or called by this package. Capability discovery must state image input, image generation, segmentation, vector proposals, structured output, streaming, limits, costs, retention policy and cancellation behaviour per configured model/version.
+Use versioned HTTP/tool contracts and provider adapters, not screen automation of every chat product. Candidate providers include OpenAI, Anthropic, Google, xAI and local model runtimes. The local studio can call the xAI responses API for one geometry proposal when the studio process has `XAI_API_KEY`. That call is not a capability acceptance, writes no stitches, and is skipped when the key is absent. No other provider is integrated. Capability discovery must state image input, image generation, segmentation, vector proposals, structured output, streaming, limits, costs, retention policy and cancellation behaviour per configured model/version.
 
 AI receives a source reference, target dimensions, rights scope, machine/material constraints and the engine capability manifest. It emits constrained proposals only. Validate source/object IDs, allowed stitch types, unsupported functions, budgets and stale revisions. Provider outages leave manual editing available. Tests must include malformed proposals, tool-output prompt injection, unsupported stitch families, timeouts and cost ceilings. Provider identity or self-reported confidence never grants approval or physical machine control.
 

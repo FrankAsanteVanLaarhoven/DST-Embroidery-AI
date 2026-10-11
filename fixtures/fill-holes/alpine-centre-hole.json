@@ -1,0 +1,50 @@
+{
+  "name": "alpine-centre-hole",
+  "expect": "ok",
+  "outer": [
+    {
+      "x": -40,
+      "y": 24
+    },
+    {
+      "x": -18,
+      "y": -8
+    },
+    {
+      "x": 0,
+      "y": -28
+    },
+    {
+      "x": 22,
+      "y": -6
+    },
+    {
+      "x": 40,
+      "y": 24
+    }
+  ],
+  "holes": [
+    [
+      {
+        "x": -6,
+        "y": -8
+      },
+      {
+        "x": 6,
+        "y": -8
+      },
+      {
+        "x": 6,
+        "y": 4
+      },
+      {
+        "x": -6,
+        "y": 4
+      }
+    ]
+  ],
+  "angle_degrees": 30,
+  "row_spacing_mm": 0.6,
+  "max_stitch_length_mm": 3.5,
+  "underlay_spacing_mm": 0
+}

@@ -1,0 +1,8 @@
+{
+  "dst_sha256": "cb74dd0aaf96dc97c4296a2e34602d47d8ef72af67d94bcbb1f7c2325c848737",
+  "dst_bytes": 851,
+  "solid_stitches": 114,
+  "holed_stitches": 102,
+  "machine_release_allowed": false,
+  "rejection": "Hole 1 is not strictly inside the outer boundary. Move it fully inside, leaving a gap, and generate again. The plan was not changed."
+}

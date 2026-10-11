@@ -239,3 +239,162 @@ Known gaps and next action:
 - `scripts/check-twinlab-m1.sh` was not re-run for this review.
 
 Release-ready claim: no. The local Compare binding passed the checks above. Universal compatibility and physical qualification remain open.
+
+## Professional baseline 0.3 review, 11 October 2026
+
+Delivery/build or commit: local workspace on top of `4ea98f9`. Not committed in this review.
+Scope and classification: non-UI requirements register and local audit utility. No application screen, route, or stitch generator was added.
+Commands and evidence paths:
+
+- `.venv/bin/python -m unittest tests.capability_register.test_audit -v` — 29 passed, 0 failed. Log: `evidence/baseline-0.3/ledger-tests.log`.
+- `.venv/bin/python tools/audit_capabilities.py` — exit 0, structural audit PASS. 210 records, 54 inherited, 156 new or expanded, nine line groups, fourteen region families, six conflicts.
+- `.venv/bin/python tools/audit_capabilities.py --require-acceptance` — exit 1, expected. Zero of 210 rows have accepted evidence.
+- Workbook SHA-256 `d1cd2147c9a282d36a9e0ff6fc812bf9f5a775bb2bac6cf92360c7f82ca32128`, copied unchanged from the supplied file. No spreadsheet application was available, so the dashboard was not pixel-rendered. Sheet names, merges, column widths, formula caches, and cell text were inspected from the package.
+
+| Check | Result | Evidence or concrete reason |
+|---|---|---|
+| Q01–Q07, Q13 | N/A | No public page, domain, or social preview was added. |
+| Q02–Q04, Q08–Q12, Q14, Q18–Q20 | N/A | No application UI was changed. The workbook is a requirements spreadsheet, not a product screen. |
+| Q15 Debug output | PASS | The audit utility prints the audit result only. The new test module has no debug print. |
+| Q16 Source maps | N/A | No client bundle was added. |
+| Q17 JavaScript and performance | N/A | No JavaScript was added. The 25,000-event latency target remains unmeasured. |
+
+Known gaps: the 210-row programme is not implemented. `LIBRARY_SUBSET` covers only the existing running, satin, fill, and underlay limits. Decorative sewing, cutting, lettering catalogues, machine transfer, and physical quality remain unqualified. The acceptance gate is intentionally red.
+
+Release-ready claim: no.
+
+## M2-G1 hole fill review, 11 October 2026
+
+Delivery/build or commit: uncommitted tree on `4ea98f9ad29c18351a9b6b47257fc654f2acce94`. Not committed and not pushed. Evidence is [../m2-g1-holes.md](../m2-g1-holes.md).
+Environment and URL: macOS, rustc 1.90.0 (Homebrew), Python 3.11.4, Chrome. TwinLab `http://127.0.0.1:4175/`. Studio hole check `http://127.0.0.1:4176/`. The pre-existing studio on port 4173 was not restarted and is not this binary.
+Scope and classification: local development UI plus the existing Rust fill. One outer ring and explicit holes, then exact DST replay. Not a public release. Baseline 0.3 acceptance stays 0/210.
+Viewports and browser: Chrome at 1440×1000, 768×1024, and 390×844 for TwinLab, and 1440×900, 768×1024, and 390×844 for the studio. Safari, Firefox, and a screen reader were not used.
+
+Commands and evidence paths:
+
+- `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --offline -- -D warnings`, and `cargo test --workspace --offline` — exit 0. Counts are in `docs/m2-g1-holes.md`.
+- `node --test tests/twinlab/unit.mjs` — 57 passed, 0 failed.
+- TwinLab hole browser passed. DST SHA-256 `65fcab89dfa0167b9d4cfbad18c040a3fa25bf8cce6150d712beb1ffca7ad0e3`. PDF SHA-256 `8fc6c6b9f4d5479da62899b2b93376b61fe7208f7d7d36531ee955ae7ef4e081`. Screenshots `evidence/m2-g1/desktop.png`, `tablet.png`, `mobile.png`.
+- Studio hole browser passed against the new binary on port 4176. Club-mark hole DST SHA-256 `cb74dd0aaf96dc97c4296a2e34602d47d8ef72af67d94bcbb1f7c2325c848737`, 851 bytes. Screenshots `evidence/m2-g1/studio-desktop.png`, `studio-tablet.png`, `studio-mobile.png`.
+- `GET /favicon.svg` returned 200 `image/svg+xml` on both servers. `GET /missing-hole-page` and `GET /missing-studio-page` returned 404 with `Page not found` and a recovery link. The browser did not click those links in this review.
+- Asset sizes: TwinLab `app.mjs` 39782, `compare.mjs` 7981, `scene.mjs` 11682, `playback.mjs` 2726, `style.css` 13227. Script total 62171 bytes. Studio `studio.js` 23846 bytes, `studio.css` 5536 bytes. Local budget remains 80 KB of script and 40 KB of CSS.
+- Workbook and inherited JSON hashes are unchanged from the baseline 0.3 review. No acceptance cell was promoted.
+
+| Check | Result | Evidence or concrete reason |
+|---|---|---|
+| Q01 Production domain | N/A | Loopback only. No domain was configured. |
+| Q02 Page titles | PASS | TwinLab title `EmbroideryOS · Compare`. Studio title `EmbroideryOS — Design studio`. Unknown routes use `Page not found — EmbroideryOS`. One h1 on each exercised view. |
+| Q03 Meta descriptions | PASS | Both pages are `noindex`. The descriptions do not include a design name, reviewer, or hash. |
+| Q04 Favicon and icons | PASS | Both `GET /favicon.svg` requests returned 200 `image/svg+xml`. The marks are the existing project icons. |
+| Q05 Open Graph image | N/A | Not a public shareable page. |
+| Q06 Canonical URLs | N/A | No indexable production origin. |
+| Q07 Social previews | N/A | No public social card. |
+| Q08 Custom 404 | PASS | Both unknown-document requests returned 404 and a branded page with a link back. The browser click on that link was not repeated; the hole flow does not change the 404 route. `unknown_page_is_a_branded_404` passed in the studio workflow tests. |
+| Q09 Loading states | PASS | A hole edit disabled DST and PDF download and said the previous artifact was not current. Rust then restored a current binding. Studio showed “Edits are not generated yet” until generate finished. |
+| Q10 Error messages | PASS | A hole on the outer boundary was rejected and told the user to move it inside and generate again. Studio said the plan was not changed and kept export disabled. The TwinLab 422 is that rejection. |
+| Q11 Heading structure | PASS | TwinLab h1 remains `See every stitch. Understand every move.` Studio h1 remains `Design studio`. |
+| Q12 Alternative text | PASS | Compare’s reopened PDF iframe keeps its name. Studio preview text says the outlines include holes and that jumps are dashed. Hole controls have visible labels: Geometry ring, Add hole, Remove hole. |
+| Q13 Sitemap and indexing | PASS | `noindex` remains set. No sitemap was added. |
+| Q14 Console errors | PASS | TwinLab page errors were empty. The only console error was the intentional 422 for the rejected hole. Studio page errors were empty. A failed generate response was classified as that rejection. |
+| Q15 Debug output | PASS | `app.mjs`, `compare.mjs`, and `studio.js` have no `console.log` or `console.debug`. The studio workflow test also rejects generator and debug strings. |
+| Q16 Source maps | PASS | No new `.map` files and no `sourceMappingURL` were added. Nothing was published. |
+| Q17 JavaScript and performance | PASS | TwinLab script 62171 bytes and CSS 13227 bytes. Studio script 23846 bytes and CSS 5536 bytes. Both sit inside the local 80 KB / 40 KB budget. A frame-time percentile was not measured. |
+| Q18 Mobile layout | PASS | TwinLab at 390 px did not overflow horizontally, and the hole edit compiled. Studio at 390 px did not overflow, and Generate stayed usable. Tablet and desktop screenshots show the same hole workflow with stacked controls on the narrow widths. |
+| Q19 Consistent spacing | PASS | The hole controls use the existing type, radius, blue action, and panel surfaces. Studio region outlines use the existing blue stroke. |
+| Q20 Working controls and links | PASS | Chrome edited a hole, recompiled in Rust, downloaded the replayed DST, regenerated and reopened the PDF, and blocked the stale export. Undo and redo kept or cleared the hole. Add hole, Remove hole, and the studio holes field worked. Machine release stayed unavailable. |
+
+Known gaps and next action:
+
+- ED21, S02, G02, and Q10 stay `NOT_RUN`. This increment does not accept those rows.
+- Touching, overlapping, and nested holes are rejected. General clipping and offsets are not implemented.
+- `scripts/check-twinlab-m1.sh` was not re-run. The port 4173 studio is the older binary.
+- Safari, Firefox, a screen reader, physical print or scan, and a physical stitch-out were not done. WASM remains blocked.
+
+Release-ready claim: no. One edited, exported, and replayed fill with a hole passed the local checks above. Physical qualification and register acceptance remain open.
+
+## Alpine Club studio shell, 11 October 2026
+
+Delivery/build or commit: uncommitted tree on `4ea98f9ad29c18351a9b6b47257fc654f2acce94`. Not committed and not pushed. The studio binary was not rebuilt for the shell polish. SHA-256 `3d22d89ff13b7e3edd8a051d0d4835fdd20b4f73f78bd3cf100339987c4d6845`. Static files are read per request on `http://127.0.0.1:4176/`.
+Environment and URL: macOS, Chrome, loopback only. TwinLab remains `http://127.0.0.1:4175/`. The studio on port 4173 was not restarted.
+Scope and classification: local development UI. The Alpine Club window, the operational views, and links to the existing TwinLab and Compare pages. Stitches still come from the Rust engine. No public release. Baseline 0.3 acceptance stays 0/210. Workbook SHA-256 `d1cd2147c9a282d36a9e0ff6fc812bf9f5a775bb2bac6cf92360c7f82ca32128` and both coverage JSON files SHA-256 `829295f1095ff5080b454e6b2a8a0893da531d300ad07e790e7383caac687db6` are unchanged.
+Viewports and browser: Chrome at 1440×1000, 768×1024, and 390×844. Safari, Firefox, and a screen reader were not used.
+
+Commands and evidence paths:
+
+- `tests/studio/shell_browser.py` against port 4176 — passed. Initial plan 4701 needle-down stitches and 301 jumps. Nominal time shown as 7.23 min, which is 4701 ÷ 650. The run opened every operational view, changed row spacing, regenerated, switched Artwork, Stitches, Travel, and Density, zoomed to 125% and back, explored a local proposal, and recorded a geometry review. Screenshots: `evidence/m2-g1/alpine-studio.png`, `alpine-studio-tablet.png`, `alpine-studio-mobile.png`, plus the approvals shots `alpine-desktop.png`, `alpine-tablet.png`, `alpine-mobile.png`.
+- A follow-up Chrome load after the colour-name and assistant-height adjustment confirmed 4701 stitches, 301 travel moves, 7.23 min, the Forest colour name, and both assistant buttons inside the 1440×1000 viewport. Page errors and console errors were empty. The full shell script was not repeated after that adjustment.
+- `tests/studio/hole_browser.py` against the same shell — passed. Club-mark hole DST SHA-256 `cb74dd0aaf96dc97c4296a2e34602d47d8ef72af67d94bcbb1f7c2325c848737`, 851 bytes. The touching hole was rejected and the plan was not changed.
+- `node --check web/studio.js` — exit 0. `web/studio.js` 46118 bytes. `web/studio.css` 10692 bytes. Local budget remains 80 KB of script and 40 KB of CSS.
+- `GET /favicon.svg` returned 200 `image/svg+xml`. `GET /missing-alpine-page` returned 404, title `Page not found — EmbroideryOS`, with the link “Back to the design studio”. The browser did not click that link in this review.
+- `scripts/check-twinlab-m1.sh` was not re-run. WASM remains blocked: `wasm32-unknown-unknown` is not installed.
+
+| Check | Result | Evidence or concrete reason |
+|---|---|---|
+| Q01 Production domain | N/A | Loopback only. No domain was configured. |
+| Q02 Page titles | PASS | Source title stays `EmbroideryOS — Design studio`. The live title becomes `Alpine Club — EmbroideryOS`. The visible h1 is the project name. Unknown routes use `Page not found — EmbroideryOS`. |
+| Q03 Meta descriptions | PASS | The studio page is `noindex`. The description does not include a design name, reviewer, or hash. |
+| Q04 Favicon and icons | PASS | `GET /favicon.svg` returned 200 `image/svg+xml`. |
+| Q05 Open Graph image | N/A | Not a public shareable page. |
+| Q06 Canonical URLs | N/A | No indexable production origin. |
+| Q07 Social previews | N/A | No public social card. |
+| Q08 Custom 404 | PASS | `GET /missing-alpine-page` returned 404 and a branded page with “Back to the design studio”. The browser did not click that link in this review. |
+| Q09 Loading states | PASS | Generate sets the button label to “Generating stitches…” and `aria-busy` until the Rust plan returns. The shell test waited until Geometry checked and the button was enabled again. A separately delayed network fault was not injected. |
+| Q10 Error messages | PASS | A hole on the outer boundary told the user to move it inside and generate again, and said the plan was not changed. An ungenerated edit sets the revision line to “Edits are not generated yet” and disables export. |
+| Q11 Heading structure | PASS | One h1, the project name. Each operational view has one visible h2: Overview, Design library, Objects, Validation, Approvals, Production, Materials, Insights, Settings. |
+| Q12 Alternative text | PASS | The stitch preview has a title and a description. Undo, redo, zoom, add object, and play have accessible names. Display colour chips sit beside the object name. |
+| Q13 Sitemap and indexing | PASS | `noindex` remains set. No sitemap was added. |
+| Q14 Console errors | PASS | The shell run and the follow-up load recorded no page errors and no console errors. The hole run’s only console error was the rejected-hole response. |
+| Q15 Debug output | PASS | `web/studio.js` has no `console.log` or `console.debug`, and none of the forbidden generator strings. |
+| Q16 Source maps | PASS | No new `.map` files and no `sourceMappingURL` were added. Nothing was published. |
+| Q17 JavaScript and performance | PASS | Studio script 46118 bytes and CSS 10692 bytes, inside the local 80 KB / 40 KB budget. A frame-time percentile was not measured. |
+| Q18 Mobile layout | PASS | At 390 px the studio document did not overflow horizontally, and Generate stayed enabled. Tablet 768 and desktop 1440 show the same Alpine project. The narrow layout stacks the rail, objects, canvas, and inspector. |
+| Q19 Consistent spacing | PASS | The shell uses the existing surface, radius, type, and blue primary action. The inspected desktop window keeps the object list, artboard, summary, and assistant in one view. |
+| Q20 Working controls and links | PASS | Chrome generated the Rust plan, edited row spacing, regenerated, switched the four preview modes, zoomed, explored a proposal, opened every operational view, and recorded a geometry review. The hole flow edited, undid, redid, and rejected a hole. TwinLab and Compare are linked. Machine release stayed unavailable. Arrow-key nudge was not driven from the browser in this pass. |
+
+Known gaps and next action:
+
+- The pictured 10,481 stitches and 16.12 minutes are not the engine result. This design is 4701 needle-down stitches, 301 jumps, and 7.23 nominal minutes.
+- The 160 × 160 mm hoop does not fit Compare’s `generic-flat-120-v1`. Studio rehearsal uses the project hoop. Neither path releases a machine.
+- Display colours are not thread brands and are not stored in DST. Physical validation was not performed. The digitising assistant is local rules only.
+- Artwork draws the regions with the Rust plan faintly over them. It is not a fabric simulation. Stitch-level sculpting is not implemented.
+- Keyboard nudge, Safari, Firefox, a screen reader, and a physical stitch-out were not done. `scripts/check-twinlab-m1.sh` was not re-run. WASM remains blocked.
+- Register rows stay `NOT_RUN`. This window does not accept them.
+
+Release-ready claim: no. The Alpine Club window and the operational views are wired to the existing Rust studio. Machine release, physical validation, and baseline 0.3 acceptance remain open.
+
+## EmbroideryOS logo, 11 October 2026
+
+The needle mark from the supplied icon is the favicon and the product mark. The studio rail, the studio TwinLab header, and the Compare header at `http://127.0.0.1:4175/` show that mark with the EmbroideryOS name. Compare also shows the line “Stitch a brighter tomorrow”. Both favicon requests returned 200 `image/svg+xml`. Chrome showed the mark at 1440 and 390 on the studio, and at 1440 on Compare and studio TwinLab. The studio page at 390 did not overflow horizontally. No server was rebuilt. The 404 page body was not changed; its tab icon uses the new favicon file. Release-ready claim: no.
+
+## Collapsible sidebar, 11 October 2026
+
+The design studio sidebar has Hide sidebar in the rail and a show control in the page header. The choice is stored as `embroideryos.rail`. Chrome hid and restored the rail at 1440 px, then in dark mode at 390 px. The collapsed 390 px page did not overflow horizontally. Enter on Hide sidebar collapsed it, and Overview and Settings still opened after it was shown again. Page errors and console errors were empty. Release-ready claim: no.
+
+## Design prompt, 11 October 2026
+
+The studio page has a design prompt. It accepts typed text, pasted text, a JPEG or PNG upload, and voice input. Voice uses the browser speech API and writes text into the prompt. Audio is not sent. Propose design posts to `/api/propose`. The studio process calls the xAI responses API, model `grok-4.7`, only when `XAI_API_KEY` is set, and only for region geometry. Rust `parse_project` checks that geometry. The route does not generate stitches. Apply geometry is a separate edit. Apply and generate is a separate control. A missing key, an empty prompt, or Discard leaves the open design unchanged.
+
+| ID | Result | Evidence |
+|---|---|---|
+| Q01, Q05, Q06, Q07, Q13 | N/A | Private loopback studio. No public origin was invented or published. |
+| Q02 | PASS | Document title remains product-specific. The view heading stays the project name. |
+| Q03 | PASS | The local description says a geometry proposal is optional and that the service does not release machine files. |
+| Q04 | N/A | Favicon was not changed in this pass. |
+| Q08 | N/A | No new document route. Unknown pages still use the branded 404. |
+| Q09 | PASS | Propose design changes to “Proposing…” and sets `aria-busy` while the request is open. |
+| Q10 | PASS | Empty prompt and a missing key both say what failed and that the design was not changed. The key value is not shown. |
+| Q11 | PASS | The page keeps one project heading. The prompt is a labelled field, not a second `h1`. |
+| Q12 | PASS | The logo remains decorative. The attached reference image has alternative text. Upload image, Voice, and Remove image have visible names. |
+| Q14 | PASS | Chrome page errors were empty. Chrome logged the expected 422 when the key was missing. No other console error was recorded. |
+| Q15 | PASS | `web/studio.js` has no `console.log` or `console.debug`. The studio workflow test also rejects generator strings. |
+| Q16 | N/A | No release artifact or source map was published. |
+| Q17 | PASS | `web/studio.js` 56718 bytes, `web/studio.css` 12289 bytes. Local budget remains 80 KB of script and 40 KB of CSS. |
+| Q18 | PASS | The prompt flow ran at 1440. Chrome at 1440, 768, 390, and 360 did not overflow horizontally. Dark mode was inspected at 390. The propose click was not repeated at 768 or 360. |
+| Q19 | PASS | The prompt uses the existing surface, line, radius, and control height. |
+| Q20 | PASS | Empty propose, image attach, voice, discard, and the missing-key propose were exercised. Apply stays unavailable until a proposal exists. |
+
+`pytest python/tests/test_geometry_proposal.py` — 8 passed. Extra stitch fields, motif, a point outside the hoop, and a missing key are rejected without a network call. `cargo test -p embroidery-studio --offline` — 8 passed. `cargo clippy -p embroidery-studio --offline --all-targets -- -D warnings` passed. `node --check web/studio.js` passed. A normalized square fill generates in Rust and `machine_release_allowed` stays false.
+
+Chrome at `http://127.0.0.1:4176/` kept the title Alpine Club and the stitch count 4701 after an empty prompt and after a prompt with an attached JPEG. The studio process has no `XAI_API_KEY`, so a live model call was not run. Headless Chrome has no microphone; the voice control reported that audio is not sent. Safari, Firefox, and a physical microphone were not tested. Screenshots: `evidence/m2-g1/prompt-desktop.png`, `prompt-mobile.png`, `prompt-mobile-dark.png`.
+
+Register rows stay `NOT_RUN`. This prompt does not accept them. Release-ready claim: no.

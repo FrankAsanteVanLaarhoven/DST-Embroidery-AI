@@ -1,0 +1,65 @@
+{
+  "name": "reject-overlapping-holes",
+  "expect": "reject",
+  "outer": [
+    {
+      "x": 0,
+      "y": 0
+    },
+    {
+      "x": 20,
+      "y": 0
+    },
+    {
+      "x": 20,
+      "y": 20
+    },
+    {
+      "x": 0,
+      "y": 20
+    }
+  ],
+  "holes": [
+    [
+      {
+        "x": 4,
+        "y": 4
+      },
+      {
+        "x": 12,
+        "y": 4
+      },
+      {
+        "x": 12,
+        "y": 12
+      },
+      {
+        "x": 4,
+        "y": 12
+      }
+    ],
+    [
+      {
+        "x": 8,
+        "y": 8
+      },
+      {
+        "x": 16,
+        "y": 8
+      },
+      {
+        "x": 16,
+        "y": 16
+      },
+      {
+        "x": 8,
+        "y": 16
+      }
+    ]
+  ],
+  "angle_degrees": 0,
+  "row_spacing_mm": 2,
+  "max_stitch_length_mm": 5,
+  "underlay_spacing_mm": 0,
+  "reject_contains": "overlaps"
+}

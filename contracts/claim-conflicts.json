@@ -1,0 +1,47 @@
+{
+  "schema": "embroideryos-claim-conflicts/0.3",
+  "conflicts": [
+    {
+      "id": "CF01",
+      "topic": "Fonts",
+      "supplied_variants": "100 built-in fonts\n130 fonts with filter and mapping\nHundreds of built-in fonts",
+      "resolution": "Unresolved category/version ambiguity. Vendor regional page itself contains all three. Publish our actual inventory with scope; do not sum or silently pick.",
+      "sources": "U1, B1"
+    },
+    {
+      "id": "CF02",
+      "topic": "OS baseline",
+      "supplied_variants": "Windows 11/10/8.1/7 headline\nWindows 7/8.1/10 in minimum-PC table",
+      "resolution": "Retain both source scopes; neither constitutes platform support evidence.",
+      "sources": "U1, B1"
+    },
+    {
+      "id": "CF03",
+      "topic": "Hardware baselines",
+      "supplied_variants": "Earlier 1.5 GHz / 800 MB / 1-4 GB RAM\nCurrent 1 GHz / 300 MB / 512 MB minimum, 1 GB recommended",
+      "resolution": "Separate acceptance profiles; gateway-assisted is not direct native parity.",
+      "sources": "U1, L02"
+    },
+    {
+      "id": "CF04",
+      "topic": "Unattributed product fragment",
+      "supplied_variants": "M Focuses on approachable digitising ... bitmap/vector ... sequencing",
+      "resolution": "Functional requirement retained; product identity not established.",
+      "sources": "U1"
+    },
+    {
+      "id": "CF05",
+      "topic": "Hoop and file versions",
+      "supplied_variants": "360 x 360 / 272 x 408 in supplied table\nLater official update lists another frame and PES revision",
+      "resolution": "Do not overwrite supplied envelopes; keep model/file-version-specific records.",
+      "sources": "U1, B1, B7"
+    },
+    {
+      "id": "CF06",
+      "topic": "Stitch Stimulation",
+      "supplied_variants": "Stitch Stimulation: Yes",
+      "resolution": "Source spelling retained as alias; interpreted as playback for requirements, not calibrated physical simulation.",
+      "sources": "U1, B1"
+    }
+  ]
+}

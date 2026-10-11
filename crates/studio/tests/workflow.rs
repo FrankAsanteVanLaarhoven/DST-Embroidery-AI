@@ -84,6 +84,29 @@ fn club_mark_changes_colour_and_http_round_trips() {
 }
 
 #[test]
+fn library_lists_alpine_and_refuses_other_paths() {
+    let listed = route("GET", "/api/library", b"");
+    assert_eq!(listed.status, 200);
+    let listed = String::from_utf8(listed.body).unwrap();
+    assert!(listed.contains("13_alpine_club.json"));
+    assert!(listed.contains("Alpine Club"));
+    let opened = route("GET", "/api/projects/13_alpine_club.json", b"");
+    assert_eq!(opened.status, 200);
+    let opened = String::from_utf8(opened.body).unwrap();
+    assert!(
+        opened.contains("\"name\": \"Alpine Club\"") || opened.contains("\"name\":\"Alpine Club\"")
+    );
+    for blocked in [
+        "/api/projects/../Cargo.toml",
+        "/api/projects/..%2FCargo.toml",
+        "/api/projects/not-a-design.json",
+    ] {
+        let response = route("GET", blocked, b"");
+        assert_eq!(response.status, 404, "{blocked}");
+    }
+}
+
+#[test]
 fn unknown_page_is_a_branded_404() {
     let response = route("GET", "/missing", b"");
     assert_eq!(response.status, 404);
@@ -95,6 +118,44 @@ fn unknown_page_is_a_branded_404() {
     let home = String::from_utf8(home.body).unwrap();
     assert!(home.contains("Design studio"));
     assert!(home.contains("EmbroideryOS"));
+}
+
+#[test]
+fn a_geometry_proposal_shape_generates_without_release() {
+    let text = r#"{"format":"embroidery-project","format_version":"1","name":"Trial square","hoop_width_mm":80.0,"hoop_height_mm":80.0,"objects":[{"object_id":1,"label":"Field","kind":"fill","points":[{"x":10.0,"y":10.0},{"x":60.0,"y":10.0},{"x":60.0,"y":60.0},{"x":10.0,"y":60.0}],"angle_degrees":15.0,"density_mm":1.2,"column_width_mm":2.0,"max_stitch_mm":3.0,"underlay_spacing_mm":0.0,"underlay":[],"pull_compensation_mm":0.0,"color_index":0}],"review":null}"#;
+    let project = parse_project(text).unwrap();
+    assert!(project.review.is_none());
+    let generation = generate_project(&project).unwrap();
+    assert!(
+        generation.validation.ok(),
+        "{}",
+        generation.validation.errors.join("; ")
+    );
+    assert!(!generation.readiness.machine_release_allowed);
+    assert!(generation.plan.sewing_stitch_count() > 0);
+}
+
+#[test]
+fn an_empty_proposal_does_not_call_the_model() {
+    let response = route(
+        "POST",
+        "/api/propose",
+        br#"{"prompt":"   ","image_data_url":""}"#,
+    );
+    assert_eq!(response.status, 400);
+    let body = String::from_utf8(response.body).unwrap();
+    assert!(body.contains("The design was not changed"));
+    assert!(!body.contains("dst_hex"));
+    assert!(!body.contains("stitches"));
+
+    let image = route(
+        "POST",
+        "/api/propose",
+        br#"{"prompt":"a badge","image_data_url":"data:image/gif;base64,AAAA"}"#,
+    );
+    assert_eq!(image.status, 400);
+    let image = String::from_utf8(image.body).unwrap();
+    assert!(image.contains("JPEG or PNG"));
 }
 
 #[test]

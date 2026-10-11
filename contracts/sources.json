@@ -1,0 +1,159 @@
+{
+  "schema": "embroideryos-sources/0.3",
+  "sources": [
+    {
+      "id": "U1",
+      "title": "User-supplied feature list, current conversation, 11 October 2026",
+      "source_type": "user_supplied",
+      "url": "",
+      "interpretation": "Primary feature baseline; repeated mentions become aliases; mixed font totals and unlabelled product fragments retained."
+    },
+    {
+      "id": "U2",
+      "title": "User screenshot: Brother Creative Blog and Artspira",
+      "source_type": "user_supplied",
+      "url": "",
+      "interpretation": "Inspiration, tutorials, projects, mobile drawing, monthly content, compatible-machine wireless transfer."
+    },
+    {
+      "id": "L02",
+      "title": "EmbroideryOS Compatibility Compare 0.2 attachment",
+      "source_type": "prior_artifact",
+      "url": "",
+      "interpretation": "54 inherited records preserved byte-for-byte in inherited/compatibility-coverage-0.2.json; requirements, not device qualification."
+    },
+    {
+      "id": "M1",
+      "title": "EmbroideryOS TwinLab M1 validation attachment",
+      "source_type": "prior_artifact",
+      "url": "",
+      "interpretation": "Candidate; fixture checks reported; native integration and full served-origin browser gate not passed."
+    },
+    {
+      "id": "R1",
+      "title": "DST-Embroidery-AI engine documentation at inspected commit",
+      "source_type": "repository",
+      "url": "https://github.com/FrankAsanteVanLaarhoven/DST-Embroidery-AI/blob/98303601416a3b0d68eae37e939031732bd77c45/docs/engine.md",
+      "interpretation": "Running, constrained satin, single-ring fill; no motif/applique generator, clipping/holes, segmentation agent or other exporters."
+    },
+    {
+      "id": "B1",
+      "title": "Brother PE-Design 11 UK product page",
+      "source_type": "vendor_documentation",
+      "url": "https://sewingcraft.brother.eu/en/products/machines/pe-design-software/pe-design-11",
+      "interpretation": "Vendor-reported specifications, not an independent benchmark; page has 100/130/hundreds font wording."
+    },
+    {
+      "id": "B2",
+      "title": "Brother PE-Design 11 manual: setting the sew type",
+      "source_type": "vendor_documentation",
+      "url": "https://support.brother.com/g/s/hf/htmldoc/ped/im/ped11/en/PED11_EN/pages/04_2106044.html",
+      "interpretation": "9 line groups and 14 named region families; the manual groups concentric/radial/spiral together."
+    },
+    {
+      "id": "B3",
+      "title": "Brother manual: Basic Stitch Design Factory Operations",
+      "source_type": "vendor_documentation",
+      "url": "https://support.brother.com/g/s/hf/htmldoc/ped/im/ped11/en/PED11.2_EN/pages/14_1207549.html",
+      "interpretation": "Decorative sewing stitch editor; expressly not an embroidery-pattern creator."
+    },
+    {
+      "id": "B4",
+      "title": "Brother manual: Sending a pattern to CanvasWorkspace",
+      "source_type": "vendor_documentation",
+      "url": "https://support.brother.com/g/s/hf/htmldoc/ped/im/ped11/en/PED11_EN/pages/09_1806110.html",
+      "interpretation": "FCM is cutting data; route has size/object limits. Does not establish third-party API availability."
+    },
+    {
+      "id": "B5",
+      "title": "Brother Artspira current regional page",
+      "source_type": "vendor_documentation",
+      "url": "https://sewingcraft.brother.eu/en/artspira",
+      "interpretation": "Mobile app, content tiers and compatible machines; capabilities vary by region/version/plan."
+    },
+    {
+      "id": "B6",
+      "title": "Brother PE-Design 11 new features",
+      "source_type": "vendor_documentation",
+      "url": "https://support.brother.com/g/s/hf/ped_info/ped11/new_features/en/ped11_newfeatures.html",
+      "interpretation": "Quilting, font mapping, photo stitch, array copies and decorative sewing workflow."
+    },
+    {
+      "id": "B7",
+      "title": "Brother PE-Design 11 update history",
+      "source_type": "vendor_documentation",
+      "url": "https://support.brother.com/g/s/hf/ped_info/ped11/one_click_update/en/ped11update_info.html",
+      "interpretation": "Version-specific hoops/PES revisions, Wireless Link and PMP compatibility; not universal machine support."
+    },
+    {
+      "id": "B8",
+      "title": "Brother manual: setting text attributes",
+      "source_type": "vendor_documentation",
+      "url": "https://support.brother.com/g/s/hf/htmldoc/ped/im/ped11/en/PED11.2_EN/pages/05_1810676.html",
+      "interpretation": "Built-in/custom/TrueType distinction; minimum sizes; conversion caveats."
+    },
+    {
+      "id": "B9",
+      "title": "Brother manual: line sewing attributes",
+      "source_type": "vendor_documentation",
+      "url": "https://support.brother.com/g/s/hf/htmldoc/ped/im/ped11/en/PED11_EN/pages/16_1293378.html",
+      "interpretation": "Chain decorative pattern and cutwork settings; does not equate chain appearance with a chain-stitch mechanism."
+    },
+    {
+      "id": "B10",
+      "title": "Brother creative inspiration page",
+      "source_type": "vendor_documentation",
+      "url": "https://sewingcraft.brother.eu/en/inspiration-and-events",
+      "interpretation": "Matches screenshot: projects, tutorials and compatible-machine Artspira workflows."
+    },
+    {
+      "id": "E1",
+      "title": "Embird official site",
+      "source_type": "vendor_documentation",
+      "url": "https://www.embird.net/",
+      "interpretation": "Reports more than 70 formats and over 20 machine brands; individual read/write/versions require scrutiny."
+    },
+    {
+      "id": "N1",
+      "title": "BERNINA V9 product levels",
+      "source_type": "vendor_documentation",
+      "url": "https://softwarehelp.bernina.com/en/MainHelp/PART_Release/introduction/introduction-2.htm",
+      "interpretation": "Creator and DesignerPlus are product levels; DesignerPlus includes Cross Stitch and Quilter. Do not treat capabilities as identical."
+    },
+    {
+      "id": "W1",
+      "title": "WilcomWorkspace Truesizer",
+      "source_type": "vendor_documentation",
+      "url": "https://wilcom.com/workspace/truesizer",
+      "interpretation": "Browser view, resize/recalculate, recolour, export and worksheets; not evidence of every desktop digitising feature in the browser."
+    },
+    {
+      "id": "W2",
+      "title": "WilcomWorkspace suite",
+      "source_type": "vendor_documentation",
+      "url": "https://wilcom.com/workspace",
+      "interpretation": "Cloud design management and team workflows; do not assume full CAD or digital-twin parity."
+    },
+    {
+      "id": "W3",
+      "title": "Wilcom EmbroideryStudio 2026",
+      "source_type": "vendor_documentation",
+      "url": "https://wilcom.com/embroiderystudio",
+      "interpretation": "Separate desktop product/version from Workspace."
+    },
+    {
+      "id": "I1",
+      "title": "ISO 23247-1:2021 public catalogue",
+      "source_type": "standards_catalogue",
+      "url": "https://www.iso.org/standard/75066.html",
+      "interpretation": "Framework relevance only; no clause audit, certification, or ISO endorsement of this project."
+    },
+    {
+      "id": "P1",
+      "title": "Proposed EmbroideryOS extension",
+      "source_type": "proposal",
+      "url": "",
+      "interpretation": "Engineering targets and acceptance designs, not measured outcomes or vendor claims."
+    }
+  ]
+}

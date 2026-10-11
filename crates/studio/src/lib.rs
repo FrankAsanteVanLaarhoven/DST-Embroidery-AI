@@ -7,6 +7,8 @@
 use std::io::Cursor;
 use std::path::PathBuf;
 
+mod propose;
+
 use embroidery_core::{parse_project, stamp_geometry_review};
 use embroidery_dst::read_dst;
 use embroidery_ffi::{capabilities_json, generate_project_json};
@@ -67,7 +69,12 @@ pub fn route(method: &str, path: &str, body: &[u8]) -> HttpResponse {
         ("GET", "/twinlab.js") => file_response("text/javascript; charset=utf-8", "twinlab.js"),
         ("GET", "/api/capabilities") => json_ok(capabilities_json().into_bytes()),
         ("GET", "/api/sample") => sample_response(),
+        ("GET", "/api/library") => library_response(),
+        ("GET", path) if path.starts_with("/api/projects/") => {
+            project_file_response(&path["/api/projects/".len()..])
+        }
         ("POST", "/api/generate") => generate_response(body),
+        ("POST", "/api/propose") => propose::response(body),
         ("POST", "/api/review") => review_response(body),
         ("POST", "/api/rehearse") => rehearse_response(body),
         ("POST", "/api/verify") => verify_response(body),
@@ -204,6 +211,86 @@ fn verify_response(body: &[u8]) -> HttpResponse {
     )
 }
 
+fn library_entries() -> Result<Vec<String>, String> {
+    let bytes = std::fs::read(repo_root().join("fixtures/projects/manifest.json")).map_err(|_| {
+        "The design library manifest is missing. Restore fixtures/projects/manifest.json and open the library again."
+            .to_string()
+    })?;
+    let entries: Vec<serde_json::Value> = serde_json::from_slice(&bytes).map_err(|_| {
+        "The design library manifest is not readable. Restore fixtures/projects/manifest.json and open the library again."
+            .to_string()
+    })?;
+    Ok(entries
+        .iter()
+        .filter_map(|entry| {
+            entry
+                .get("file")
+                .and_then(|file| file.as_str())
+                .map(str::to_string)
+        })
+        .collect())
+}
+
+fn library_response() -> HttpResponse {
+    let entries = match library_entries() {
+        Ok(entries) => entries,
+        Err(message) => return json_error(500, &message),
+    };
+    let mut items = Vec::new();
+    for file in entries {
+        let path = repo_root().join("fixtures/projects").join(&file);
+        let Ok(bytes) = std::fs::read(&path) else {
+            continue;
+        };
+        let Ok(value) = serde_json::from_slice::<serde_json::Value>(&bytes) else {
+            continue;
+        };
+        let objects = value
+            .get("objects")
+            .and_then(|item| item.as_array())
+            .cloned()
+            .unwrap_or_default();
+        let kinds: Vec<&str> = objects
+            .iter()
+            .filter_map(|object| object.get("kind").and_then(|kind| kind.as_str()))
+            .collect();
+        items.push(json!({
+            "file": file,
+            "name": value.get("name").and_then(|item| item.as_str()).unwrap_or("Untitled"),
+            "hoop_width_mm": value.get("hoop_width_mm").and_then(|item| item.as_f64()).unwrap_or(0.0),
+            "hoop_height_mm": value.get("hoop_height_mm").and_then(|item| item.as_f64()).unwrap_or(0.0),
+            "objects": objects.len(),
+            "kinds": kinds,
+        }));
+    }
+    json_ok(json!(items).to_string().into_bytes())
+}
+
+fn project_file_response(file: &str) -> HttpResponse {
+    let entries = match library_entries() {
+        Ok(entries) => entries,
+        Err(message) => return json_error(500, &message),
+    };
+    let allowed = !file.is_empty()
+        && !file.contains('/')
+        && !file.contains('\\')
+        && !file.contains("..")
+        && entries.iter().any(|entry| entry == file);
+    if !allowed {
+        return json_error(
+            404,
+            "That project is not in the local library. Choose a listed design and open it again.",
+        );
+    }
+    match std::fs::read(repo_root().join("fixtures/projects").join(file)) {
+        Ok(bytes) => json_ok(bytes),
+        Err(_) => json_error(
+            500,
+            "That library project is missing from fixtures/projects. Restore the file and open it again.",
+        ),
+    }
+}
+
 fn sample_response() -> HttpResponse {
     match std::fs::read(repo_root().join("fixtures/projects/08_club_mark.json")) {
         Ok(bytes) => json_ok(bytes),
@@ -312,7 +399,7 @@ pub fn encode(response: HttpResponse) -> Vec<u8> {
     out
 }
 
-fn json_ok(body: Vec<u8>) -> HttpResponse {
+pub(crate) fn json_ok(body: Vec<u8>) -> HttpResponse {
     HttpResponse {
         status: 200,
         content_type: "application/json; charset=utf-8",
@@ -320,7 +407,7 @@ fn json_ok(body: Vec<u8>) -> HttpResponse {
     }
 }
 
-fn json_error(status: u16, message: &str) -> HttpResponse {
+pub(crate) fn json_error(status: u16, message: &str) -> HttpResponse {
     HttpResponse {
         status,
         content_type: "application/json; charset=utf-8",

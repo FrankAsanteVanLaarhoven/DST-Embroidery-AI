@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "name": "Square hole",
+  "revision": 1,
+  "objects": [
+    {
+      "id": 1,
+      "label": "Frame",
+      "kind": "fill",
+      "points": [
+        {
+          "x": -20,
+          "y": -20
+        },
+        {
+          "x": 20,
+          "y": -20
+        },
+        {
+          "x": 20,
+          "y": 20
+        },
+        {
+          "x": -20,
+          "y": 20
+        }
+      ],
+      "holes": [
+        [
+          {
+            "x": -6,
+            "y": -6
+          },
+          {
+            "x": 6,
+            "y": -6
+          },
+          {
+            "x": 6,
+            "y": 6
+          },
+          {
+            "x": -6,
+            "y": 6
+          }
+        ]
+      ],
+      "rgb": [
+        53,
+        106,
+        210
+      ],
+      "spacing_mm": 2.0,
+      "angle_degrees": 0,
+      "max_stitch_mm": 4.0,
+      "width_mm": 3.0,
+      "compensation_mm": 0,
+      "underlay_mm": 2.0
+    }
+  ]
+}

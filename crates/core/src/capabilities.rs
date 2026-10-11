@@ -80,7 +80,7 @@ pub fn capability_manifest() -> &'static [Capability] {
         Capability {
             id: "fill",
             status: CapabilityStatus::Available,
-            detail: "Scanline fill of one outline without holes. Optional perpendicular_run underlay.",
+            detail: "Scanline fill of one simple outer ring and at most 32 simple holes. Holes must sit strictly inside, without touching, overlapping, or nesting. Perpendicular underlay uses the same region. This is not general Boolean clipping or an offset.",
         },
         Capability {
             id: "motif",

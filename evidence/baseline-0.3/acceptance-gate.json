@@ -1,0 +1,9 @@
+{
+  "schema": "embroideryos-acceptance-gate/0.3",
+  "result": "FAIL",
+  "findings": [
+    "0 of 210 rows have accepted evidence"
+  ],
+  "authenticates_evidence": false,
+  "machine_release_allowed": false
+}

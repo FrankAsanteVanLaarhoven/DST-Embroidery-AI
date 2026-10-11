@@ -1,0 +1,54 @@
+{
+  "name": "closed-duplicate-endpoint",
+  "expect": "ok",
+  "outer": [
+    {
+      "x": 0,
+      "y": 0
+    },
+    {
+      "x": 20,
+      "y": 0
+    },
+    {
+      "x": 20,
+      "y": 20
+    },
+    {
+      "x": 0,
+      "y": 20
+    },
+    {
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "holes": [
+    [
+      {
+        "x": 6,
+        "y": 6
+      },
+      {
+        "x": 14,
+        "y": 6
+      },
+      {
+        "x": 14,
+        "y": 14
+      },
+      {
+        "x": 6,
+        "y": 14
+      },
+      {
+        "x": 6,
+        "y": 6
+      }
+    ]
+  ],
+  "angle_degrees": 0,
+  "row_spacing_mm": 2,
+  "max_stitch_length_mm": 5,
+  "underlay_spacing_mm": 0
+}

@@ -1,0 +1,20 @@
+{
+  "before_sha": "cc939bc4355bef786ebfbdb88b1de34df224d2c89cce527abec4a3475f0d5ada",
+  "after_sha": "c895401797b8ce29c217a75b5d808e530505594422ed70fbea4dad4b0269998e",
+  "download_sha": "c895401797b8ce29c217a75b5d808e530505594422ed70fbea4dad4b0269998e",
+  "download_matches": true,
+  "bytes": 11324,
+  "spacing": 1.4,
+  "revision": 2,
+  "needle_placements": 3509,
+  "records": 3604,
+  "mode": "native-rust",
+  "renderer": "webgl",
+  "views_agree_at_end": true,
+  "mobile_no_overflow": true,
+  "missing_status": 404,
+  "missing_title": "Page not found \u2014 EmbroideryOS",
+  "console": [
+    "error: Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ]
+}

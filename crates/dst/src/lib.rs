@@ -14,7 +14,8 @@ mod read;
 mod ternary;
 
 pub use compile::{
-    compile_dst, compile_to_vec, write_dst, write_dst_vec, write_dst_with, WriteOptions,
+    compile_dst, compile_to_vec, compile_to_vec_with_links, write_dst, write_dst_vec,
+    write_dst_with, ExportLink, WriteOptions,
 };
 pub use read::{read_dst, read_dst_with, ReadOptions};
 pub use ternary::{decode_record, encode_record, DecodedRecord, RecordCommand};

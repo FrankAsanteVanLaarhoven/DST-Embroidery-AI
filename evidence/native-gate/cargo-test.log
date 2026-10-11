@@ -1,0 +1,192 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running unittests src/lib.rs (target/debug/deps/embroidery_core-cb3161a744bbe7a8)
+
+running 23 tests
+test generators::running::tests::failure_does_not_append ... ok
+test generators::fill::tests::open_duplicate_endpoint_is_accepted ... ok
+test generators::running::tests::splits_a_long_span_and_keeps_the_bend ... ok
+test generators::fill::tests::horizontal_fill_covers_inset_rows_and_alternates ... ok
+test generators::fill::tests::notch_is_left_unfilled ... ok
+test generators::satin::tests::straight_column_alternates_and_stays_inside_the_width ... ok
+test geometry::tests::offset_of_a_horizontal_line_is_vertical ... ok
+test generators::satin::tests::underlay_is_sewn_before_the_column ... ok
+test generators::satin::tests::a_column_wider_than_one_dst_record_is_rejected_without_writing ... ok
+test geometry::tests::resample_drops_zero_length_duplicates ... ok
+test geometry::tests::resample_keeps_short_spans_and_splits_long_ones ... ok
+test geometry::tests::sample_includes_endpoints_and_unit_normals ... ok
+test model::tests::empty_plan_has_no_bounds ... ok
+test model::tests::half_even_matches_python_round ... ok
+test model::tests::bounds_cover_both_ends ... ok
+test model::tests::out_of_range_coordinate_explains_the_limit ... ok
+test sha256::tests::empty_and_abc_match_the_standard_vectors ... ok
+test validate::tests::rejects_empty_long_and_non_finite_stitches ... ok
+test validate::tests::warns_when_the_pen_would_have_to_jump ... ok
+test project::tests::motif_and_foreign_formats_are_rejected ... ok
+test project::tests::running_project_generates_and_does_not_release_a_machine ... ok
+test project::tests::review_text_does_not_change_the_revision ... ok
+test project::tests::a_parameter_edit_invalidates_the_geometry_review ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/embroidery_dst-6f732d63dc62c67a)
+
+running 16 tests
+test compile::tests::a_long_jump_is_split_without_changing_the_endpoint ... ok
+test compile::tests::color_change_matches_captured_pyembroidery_file ... ok
+test compile::tests::extended_header_carries_a_thread_and_still_fits ... ok
+test compile::tests::square_matches_captured_pyembroidery_file ... ok
+test compile::tests::negative_y_matches_captured_pyembroidery_file ... ok
+test compile::tests::strict_compile_rejects_a_stitch_past_the_record_limit ... ok
+test compile::tests::trim_signature_matches_pyembroidery_body_and_counts_real_records ... ok
+test ternary::tests::captured_pyembroidery_vectors ... ok
+test read::tests::color_and_trim_roundtrip ... ok
+test ternary::tests::control_records_match_the_public_bit_patterns ... ok
+test read::tests::extended_thread_survives_a_roundtrip ... ok
+test read::tests::square_roundtrip_keeps_quantised_positions ... ok
+test read::tests::truncated_record_names_the_next_step ... ok
+test ternary::tests::full_scale_movement_is_not_classified_as_a_control_record ... ok
+test ternary::tests::oversize_delta_is_rejected ... ok
+test ternary::tests::every_legal_delta_roundtrips_for_stitch_and_jump ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/pyembroidery_oracle.rs (target/debug/deps/pyembroidery_oracle-8ae8c1181f977693)
+
+running 5 tests
+test square_fixture_matches_the_compiler ... ok
+test split_jump_matches_a_presplit_pyembroidery_pattern ... ok
+test pyembroidery_reads_our_square_back_to_the_same_counts ... ok
+test unsplit_files_match_dst_writer_byte_for_byte ... ok
+test ternary_matrix_matches_pyembroidery_encode_record ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running unittests src/lib.rs (target/debug/deps/embroidery_ffi-6c22113cd02422ab)
+
+running 4 tests
+test tests::version_is_readable ... ok
+test tests::c_api_compiles_and_rejects_bad_json ... ok
+test tests::c_api_validate_reports_an_empty_plan ... ok
+test tests::generate_project_exports_dst_and_rejects_motif ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/embroidery_motion-d16ddc74fdc9a7a1)
+
+running 10 tests
+test frame::tests::design_millimetres_map_onto_scene_metres ... ok
+test trace::tests::estimated_time_uses_the_declared_rates ... ok
+test frame::tests::travel_moves_the_hoop_with_the_needle_up ... ok
+test rehearse::tests::motif_is_rejected_before_a_trace_exists ... ok
+test trace::tests::rehearsal_uses_quantised_units_rather_than_the_source_point ... ok
+test frame::tests::penetration_holds_the_hoop_and_leaves_the_needle_on_axis ... ok
+test trace::tests::a_point_outside_the_hoop_is_a_kinematic_check ... ok
+test trace::tests::decoded_needle_points_match_the_file_and_keep_the_object ... ok
+test rehearse::tests::an_injected_thread_break_is_not_an_observation ... ok
+test rehearse::tests::club_mark_replay_follows_the_exported_bytes ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/embroidery_simulate-7d2b6db46e78cb95)
+
+running 3 tests
+test tests::a_normal_stitch_is_not_dense ... ok
+test tests::a_stitch_past_one_dst_record_is_an_error ... ok
+test tests::piled_stitches_are_flagged ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/embroidery_studio-4dc62e9721d6243c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/embroidery_studio-6ca8ae0f90d747ed)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/workflow.rs (target/debug/deps/workflow-17f4c5bae3a785f5)
+
+running 5 tests
+test unknown_page_is_a_branded_404 ... ok
+test the_browser_does_not_plan_stitches ... ok
+test club_mark_changes_colour_and_http_round_trips ... ok
+test twinlab_replays_the_compiled_dst ... ok
+test twelve_fixtures_cover_generation_and_dst_readback ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/lib.rs (target/debug/deps/embroidery_twin-511ec17fb1daeb8b)
+
+running 17 tests
+test tests::duplicate_object_ids_are_rejected ... ok
+test tests::empty_and_excessive_documents_are_rejected ... ok
+test tests::density_and_nonfinite_values_are_rejected ... ok
+test tests::out_of_hoop_geometry_is_rejected ... ok
+test tests::generated_satin_outside_hoop_is_rejected ... ok
+test tests::self_intersecting_fill_is_rejected ... ok
+test tests::raw_stitch_injection_is_rejected ... ok
+test tests::trim_signature_remains_three_jump_records ... ok
+test tests::unknown_profile_is_rejected ... ok
+test tests::truncated_or_extra_records_are_rejected ... ok
+test tests::unsupported_generator_is_rejected ... ok
+test tests::signed_axes_survive_the_codec ... ok
+test tests::colour_stops_and_object_spans_are_preserved ... ok
+test tests::spacing_changes_the_export ... ok
+test tests::all_three_generators_roundtrip_exact_export ... ok
+test tests::unchanged_design_is_byte_deterministic ... ok
+test tests::one_hundred_parameterised_export_cases ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+     Running unittests src/main.rs (target/debug/deps/embroidery_twin-0878ffcac4da9fc5)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests embroidery_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests embroidery_dst
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests embroidery_ffi
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests embroidery_motion
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests embroidery_simulate
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests embroidery_studio
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests embroidery_twin
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

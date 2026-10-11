@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "name": "Square",
+  "revision": 1,
+  "objects": [
+    {
+      "id": 1,
+      "label": "Golden codec square",
+      "kind": "running",
+      "points": [
+        {"x": 0, "y": 0},
+        {"x": 10, "y": 0},
+        {"x": 10, "y": 10},
+        {"x": 0, "y": 10}
+      ],
+      "rgb": [53, 106, 210],
+      "spacing_mm": 0.5,
+      "angle_degrees": 0,
+      "max_stitch_mm": 10,
+      "width_mm": 3,
+      "compensation_mm": 0,
+      "underlay_mm": 0
+    }
+  ]
+}

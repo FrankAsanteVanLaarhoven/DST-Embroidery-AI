@@ -1,0 +1,19 @@
+✔ real Rust returns the native protocol and positive needle placements (0.889167ms)
+✔ example exercises running, satin and fill objects (0.956916ms)
+✔ every replay event maps to the exact exported byte offset (2.25975ms)
+✔ repeated native generation is byte-deterministic (53.150291ms)
+✔ changed fill spacing changes the native export (47.021834ms)
+✔ RGB-only change updates binding even when standard DST bytes stay equal (64.864416ms)
+✔ native profile whitelist rejects unimplemented machine profiles (2.869458ms)
+✔ native hoop gate rejects unsupported geometry (2.414792ms)
+✔ native generator whitelist rejects unsupported stitch types (2.408542ms)
+✔ native input refuses raw-stitch injection (2.241209ms)
+✔ actual HTTP-to-Rust compile downloads the same buffer (92.19675ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 490.450333

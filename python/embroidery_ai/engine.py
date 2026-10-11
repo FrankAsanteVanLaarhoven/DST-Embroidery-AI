@@ -85,6 +85,35 @@ class Engine:
             )
         return report
 
+    def generate_project(self, project: Mapping[str, Any]) -> dict[str, Any]:
+        """Generate a stitch plan from an embroidery-project document.
+
+        This calls the Rust generators. A digitising proposal is not a project:
+        it has no geometry. Motif and applique are rejected by the engine.
+        """
+
+        if project.get("format") != "embroidery-project":
+            raise EngineError(
+                "generate_project expects an embroidery-project document. "
+                "A digitising proposal has no geometry. Build the project, then generate."
+            )
+        report = json.loads(self._call(self._lib.embroidery_generate_project_json, project))
+        if not isinstance(report, dict):
+            raise EngineError(
+                "The engine returned a generation result that is not an object. Rebuild embroidery-ffi."
+            )
+        return report
+
+    def capabilities(self) -> dict[str, Any]:
+        """Return the engine capability manifest."""
+
+        report = json.loads(self._call_out(self._lib.embroidery_capabilities_json))
+        if not isinstance(report, dict):
+            raise EngineError(
+                "The engine returned a capability manifest that is not an object. Rebuild embroidery-ffi."
+            )
+        return report
+
     def score(self, plan: Mapping[str, Any]) -> dict[str, Any]:
         """Return the production-risk report for a stitch plan."""
 
@@ -105,6 +134,7 @@ class Engine:
             "embroidery_compile_dst_json",
             "embroidery_validate_json",
             "embroidery_score_json",
+            "embroidery_generate_project_json",
         ):
             function = getattr(self._lib, name)
             function.argtypes = [
@@ -114,6 +144,13 @@ class Engine:
                 ctypes.POINTER(ctypes.c_size_t),
             ]
             function.restype = ctypes.c_int
+
+        self._lib.embroidery_capabilities_json.argtypes = [
+            ctypes.POINTER(pointer),
+            ctypes.POINTER(ctypes.c_size_t),
+            ctypes.POINTER(ctypes.c_size_t),
+        ]
+        self._lib.embroidery_capabilities_json.restype = ctypes.c_int
 
         self._lib.embroidery_free.argtypes = [
             pointer,
@@ -128,6 +165,13 @@ class Engine:
                 "This call expects a stitch plan with a stitches array. "
                 "A digitising proposal only has regions. Run the Rust generators, then compile the plan they return."
             )
+
+    def _call_out(self, function: Any) -> bytes:
+        out_ptr = ctypes.POINTER(ctypes.c_uint8)()
+        out_len = ctypes.c_size_t()
+        out_cap = ctypes.c_size_t()
+        code = function(ctypes.byref(out_ptr), ctypes.byref(out_len), ctypes.byref(out_cap))
+        return self._finish(code, out_ptr, out_len, out_cap)
 
     def _call(self, function: Any, plan: Mapping[str, Any]) -> bytes:
         try:
@@ -146,6 +190,9 @@ class Engine:
             ctypes.byref(out_len),
             ctypes.byref(out_cap),
         )
+        return self._finish(code, out_ptr, out_len, out_cap)
+
+    def _finish(self, code: int, out_ptr: Any, out_len: Any, out_cap: Any) -> bytes:
         data = b""
         if out_ptr:
             data = ctypes.string_at(out_ptr, out_len.value)
@@ -158,7 +205,7 @@ class Engine:
             raise EngineError(message or "The engine rejected the plan and returned no message.")
         if code == 2:
             raise EngineError(
-                "The engine rejected a null argument. Pass UTF-8 stitch-plan JSON."
+                "The engine rejected a null argument. Pass UTF-8 JSON."
             )
         raise EngineError(
             f"The engine returned status {code}. Rebuild embroidery-ffi and retry the call."

@@ -42,6 +42,23 @@ int embroidery_score_json(
     size_t *out_len,
     size_t *out_cap);
 
+/*
+ * Generate a stitch plan from an embroidery-project version 1 document.
+ * Success returns JSON with the plan, validation, readiness, and DST hex
+ * when engineering export is allowed. Machine release is never granted.
+ */
+int embroidery_generate_project_json(
+    const char *project_json,
+    uint8_t **out_ptr,
+    size_t *out_len,
+    size_t *out_cap);
+
+/* Capability manifest. Status 0 returns JSON. Status 2 means a null pointer. */
+int embroidery_capabilities_json(
+    uint8_t **out_ptr,
+    size_t *out_len,
+    size_t *out_cap);
+
 void embroidery_free(uint8_t *ptr, size_t len, size_t cap);
 
 #ifdef __cplusplus

@@ -25,6 +25,20 @@ There is no 500-design corpus in this repository. `fixtures/dst/` contains the o
 
 Do not describe this tree as matching Wilcom, or any other digitising system, on stitch quality.
 
+## Project fixtures, measured
+
+`crates/studio/tests/workflow.rs` runs the twelve documents in `fixtures/projects/` through project generation, validation, DST export, and `read_dst`. The valid running, satin, and fill fixtures produce a DST payload whose header starts with `LA:` and whose last point quantises back to the same design units. The four invalid fixtures fail with the expected unavailable-capability or record-limit message. The club-mark fixture inserts a colour change.
+
+These fixtures lock the generation bridge. They are not a 500-design quality benchmark, and they were not sewn. Native and WASM DST bytes were not compared, because `wasm32-unknown-unknown` is not installed.
+
+## TwinLab rehearsal, measured
+
+`embroidery-motion` checks the named millimetre-to-metre transform, hoop hold during penetration, quantised replay against `read_dst`, and a hoop-limit warning whose origin is `kinematic_check`. `twinlab_replays_the_compiled_dst` posts the club-mark project to `/api/rehearse` and checks the qualification string, `machine_release_allowed: false`, a needle-down count, and a 64-character DST hash.
+
+Chrome on `http://127.0.0.1:4173/twinlab` loaded that rehearsal. In the same turn, event 3 read design 25.000 mm, 14.000 mm and hoop −25.000 mm, −14.000 mm. The next event read 30.000 mm, 14.000 mm, units 300, 140. Setting playback to 4× left the estimated execution at 13.095 seconds. An injected thread break was labelled `injected_scenario` and was not observed. The 3D view started as an interactive scene. No physical sew-out was run.
+
+This is not the proposed 192-stitch-out pilot (12 artworks × 2 flat configurations × 2 fabrics × 2 digitising methods × 2 repeats). That pilot has not been designed as a power calculation and has not been executed. It is not the 500-design benchmark above, and it is not a calibrated twin.
+
 ## Unit coverage that is not a benchmark
 
 `cargo test --workspace` covers geometry resampling, satin width rejection, scanline fill on a rectangle and a C-shaped notch, validation messages, the risk score on an empty plan, a normal stitch, and a dense 1 mm pile, plus the DST cases above. Those tests lock the algorithms. They are not a production-quality score.

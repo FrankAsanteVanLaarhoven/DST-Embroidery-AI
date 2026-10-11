@@ -1,0 +1,54 @@
+[
+  {
+    "file": "01_running_line.json",
+    "expect": "ok"
+  },
+  {
+    "file": "02_running_bend.json",
+    "expect": "ok"
+  },
+  {
+    "file": "03_satin_plain.json",
+    "expect": "ok"
+  },
+  {
+    "file": "04_satin_underlay.json",
+    "expect": "ok"
+  },
+  {
+    "file": "05_fill_square.json",
+    "expect": "ok"
+  },
+  {
+    "file": "06_fill_angle.json",
+    "expect": "ok"
+  },
+  {
+    "file": "07_fill_underlay.json",
+    "expect": "ok"
+  },
+  {
+    "file": "08_club_mark.json",
+    "expect": "ok"
+  },
+  {
+    "file": "09_invalid_motif.json",
+    "expect": "error",
+    "contains": "unavailable"
+  },
+  {
+    "file": "10_invalid_applique.json",
+    "expect": "error",
+    "contains": "unavailable"
+  },
+  {
+    "file": "11_invalid_zigzag.json",
+    "expect": "error",
+    "contains": "unavailable"
+  },
+  {
+    "file": "12_invalid_wide_satin.json",
+    "expect": "error",
+    "contains": "12.1"
+  }
+]

@@ -1,0 +1,32 @@
+{
+  "schema": "embroideryos-compare-proof/0.1",
+  "source": {
+    "kind": "source_raster_derivative",
+    "page": 1,
+    "source_sha256": "3499f537b294079f259c0b7c1a04d9485e671e55def24d542a93ed9b7bb3d091",
+    "filename": "reference-square.png",
+    "width_mm": 14.0,
+    "height_mm": 14.0,
+    "x_mm": -2.0,
+    "y_mm": -2.0
+  },
+  "bundle_file_sha256": "fa7872145726a8df5007ee29525acf4a98ded73c5799de8c165312dd7e7aa467",
+  "dst_sha256": "792c1f9458ea7ac15f8274b0dc7854ef312aec1d3df396b108527f6b53ef1ed8",
+  "pdf_sha256": "93296884402c9bbf8226df25559a7e4f1beb35197bf41d777564fed316333021",
+  "kernel_mode_reported": "transport-test-fixture",
+  "checks": {
+    "dst_hash": true,
+    "record_byte_binding": true,
+    "trace_structure": true,
+    "rust_executed": false,
+    "decoder_semantics_independently_verified": false,
+    "historical_source_association_verified": false,
+    "physical_qualification": false
+  },
+  "actual_size_panel": true,
+  "page_size_pt": [
+    841.8897637795277,
+    595.2755905511812
+  ],
+  "provenance_note": "Integrity-only review; no authenticated release authority."
+}

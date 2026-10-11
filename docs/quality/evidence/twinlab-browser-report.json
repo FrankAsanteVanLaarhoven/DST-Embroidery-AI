@@ -1,0 +1,256 @@
+{
+  "steps": {
+    "loaded": {
+      "title": "EmbroideryOS \u2014 Machine TwinLab",
+      "h1": [
+        "Machine TwinLab"
+      ],
+      "qualification": "Virtual demo \u00b7 Generic machine \u00b7 No hardware connected \u00b7 Physical quality not validated",
+      "pose": "pass",
+      "camera": "pass",
+      "qualificationFlag": "match",
+      "estimate": "Estimated execution is 13.095 seconds at the declared demo rates. Playback speed does not change this estimate.",
+      "error": "",
+      "scenario": "",
+      "gl": "Interactive scene. Drag to orbit, shift-drag to pan, wheel to zoom. Declared linear moves between exported points. The casing stays still.",
+      "event": "0",
+      "designX": "0",
+      "designY": "0",
+      "readout": "Design 0.000 mm, 0.000 mm. Hoop 0.000 mm, 0.000 mm. Needle tip 14.000 mm.",
+      "eventLabel": "Event 0, jump. Object 1.",
+      "playDisabled": false,
+      "stitches": 0,
+      "jumps": 0,
+      "facts": "Profile\ngeneric fixed-needle-xy-frame\nEvidence\ndeclared_demo\nServer mode\nkinematic_demo\nDisplay mode\nkinematic demo\nHoop\n120 \u00d7 100 mm\nNeedle-down\n106\nJumps\n13\nColour changes\n1\nTrims\n0\nEncoded records\n121\nRevision\n01c7f7f9b50cf34cc7b8a81f51772e9d198c8aa3932c3729c0ddf4f60bfe9742\nDST SHA-256\n5daa74c3fe61962ad7109f3c199f953aac501d44763e7adfe906e2d27888964d\nDesign frame\nmillimetres, Y down\nScene frame\nmetres, Y up; design Y maps to scene Z; 1 mm = 0.001 m\nMechanism\nfixed needle at scene XZ origin; hoop translation is the negated design point\nTiming\n600 stitches per minute, 200 mm/s jumps, 2 s colour changes, and 0.4 s trims are development assumptions. They are not a manufacturer rating.",
+      "evidence": "cap attachment: unavailable\ncollision: unknown\nfabric prediction: unknown\nfile acceptance: unknown\ngeometry: declared\nmachine release: unavailable\ntelemetry: unavailable\ntiming: assumed_demo\ncalibrated process model unavailable. No measured observations are loaded. This demo cannot issue a calibrated prediction.\nconnected readonly twin unavailable. No machine telemetry is connected.",
+      "robots": "noindex",
+      "playHeight": 44,
+      "url": "/twinlab"
+    },
+    "injected": {
+      "title": "EmbroideryOS \u2014 Machine TwinLab",
+      "h1": [
+        "Machine TwinLab"
+      ],
+      "qualification": "Virtual demo \u00b7 Generic machine \u00b7 No hardware connected \u00b7 Physical quality not validated",
+      "pose": "pass",
+      "camera": "pass",
+      "qualificationFlag": "match",
+      "estimate": "Estimated execution is 13.095 seconds at the declared demo rates. Playback speed does not change this estimate.",
+      "error": "",
+      "scenario": "Injected thread-break scenario. This was not reported by a machine. Origin: injected_scenario. Observed: no.",
+      "gl": "Interactive scene. Drag to orbit, shift-drag to pan, wheel to zoom. Declared linear moves between exported points. The casing stays still.",
+      "event": "3",
+      "designX": "25",
+      "designY": "14",
+      "readout": "Design 25.000 mm, 14.000 mm. Hoop -25.000 mm, -14.000 mm. Needle tip 14.000 mm.",
+      "eventLabel": "Event 3, sew. Object 1.",
+      "playDisabled": false,
+      "stitches": 1,
+      "jumps": 2,
+      "facts": "Profile\ngeneric fixed-needle-xy-frame\nEvidence\ndeclared_demo\nServer mode\nkinematic_demo\nDisplay mode\nkinematic demo\nHoop\n120 \u00d7 100 mm\nNeedle-down\n106\nJumps\n13\nColour changes\n1\nTrims\n0\nEncoded records\n121\nRevision\n01c7f7f9b50cf34cc7b8a81f51772e9d198c8aa3932c3729c0ddf4f60bfe9742\nDST SHA-256\n5daa74c3fe61962ad7109f3c199f953aac501d44763e7adfe906e2d27888964d\nDesign frame\nmillimetres, Y down\nScene frame\nmetres, Y up; design Y maps to scene Z; 1 mm = 0.001 m\nMechanism\nfixed needle at scene XZ origin; hoop translation is the negated design point\nTiming\n600 stitches per minute, 200 mm/s jumps, 2 s colour changes, and 0.4 s trims are development assumptions. They are not a manufacturer rating.",
+      "evidence": "cap attachment: unavailable\ncollision: unknown\nfabric prediction: unknown\nfile acceptance: unknown\ngeometry: declared\nmachine release: unavailable\ntelemetry: unavailable\ntiming: assumed_demo\ncalibrated process model unavailable. No measured observations are loaded. This demo cannot issue a calibrated prediction.\nconnected readonly twin unavailable. No machine telemetry is connected.",
+      "robots": "noindex",
+      "playHeight": 44,
+      "url": "/twinlab"
+    },
+    "from-studio": {
+      "title": "EmbroideryOS \u2014 Machine TwinLab",
+      "h1": [
+        "Machine TwinLab"
+      ],
+      "qualification": "Virtual demo \u00b7 Generic machine \u00b7 No hardware connected \u00b7 Physical quality not validated",
+      "pose": "pass",
+      "camera": "pass",
+      "qualificationFlag": "match",
+      "estimate": "Estimated execution is 13.095 seconds at the declared demo rates. Playback speed does not change this estimate.",
+      "error": "",
+      "scenario": "",
+      "gl": "Interactive scene. Drag to orbit, shift-drag to pan, wheel to zoom. Declared linear moves between exported points. The casing stays still.",
+      "event": "0",
+      "designX": "0",
+      "designY": "0",
+      "readout": "Design 0.000 mm, 0.000 mm. Hoop 0.000 mm, 0.000 mm. Needle tip 14.000 mm.",
+      "eventLabel": "Event 0, jump. Object 1.",
+      "playDisabled": false,
+      "stitches": 0,
+      "jumps": 0,
+      "facts": "Profile\ngeneric fixed-needle-xy-frame\nEvidence\ndeclared_demo\nServer mode\nkinematic_demo\nDisplay mode\nkinematic demo\nHoop\n120 \u00d7 100 mm\nNeedle-down\n106\nJumps\n13\nColour changes\n1\nTrims\n0\nEncoded records\n121\nRevision\n01c7f7f9b50cf34cc7b8a81f51772e9d198c8aa3932c3729c0ddf4f60bfe9742\nDST SHA-256\n5daa74c3fe61962ad7109f3c199f953aac501d44763e7adfe906e2d27888964d\nDesign frame\nmillimetres, Y down\nScene frame\nmetres, Y up; design Y maps to scene Z; 1 mm = 0.001 m\nMechanism\nfixed needle at scene XZ origin; hoop translation is the negated design point\nTiming\n600 stitches per minute, 200 mm/s jumps, 2 s colour changes, and 0.4 s trims are development assumptions. They are not a manufacturer rating.",
+      "evidence": "cap attachment: unavailable\ncollision: unknown\nfabric prediction: unknown\nfile acceptance: unknown\ngeometry: declared\nmachine release: unavailable\ntelemetry: unavailable\ntiming: assumed_demo\ncalibrated process model unavailable. No measured observations are loaded. This demo cannot issue a calibrated prediction.\nconnected readonly twin unavailable. No machine telemetry is connected.",
+      "robots": "noindex",
+      "playHeight": 44,
+      "url": "/twinlab"
+    }
+  },
+  "speed": {
+    "before": "Estimated execution is 13.095 seconds at the declared demo rates. Playback speed does not change this estimate.",
+    "after": "Estimated execution is 13.095 seconds at the declared demo rates. Playback speed does not change this estimate.",
+    "secondsBefore": "13.094923647851099",
+    "secondsAfter": "13.094923647851099",
+    "selected": "4"
+  },
+  "play": {
+    "before": "0",
+    "during": {
+      "event": "15",
+      "label": "Event 15, sew. Object 1.",
+      "readout": "Design 62.224 mm, 18.000 mm. Hoop -62.224 mm, -18.000 mm. Needle tip 14.000 mm."
+    },
+    "estimateAfterPause": "Estimated execution is 13.095 seconds at the declared demo rates. Playback speed does not change this estimate."
+  },
+  "seek": {
+    "index": 3,
+    "x": 25,
+    "y": 14,
+    "unitsX": 250,
+    "unitsY": 140,
+    "hoopX": -25,
+    "hoopY": -14,
+    "shownEvent": "15",
+    "shownX": 62.22392783042697,
+    "shownY": 18,
+    "readout": "Design 62.224 mm, 18.000 mm. Hoop -62.224 mm, -18.000 mm. Needle tip 14.000 mm.",
+    "unitsText": "600, 180",
+    "release": false,
+    "hardware": false,
+    "validated": false,
+    "hash": "5daa74c3fe61962ad7109f3c199f953aac501d44763e7adfe906e2d27888964d",
+    "needleDown": 106
+  },
+  "stitches_at_end": 12,
+  "click": {
+    "before": "15",
+    "after": "15",
+    "label": "Event 15, sew. Object 1."
+  },
+  "step": {
+    "before": "3",
+    "after": "3",
+    "scenario": "",
+    "readout": "Design 25.000 mm, 14.000 mm. Hoop -25.000 mm, -14.000 mm. Needle tip 14.000 mm."
+  },
+  "geometric": {
+    "playDisabled": true,
+    "note": "Geometric preview shows placement only. Timed playback is off. This is not a timing or quality claim.",
+    "calibratedDisabled": true,
+    "calibratedText": "Calibrated process model \u2014 No measured observations are loaded. This demo cannot issue a calibrated prediction.",
+    "connectedDisabled": true
+  },
+  "parts": {
+    "hoop": "true",
+    "needle": "false",
+    "section": "true",
+    "note": "The hoop moves by the negated design point and holds still while the needle penetrates."
+  },
+  "layout": {
+    "390": {
+      "docScroll": 390,
+      "docClient": 390,
+      "bodyScroll": 390,
+      "inner": 390,
+      "playHeight": 44,
+      "playWidth": 56,
+      "playTop": 400,
+      "playBottom": 444,
+      "bannerTop": -623,
+      "bannerWidth": 390,
+      "stageTop": -541,
+      "h1": "Machine TwinLab",
+      "error": ""
+    },
+    "768": {
+      "docScroll": 753,
+      "docClient": 753,
+      "bodyScroll": 753,
+      "inner": 768,
+      "playHeight": 44,
+      "playWidth": 56,
+      "playTop": 490,
+      "playBottom": 534,
+      "bannerTop": -429,
+      "bannerWidth": 753,
+      "stageTop": -367,
+      "h1": "Machine TwinLab",
+      "error": ""
+    },
+    "1280": {
+      "docScroll": 1280,
+      "docClient": 1280,
+      "bodyScroll": 1280,
+      "inner": 1280,
+      "playHeight": 44,
+      "playWidth": 56,
+      "playTop": 670,
+      "playBottom": 714,
+      "bannerTop": 84,
+      "bannerWidth": 1280,
+      "stageTop": 145,
+      "h1": "Machine TwinLab",
+      "error": ""
+    }
+  },
+  "missing": {
+    "title": "Page not found \u2014 EmbroideryOS",
+    "h1": "Page not found",
+    "text": "Page not found\n\nThat address is not part of the local design studio.\n\nBack to the design studio"
+  },
+  "recovery": "/ Design studio",
+  "browser_events": [
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "rendering",
+          "level": "warning",
+          "text": "[.WebGL-0x10400479000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+          "timestamp": 1791698919051.272,
+          "url": "http://127.0.0.1:4173/twinlab"
+        }
+      }
+    },
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "rendering",
+          "level": "warning",
+          "text": "[.WebGL-0x10400479000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+          "timestamp": 1791698919052.082,
+          "url": "http://127.0.0.1:4173/twinlab"
+        }
+      }
+    },
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "rendering",
+          "level": "warning",
+          "text": "[.WebGL-0x10400479000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+          "timestamp": 1791698919053.63,
+          "url": "http://127.0.0.1:4173/twinlab"
+        }
+      }
+    },
+    {
+      "method": "Network.responseReceived",
+      "url": "http://127.0.0.1:4173/missing-twinlab-page",
+      "status": 404,
+      "errorText": null
+    },
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "network",
+          "level": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "timestamp": 1791698923267.289,
+          "url": "http://127.0.0.1:4173/missing-twinlab-page",
+          "networkRequestId": "277BDB1EE8E49E516EACA7E7A1C0DC53"
+        }
+      }
+    }
+  ],
+  "speed_check_name": true
+}

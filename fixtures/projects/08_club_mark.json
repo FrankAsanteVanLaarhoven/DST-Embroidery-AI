@@ -1,0 +1,64 @@
+{
+  "format": "embroidery-project",
+  "format_version": "1",
+  "name": "Club mark",
+  "hoop_width_mm": 120.0,
+  "hoop_height_mm": 100.0,
+  "objects": [
+    {
+      "object_id": 1,
+      "label": "Block",
+      "kind": "fill",
+      "points": [
+        {
+          "x": 15,
+          "y": 12
+        },
+        {
+          "x": 70,
+          "y": 12
+        },
+        {
+          "x": 70,
+          "y": 42
+        },
+        {
+          "x": 15,
+          "y": 42
+        }
+      ],
+      "angle_degrees": 0.0,
+      "density_mm": 4.0,
+      "column_width_mm": 3.0,
+      "max_stitch_mm": 5.0,
+      "underlay_spacing_mm": 0.0,
+      "underlay": [],
+      "pull_compensation_mm": 0.0,
+      "color_index": 0
+    },
+    {
+      "object_id": 2,
+      "label": "Stripe",
+      "kind": "satin",
+      "points": [
+        {
+          "x": 20,
+          "y": 58
+        },
+        {
+          "x": 75,
+          "y": 58
+        }
+      ],
+      "angle_degrees": 0.0,
+      "density_mm": 4.0,
+      "column_width_mm": 3.0,
+      "max_stitch_mm": 4.0,
+      "underlay_spacing_mm": 0.0,
+      "underlay": [],
+      "pull_compensation_mm": 0.1,
+      "color_index": 1
+    }
+  ],
+  "review": null
+}

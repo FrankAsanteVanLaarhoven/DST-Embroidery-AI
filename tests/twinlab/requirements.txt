@@ -1,0 +1,6 @@
+# Test dependencies only; the application has no npm runtime dependencies.
+# The native baseline/oracle and combined install remain to be verified.
+pydantic==2.13.5
+pyembroidery==1.5.1
+pytest==9.0.2
+playwright==1.57.0

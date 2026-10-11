@@ -45,7 +45,7 @@ pub fn write_dst_with<W: Write>(
     mut writer: W,
     options: &WriteOptions,
 ) -> io::Result<()> {
-    let (records, bounds, end) = compile_machine(plan)?;
+    let (records, _links, bounds, end) = compile_machine(plan)?;
     let header = header_bytes(plan, &records, bounds, end, options)?;
     writer.write_all(&header)?;
     for record in &records {
@@ -81,12 +81,58 @@ pub fn compile_to_vec(
     max_stitch_mm: f64,
     max_jump_mm: f64,
 ) -> io::Result<Vec<u8>> {
-    let mut buffer = Vec::new();
-    compile_dst(plan, &mut buffer, max_stitch_mm, max_jump_mm)?;
-    Ok(buffer)
+    Ok(compile_to_vec_with_links(plan, max_stitch_mm, max_jump_mm)?.0)
 }
 
-fn compile_machine(plan: &StitchPlan) -> io::Result<(Vec<MachineRecord>, Bounds, (i32, i32))> {
+/// One exported body record, excluding the end record, tied back to the plan.
+///
+/// DST does not store object identity. The link is produced while compiling so
+/// a later reader of these exact bytes can still name the source object.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ExportLink {
+    pub object_id: u64,
+    pub plan_stitch_index: u32,
+}
+
+/// Validate, write DST, and return a sidecar aligned with the body records.
+///
+/// The bytes match [`compile_to_vec`]. `links.len() + 1` equals the number of
+/// 3-byte records, because the final end record has no design object.
+pub fn compile_to_vec_with_links(
+    plan: &StitchPlan,
+    max_stitch_mm: f64,
+    max_jump_mm: f64,
+) -> io::Result<(Vec<u8>, Vec<ExportLink>)> {
+    let report = embroidery_core::validate(plan, max_stitch_mm, max_jump_mm);
+    if !report.ok() {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            format!(
+                "The stitch plan failed validation. Fix these errors and compile again:\n{}",
+                report.errors.join("\n")
+            ),
+        ));
+    }
+    let (records, links, bounds, end) = compile_machine(plan)?;
+    if links.len() + 1 != records.len() {
+        return Err(invalid(
+            "The export sidecar does not match the DST records. This is a compiler bug; report the design.",
+        ));
+    }
+    let header = header_bytes(plan, &records, bounds, end, &WriteOptions::default())?;
+    let mut buffer = Vec::with_capacity(512 + records.len() * 3);
+    buffer.extend_from_slice(&header);
+    for record in &records {
+        let bytes = encode_record(record.dx, record.dy, record.command)
+            .map_err(|message| io::Error::new(io::ErrorKind::InvalidData, message))?;
+        buffer.extend_from_slice(&bytes);
+    }
+    Ok((buffer, links))
+}
+
+type CompiledMachine = (Vec<MachineRecord>, Vec<ExportLink>, Bounds, (i32, i32));
+
+fn compile_machine(plan: &StitchPlan) -> io::Result<CompiledMachine> {
     if plan.stitches.is_empty() {
         return Err(invalid(
             "Stitch plan contains no stitches. Generate a running, satin, or fill object before writing DST.",
@@ -94,62 +140,97 @@ fn compile_machine(plan: &StitchPlan) -> io::Result<(Vec<MachineRecord>, Bounds,
     }
 
     let mut records = Vec::new();
+    let mut links = Vec::new();
     let mut pen = (0i32, 0i32);
     let mut bounds: Option<Bounds> = None;
 
-    for stitch in &plan.stitches {
+    for (index, stitch) in plan.stitches.iter().enumerate() {
+        let link = ExportLink {
+            object_id: stitch.object_id,
+            plan_stitch_index: index as u32,
+        };
         match stitch.kind {
             StitchKind::Jump => {
                 let to = point_units(stitch.to)?;
-                move_pen(&mut records, &mut pen, to, RecordCommand::Jump, &mut bounds)?;
+                move_pen(
+                    &mut records,
+                    &mut links,
+                    &mut pen,
+                    to,
+                    RecordCommand::Jump,
+                    &mut bounds,
+                    link,
+                )?;
             }
             StitchKind::ColorChange => {
                 let from = point_units(stitch.from)?;
                 let to = point_units(stitch.to)?;
                 move_pen(
                     &mut records,
+                    &mut links,
                     &mut pen,
                     from,
                     RecordCommand::Jump,
                     &mut bounds,
+                    link,
                 )?;
-                records.push(MachineRecord {
-                    dx: 0,
-                    dy: 0,
-                    command: RecordCommand::ColorChange,
-                });
+                push_linked(
+                    &mut records,
+                    &mut links,
+                    MachineRecord {
+                        dx: 0,
+                        dy: 0,
+                        command: RecordCommand::ColorChange,
+                    },
+                    link,
+                );
                 note(&mut bounds, pen);
-                move_pen(&mut records, &mut pen, to, RecordCommand::Jump, &mut bounds)?;
+                move_pen(
+                    &mut records,
+                    &mut links,
+                    &mut pen,
+                    to,
+                    RecordCommand::Jump,
+                    &mut bounds,
+                    link,
+                )?;
             }
             StitchKind::Trim => {
                 let from = point_units(stitch.from)?;
                 let to = point_units(stitch.to)?;
                 move_pen(
                     &mut records,
+                    &mut links,
                     &mut pen,
                     from,
                     RecordCommand::Jump,
                     &mut bounds,
+                    link,
                 )?;
                 // pyembroidery's default trim_at=3 signature. Net movement is zero,
                 // so the jog is not part of the design bounds.
-                records.push(MachineRecord {
-                    dx: 2,
-                    dy: 2,
-                    command: RecordCommand::Jump,
-                });
-                records.push(MachineRecord {
-                    dx: -4,
-                    dy: -4,
-                    command: RecordCommand::Jump,
-                });
-                records.push(MachineRecord {
-                    dx: 2,
-                    dy: 2,
-                    command: RecordCommand::Jump,
-                });
+                for (dx, dy) in [(2, 2), (-4, -4), (2, 2)] {
+                    push_linked(
+                        &mut records,
+                        &mut links,
+                        MachineRecord {
+                            dx,
+                            dy,
+                            command: RecordCommand::Jump,
+                        },
+                        link,
+                    );
+                }
                 note(&mut bounds, pen);
-                move_pen(&mut records, &mut pen, to, RecordCommand::Jump, &mut bounds)?;
+                move_pen(
+                    &mut records,
+                    &mut links,
+                    &mut pen,
+                    to,
+                    RecordCommand::Jump,
+                    &mut bounds,
+                    link,
+                )?;
             }
             StitchKind::Running
             | StitchKind::Satin
@@ -160,17 +241,21 @@ fn compile_machine(plan: &StitchPlan) -> io::Result<(Vec<MachineRecord>, Bounds,
                 let to = point_units(stitch.to)?;
                 move_pen(
                     &mut records,
+                    &mut links,
                     &mut pen,
                     from,
                     RecordCommand::Jump,
                     &mut bounds,
+                    link,
                 )?;
                 move_pen(
                     &mut records,
+                    &mut links,
                     &mut pen,
                     to,
                     RecordCommand::Stitch,
                     &mut bounds,
+                    link,
                 )?;
             }
         }
@@ -193,25 +278,42 @@ fn compile_machine(plan: &StitchPlan) -> io::Result<(Vec<MachineRecord>, Bounds,
     let bounds = bounds.ok_or_else(|| {
         invalid("DST compile produced no needle positions. Add a sewing stitch and export again.")
     })?;
-    Ok((records, bounds, pen))
+    Ok((records, links, bounds, pen))
+}
+
+fn push_linked(
+    records: &mut Vec<MachineRecord>,
+    links: &mut Vec<ExportLink>,
+    record: MachineRecord,
+    link: ExportLink,
+) {
+    records.push(record);
+    links.push(link);
 }
 
 fn move_pen(
     records: &mut Vec<MachineRecord>,
+    links: &mut Vec<ExportLink>,
     pen: &mut (i32, i32),
     target: (i32, i32),
     command: RecordCommand,
     bounds: &mut Option<Bounds>,
+    link: ExportLink,
 ) -> io::Result<()> {
     let dx = target.0 - pen.0;
     let dy = target.1 - pen.1;
     if dx == 0 && dy == 0 {
         if command == RecordCommand::Stitch {
-            records.push(MachineRecord {
-                dx: 0,
-                dy: 0,
-                command,
-            });
+            push_linked(
+                records,
+                links,
+                MachineRecord {
+                    dx: 0,
+                    dy: 0,
+                    command,
+                },
+                link,
+            );
             note(bounds, *pen);
         }
         return Ok(());
@@ -220,11 +322,16 @@ fn move_pen(
     let mut x = pen.0;
     let mut y = pen.1;
     for (step_x, step_y) in split_delta(dx, dy)? {
-        records.push(MachineRecord {
-            dx: step_x,
-            dy: step_y,
-            command,
-        });
+        push_linked(
+            records,
+            links,
+            MachineRecord {
+                dx: step_x,
+                dy: step_y,
+                command,
+            },
+            link,
+        );
         x += step_x;
         y += step_y;
         note(bounds, (x, y));

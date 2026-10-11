@@ -5,6 +5,9 @@ members = [
     "crates/dst",
     "crates/simulate",
     "crates/ffi",
+    "crates/motion",
+    "crates/studio",
+    "crates/twin",
 ]
 
 [workspace.package]

@@ -1,0 +1,135 @@
+{
+  "mode": "native-served",
+  "renderer": "webgl",
+  "passed": 31,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "test mode is explicit",
+      "passed": true
+    },
+    {
+      "name": "3D scene initialises a real graphics backend",
+      "passed": true
+    },
+    {
+      "name": "current design has a bound artifact",
+      "passed": true
+    },
+    {
+      "name": "DST hash shown in evidence panel",
+      "passed": true
+    },
+    {
+      "name": "exact DST export becomes available",
+      "passed": true
+    },
+    {
+      "name": "2D/3D same decoded event at 0%",
+      "passed": true
+    },
+    {
+      "name": "inverse hoop transform at 0%",
+      "passed": true
+    },
+    {
+      "name": "2D/3D same decoded event at 10%",
+      "passed": true
+    },
+    {
+      "name": "inverse hoop transform at 10%",
+      "passed": true
+    },
+    {
+      "name": "2D/3D same decoded event at 25%",
+      "passed": true
+    },
+    {
+      "name": "inverse hoop transform at 25%",
+      "passed": true
+    },
+    {
+      "name": "2D/3D same decoded event at 50%",
+      "passed": true
+    },
+    {
+      "name": "inverse hoop transform at 50%",
+      "passed": true
+    },
+    {
+      "name": "2D/3D same decoded event at 75%",
+      "passed": true
+    },
+    {
+      "name": "inverse hoop transform at 75%",
+      "passed": true
+    },
+    {
+      "name": "2D/3D same decoded event at 100%",
+      "passed": true
+    },
+    {
+      "name": "inverse hoop transform at 100%",
+      "passed": true
+    },
+    {
+      "name": "end state reveals exactly the decoded needle placements",
+      "passed": true
+    },
+    {
+      "name": "camera switch changes rendered 3D pixels",
+      "passed": true
+    },
+    {
+      "name": "camera does not change execution state",
+      "passed": true
+    },
+    {
+      "name": "2D-only view hides machine viewport",
+      "passed": true
+    },
+    {
+      "name": "3D-only view hides design viewport",
+      "passed": true
+    },
+    {
+      "name": "downloaded bytes match displayed DST SHA-256",
+      "passed": true
+    },
+    {
+      "name": "dark appearance applies",
+      "passed": true
+    },
+    {
+      "name": "mobile layout has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "duplicate change events create only one revision",
+      "passed": true
+    },
+    {
+      "name": "editing invalidates the old artifact immediately",
+      "passed": true
+    },
+    {
+      "name": "editing disables stale export",
+      "passed": true
+    },
+    {
+      "name": "editing disables stale playback",
+      "passed": true
+    },
+    {
+      "name": "edited geometry compiles through live Rust",
+      "passed": true
+    },
+    {
+      "name": "no uncaught page JavaScript errors",
+      "passed": true
+    }
+  ],
+  "skipped": [],
+  "page_errors": [],
+  "limitations": []
+}

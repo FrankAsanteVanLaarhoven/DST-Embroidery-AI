@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="Local machine rehearsal. The view replays an exported DST file on a generic rig. No hardware is connected and physical quality is not validated.">
+  <title>EmbroideryOS — Machine TwinLab</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/studio.css">
+  <link rel="stylesheet" href="/twinlab.css">
+  <script>
+    (function () {
+      try {
+        var appearance = localStorage.getItem("embroideryos.appearance") || "system";
+        var dark = appearance === "dark" || (appearance === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.dataset.appearance = dark ? "dark" : "light";
+        document.documentElement.dataset.motion = localStorage.getItem("embroideryos.motion") || "full";
+        document.documentElement.dataset.opaque = localStorage.getItem("embroideryos.opaque") || "true";
+      } catch (error) {
+        document.documentElement.dataset.appearance = "light";
+        document.documentElement.dataset.motion = "full";
+        document.documentElement.dataset.opaque = "true";
+      }
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip" href="#stage">Skip to the simulation</a>
+  <header class="topbar">
+    <div>
+      <p class="wordmark">EmbroideryOS</p>
+      <h1>Machine TwinLab</h1>
+    </div>
+    <div class="topbar-actions">
+      <a class="status-pill" href="/">Design studio</a>
+      <button type="button" id="load-sample">Load sample</button>
+      <button type="button" id="second-view">Open second view</button>
+    </div>
+  </header>
+  <p class="qualification" id="qualification" role="status">Virtual demo · Generic machine · No hardware connected · Physical quality not validated</p>
+  <div class="workspace twin" id="workspace">
+    <nav class="panel assembly" aria-label="Machine assembly">
+      <h2>Assembly</h2>
+      <ul class="object-list" id="parts">
+        <li><button type="button" data-part="base" aria-pressed="false">Base</button></li>
+        <li><button type="button" data-part="needle" aria-pressed="true">Needle</button></li>
+        <li><button type="button" data-part="presser" aria-pressed="false">Presser foot</button></li>
+        <li><button type="button" data-part="carriage" aria-pressed="false">Carriage</button></li>
+        <li><button type="button" data-part="hoop" aria-pressed="false">Hoop</button></li>
+        <li><button type="button" data-part="fabric" aria-pressed="false">Fabric</button></li>
+      </ul>
+      <p class="hint" id="part-note">The needle stays on the machine axis. The hoop and fabric move.</p>
+    </nav>
+    <section class="panel stage" id="stage" tabindex="0" aria-label="Simulation">
+      <div class="viewports" id="viewports" data-view="split">
+        <div class="viewport viewport-2d">
+          <h2>2D design</h2>
+          <svg class="preview twin-surface" id="design" role="img" aria-labelledby="design-title design-desc" viewBox="-8 -8 136 116">
+            <title id="design-title">Design view</title>
+            <desc id="design-desc">No exported trace yet. Load a project to draw decoded needle placements. Y increases downward.</desc>
+          </svg>
+          <p class="hint">Y increases downward. Solid lines are decoded needle-down stitches. Dashed lines are jumps. A click seeks that event.</p>
+        </div>
+        <div class="viewport viewport-3d">
+          <h2>3D machine</h2>
+          <canvas class="preview twin-surface" id="machine" width="640" height="480" aria-label="Machine scene. The needle stays on the axis and the hoop moves."></canvas>
+          <p class="hint" id="gl-status">Starting the scene.</p>
+        </div>
+      </div>
+      <p class="readout" id="readout">No trace loaded.</p>
+      <p class="hint" id="event-label" role="status"></p>
+    </section>
+    <aside class="panel inspector" aria-label="Rehearsal inspector">
+      <h2>Inspector</h2>
+      <div class="inspector-scroll">
+        <p class="hint" id="mode-note">Kinematic demo uses declared linear moves. It is not agreement with a physical machine.</p>
+        <dl id="facts"></dl>
+        <h2>Evidence</h2>
+        <ul class="checks" id="evidence"></ul>
+        <h2>Selected event</h2>
+        <dl id="event-facts"></dl>
+        <p class="notice" id="scenario" role="status"></p>
+        <div id="errors" class="alert" role="alert"></div>
+      </div>
+    </aside>
+    <section class="panel timeline" aria-label="Playback">
+      <h2>Timeline</h2>
+      <p class="hint" id="estimate">Estimated execution appears after the exported file is decoded. Playback speed does not change that estimate.</p>
+      <div class="row">
+        <button type="button" id="rewind" disabled>Rewind</button>
+        <button type="button" id="step-back" disabled>Step back</button>
+        <button type="button" id="play" class="primary" disabled>Play</button>
+        <button type="button" id="pause" disabled>Pause</button>
+        <button type="button" id="step-forward" disabled>Step forward</button>
+        <button type="button" id="inject" disabled>Inject thread break</button>
+      </div>
+      <div class="transport">
+        <label>
+          Event
+          <input id="scrub" type="range" min="0" max="0" value="0" disabled>
+        </label>
+        <label>
+          Speed
+          <select id="speed">
+            <option value="0.25">0.25×</option>
+            <option value="0.5">0.5×</option>
+            <option value="1" selected>1×</option>
+            <option value="2">2×</option>
+            <option value="4">4×</option>
+          </select>
+        </label>
+        <label>
+          Display mode
+          <select id="mode">
+            <option value="geometric">Geometric preview</option>
+            <option value="kinematic" selected>Kinematic demo</option>
+            <option value="calibrated" disabled>Calibrated process model</option>
+            <option value="connected" disabled>Connected read-only twin</option>
+          </select>
+        </label>
+        <label>
+          View
+          <select id="view">
+            <option value="split" selected>Split</option>
+            <option value="2d">2D</option>
+            <option value="3d">3D</option>
+          </select>
+        </label>
+      </div>
+      <div class="row">
+        <button type="button" id="cam-top">Top</button>
+        <button type="button" id="cam-front">Front</button>
+        <button type="button" id="cam-side">Side</button>
+        <button type="button" id="cam-ortho" aria-pressed="false">Orthographic</button>
+        <button type="button" id="wireframe" aria-pressed="false">Wireframe</button>
+        <button type="button" id="isolate" aria-pressed="false">Isolate part</button>
+        <button type="button" id="section" aria-pressed="false">Section</button>
+      </div>
+      <p class="hint">Drag the 3D view to orbit. Shift-drag pans. The scroll wheel zooms. Section view is a display cut at machine X = 0, not a collision result.</p>
+    </section>
+  </div>
+  <script src="/twinlab.js"></script>
+</body>
+</html>

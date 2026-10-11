@@ -1,0 +1,38 @@
+name: TwinLab M1 native gate
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      # Action commit IDs resolved from their official repositories during preparation.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+      - name: Prepare native test tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.90.0 --profile minimal --component clippy
+          rustup override set 1.90.0
+          python3 -m venv .venv
+          .venv/bin/python -m pip install -r tests/twinlab/requirements.txt
+          .venv/bin/python -m playwright install --with-deps chromium
+      - name: Run real pipeline, baseline and browser gates
+        shell: bash
+        run: bash scripts/check-twinlab-m1.sh
+      - name: Retain verification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: twinlab-m1-native-evidence
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 14

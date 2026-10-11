@@ -1,0 +1,41 @@
+{
+  "format": "embroidery-project",
+  "format_version": "1",
+  "name": "Fill angle",
+  "hoop_width_mm": 120.0,
+  "hoop_height_mm": 100.0,
+  "objects": [
+    {
+      "object_id": 1,
+      "label": "Block",
+      "kind": "fill",
+      "points": [
+        {
+          "x": 20,
+          "y": 20
+        },
+        {
+          "x": 60,
+          "y": 20
+        },
+        {
+          "x": 60,
+          "y": 60
+        },
+        {
+          "x": 20,
+          "y": 60
+        }
+      ],
+      "angle_degrees": 45.0,
+      "density_mm": 4.0,
+      "column_width_mm": 3.0,
+      "max_stitch_mm": 5.0,
+      "underlay_spacing_mm": 0.0,
+      "underlay": [],
+      "pull_compensation_mm": 0.0,
+      "color_index": 0
+    }
+  ],
+  "review": null
+}

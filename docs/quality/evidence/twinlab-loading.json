@@ -1,0 +1,25 @@
+{
+  "pending": true,
+  "pendingBusy": "true",
+  "pendingPlayDisabled": true,
+  "done": {
+    "label": "Event 0, jump. Object 1.",
+    "busy": "false",
+    "error": "",
+    "pose": "pass",
+    "playDisabled": false
+  },
+  "sameTurn": {
+    "focus": "stage",
+    "afterSeek": {
+      "event": "3",
+      "readout": "Design 25.000 mm, 14.000 mm. Hoop -25.000 mm, -14.000 mm. Needle tip 14.000 mm.",
+      "facts": "KindsewDesign25.000 mm, 14.000 mmUnits250, 140Colour0Object1Plan stitch1File records1 from record 3"
+    },
+    "afterArrow": {
+      "event": "4",
+      "readout": "Design 30.000 mm, 14.000 mm. Hoop -30.000 mm, -14.000 mm. Needle tip 14.000 mm.",
+      "facts": "KindsewDesign30.000 mm, 14.000 mmUnits300, 140Colour0Object1Plan stitch2File records1 from record 4"
+    }
+  }
+}

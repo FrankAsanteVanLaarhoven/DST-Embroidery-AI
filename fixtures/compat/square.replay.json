@@ -1,0 +1,182 @@
+{
+  "protocol": "twinlab-m1/1",
+  "design": {
+    "schema_version": 1,
+    "name": "Square",
+    "revision": 1,
+    "objects": [
+      {
+        "id": 1,
+        "label": "Golden codec square",
+        "kind": "running",
+        "points": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 10,
+            "y": 0
+          },
+          {
+            "x": 10,
+            "y": 10
+          },
+          {
+            "x": 0,
+            "y": 10
+          }
+        ],
+        "rgb": [
+          53,
+          106,
+          210
+        ],
+        "spacing_mm": 0.5,
+        "angle_degrees": 0,
+        "max_stitch_mm": 10,
+        "width_mm": 3,
+        "compensation_mm": 0,
+        "underlay_mm": 0
+      }
+    ]
+  },
+  "profile": {
+    "id": "generic-flat-120-v1",
+    "name": "Generic 6-needle · flat frame",
+    "units": "mm",
+    "width_mm": 120,
+    "height_mm": 120,
+    "calibrated": false,
+    "hardware_connected": false
+  },
+  "kernel": {
+    "version": "fixture",
+    "base_commit": "98303601416a3b0d68eae37e939031732bd77c45",
+    "generation": "Recorded codec fixture",
+    "export": "Pinned repository bytes",
+    "mode": "transport-test-fixture"
+  },
+  "generated_stitch_count": 3,
+  "warnings": [
+    "This fixture does not execute the new Rust bridge."
+  ],
+  "palette": [
+    {
+      "rgb": [
+        53,
+        106,
+        210
+      ],
+      "needle": 1
+    }
+  ],
+  "trace": {
+    "units": "0.1 mm; X right; Y down",
+    "decoder": "Expected positions from baseline square oracle (not executed here)",
+    "trim_policy": "raw jumps; no trim inference",
+    "timing": "illustrative only",
+    "events": [
+      {
+        "index": 0,
+        "byte_offset": 512,
+        "raw": [
+          9,
+          4,
+          7
+        ],
+        "kind": "stitch",
+        "from_units": [
+          0,
+          0
+        ],
+        "to_units": [
+          100,
+          0
+        ],
+        "color_index": 0,
+        "start_ms": 0,
+        "end_ms": 100,
+        "object_id": 1
+      },
+      {
+        "index": 1,
+        "byte_offset": 515,
+        "raw": [
+          96,
+          16,
+          19
+        ],
+        "kind": "stitch",
+        "from_units": [
+          100,
+          0
+        ],
+        "to_units": [
+          100,
+          100
+        ],
+        "color_index": 0,
+        "start_ms": 100,
+        "end_ms": 200,
+        "object_id": 1
+      },
+      {
+        "index": 2,
+        "byte_offset": 518,
+        "raw": [
+          6,
+          8,
+          11
+        ],
+        "kind": "stitch",
+        "from_units": [
+          100,
+          100
+        ],
+        "to_units": [
+          0,
+          100
+        ],
+        "color_index": 0,
+        "start_ms": 200,
+        "end_ms": 300,
+        "object_id": 1
+      },
+      {
+        "index": 3,
+        "byte_offset": 521,
+        "raw": [
+          0,
+          0,
+          243
+        ],
+        "kind": "end",
+        "from_units": [
+          0,
+          100
+        ],
+        "to_units": [
+          0,
+          100
+        ],
+        "color_index": 0,
+        "start_ms": 300,
+        "end_ms": 301,
+        "object_id": null
+      }
+    ],
+    "record_count": 4,
+    "needle_placements": 3,
+    "duration_ms": 301
+  },
+  "artifact_id": "777efecb0dac81ee29c512611bb45e612b1390bcf95678097ae25bd950173854",
+  "provenance": {
+    "design_sha256": "a4d7b719f2c6ffb7bcac2f49b74042a415d9c1380f3ac91c3daa5c79ff8c1543",
+    "profile_sha256": "cd9b85181c83bdc41acb0d60e28fc841d9cbccc01eda32242ab45718cc00d626",
+    "dst_sha256": "792c1f9458ea7ac15f8274b0dc7854ef312aec1d3df396b108527f6b53ef1ed8",
+    "trace_sha256": "b2eba276d75cbd2b6021a319bb2bdb1b5c933da6d5cd09c9b6b38f6c130a0b48",
+    "engine_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "dst_base64": "TEE6U3F1YXJlICAgICAgICAgIA1TVDogICAgICA0DUNPOiAgMA0rWDogIDEwMA0tWDogICAgMA0rWTogIDEwMA0tWTogICAgMA1BWDorICAgIDANQVk6LSAgMTAwDU1YOisgICAgMA1NWTorICAgIDANUEQ6KioqKioqDRogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAJBAdgEBMGCAsAAPM="
+}

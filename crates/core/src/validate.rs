@@ -1,10 +1,12 @@
+use serde::Serialize;
+
 use crate::model::{mm_to_units, StitchKind, StitchPlan, DST_MAX_DELTA_UNITS};
 
 /// Machine and quality findings for one plan.
 ///
 /// `errors` block a strict DST compile. `warnings` describe travel the
 /// compiler will insert and stitches that will collapse to one count.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[must_use]
 pub struct ValidationReport {
     pub errors: Vec<String>,

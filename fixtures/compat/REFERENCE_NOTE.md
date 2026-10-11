@@ -1,0 +1,1 @@
+This is a newly constructed source-artwork TEST FIXTURE from the known square-design geometry. It is NOT recovered historical artwork, a customer logo or proof of AI digitising. It represents a 14 mm square image positioned at (-2, -2) mm; the three-segment 10 mm design occupies (0,0) to (10,10). The DST is the pinned M1 fixture; no Rust compilation occurred in this extension.

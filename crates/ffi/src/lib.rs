@@ -8,7 +8,9 @@
 use std::ffi::CStr;
 use std::os::raw::{c_char, c_int};
 
-use embroidery_core::{validate, StitchPlan};
+use embroidery_core::{
+    capability_manifest, generate_project, parse_project, underlay_rules, validate, StitchPlan,
+};
 use embroidery_dst::compile_to_vec;
 use embroidery_simulate::score;
 
@@ -36,6 +38,50 @@ pub fn score_plan_json(plan_json: &str) -> Result<String, String> {
     let plan = parse_plan(plan_json)?;
     serde_json::to_string(&score(&plan))
         .map_err(|error| format!("Could not encode the risk report ({error})."))
+}
+
+pub fn generate_project_json(project_json: &str) -> Result<String, String> {
+    let project = parse_project(project_json).map_err(|error| error.to_string())?;
+    let generation = generate_project(&project).map_err(|error| error.to_string())?;
+    let dst_hex = if generation.readiness.engineering_export_allowed {
+        let bytes = compile_to_vec(&generation.plan, MAX_STITCH_MM, MAX_JUMP_MM)
+            .map_err(|error| error.to_string())?;
+        Some(encode_hex(&bytes))
+    } else {
+        None
+    };
+    let risk = score(&generation.plan);
+    serde_json::to_string(&serde_json::json!({
+        "ok": true,
+        "revision": generation.revision,
+        "readiness": generation.readiness,
+        "validation": generation.validation,
+        "provenance": generation.provenance,
+        "plan": generation.plan,
+        "dst_hex": dst_hex,
+        "risk": risk,
+    }))
+    .map_err(|error| format!("Could not encode the generation result ({error})."))
+}
+
+pub fn capabilities_json() -> String {
+    serde_json::to_string(&serde_json::json!({
+        "engine": "embroidery-core",
+        "engine_version": "0.1.0",
+        "capabilities": capability_manifest(),
+        "underlay": underlay_rules(),
+    }))
+    .expect("capability manifest")
+}
+
+fn encode_hex(bytes: &[u8]) -> String {
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    let mut out = String::with_capacity(bytes.len() * 2);
+    for byte in bytes {
+        out.push(HEX[(byte >> 4) as usize] as char);
+        out.push(HEX[(byte & 0x0f) as usize] as char);
+    }
+    out
 }
 
 fn parse_plan(plan_json: &str) -> Result<StitchPlan, String> {
@@ -98,6 +144,42 @@ pub unsafe extern "C" fn embroidery_score_json(
     dispatch(plan_json, out_ptr, out_len, out_cap, |json| {
         score_plan_json(json).map(String::into_bytes)
     })
+}
+
+/// # Safety
+///
+/// `project_json` is either null or a readable NUL-terminated string that
+/// remains valid for this call. The output pointers follow the same contract
+/// as [`embroidery_compile_dst_json`]. Success is a JSON generation result.
+/// Failure is a UTF-8 message with no trailing NUL.
+#[no_mangle]
+pub unsafe extern "C" fn embroidery_generate_project_json(
+    project_json: *const c_char,
+    out_ptr: *mut *mut u8,
+    out_len: *mut usize,
+    out_cap: *mut usize,
+) -> c_int {
+    dispatch(project_json, out_ptr, out_len, out_cap, |json| {
+        generate_project_json(json).map(String::into_bytes)
+    })
+}
+
+/// # Safety
+///
+/// `out_ptr`, `out_len`, and `out_cap` are either null or writable. On status
+/// 0 they describe a JSON capability manifest the caller must release with
+/// [`embroidery_free`]. On status 2 they are left untouched.
+#[no_mangle]
+pub unsafe extern "C" fn embroidery_capabilities_json(
+    out_ptr: *mut *mut u8,
+    out_len: *mut usize,
+    out_cap: *mut usize,
+) -> c_int {
+    if out_ptr.is_null() || out_len.is_null() || out_cap.is_null() {
+        return 2;
+    }
+    write_out(out_ptr, out_len, out_cap, capabilities_json().into_bytes());
+    0
 }
 
 /// # Safety
@@ -236,6 +318,56 @@ mod tests {
         let report: serde_json::Value =
             serde_json::from_slice(unsafe { std::slice::from_raw_parts(ptr, len) }).unwrap();
         assert_eq!(report["ok"], false);
+        unsafe { embroidery_free(ptr, len, cap) };
+    }
+
+    #[test]
+    fn generate_project_exports_dst_and_rejects_motif() {
+        let project = r#"{
+            "format": "embroidery-project",
+            "format_version": "1",
+            "name": "Line",
+            "hoop_width_mm": 120.0,
+            "hoop_height_mm": 100.0,
+            "objects": [{
+                "object_id": 1,
+                "label": "Outline",
+                "kind": "running",
+                "points": [{"x": 10.0, "y": 20.0}, {"x": 40.0, "y": 20.0}],
+                "angle_degrees": 0.0,
+                "density_mm": 2.5,
+                "column_width_mm": 2.0,
+                "max_stitch_mm": 2.5,
+                "underlay_spacing_mm": 0.0,
+                "underlay": [],
+                "pull_compensation_mm": 0.0,
+                "color_index": 0
+            }],
+            "review": null
+        }"#;
+        let json = CString::new(project).unwrap();
+        let mut ptr = std::ptr::null_mut();
+        let mut len = 0usize;
+        let mut cap = 0usize;
+        let code = unsafe {
+            embroidery_generate_project_json(json.as_ptr(), &mut ptr, &mut len, &mut cap)
+        };
+        assert_eq!(code, 0);
+        let body = unsafe { std::slice::from_raw_parts(ptr, len) };
+        let value: serde_json::Value = serde_json::from_slice(body).unwrap();
+        assert_eq!(value["readiness"]["machine_release_allowed"], false);
+        assert!(value["dst_hex"].as_str().unwrap().starts_with("4c41"));
+        unsafe { embroidery_free(ptr, len, cap) };
+
+        let motif = project.replace("\"running\"", "\"motif\"");
+        let json = CString::new(motif).unwrap();
+        let code = unsafe {
+            embroidery_generate_project_json(json.as_ptr(), &mut ptr, &mut len, &mut cap)
+        };
+        assert_eq!(code, 1);
+        let message = unsafe { std::slice::from_raw_parts(ptr, len) };
+        let message = std::str::from_utf8(message).unwrap();
+        assert!(message.contains("unavailable"));
         unsafe { embroidery_free(ptr, len, cap) };
     }
 

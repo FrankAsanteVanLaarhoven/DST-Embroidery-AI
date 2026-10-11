@@ -1,0 +1,13 @@
+[package]
+name = "embroidery-dst"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+description = "Tajima DST compiler and reader"
+
+[dependencies]
+embroidery-core = { path = "../core" }
+
+[lints.rust]
+unsafe_code = "forbid"

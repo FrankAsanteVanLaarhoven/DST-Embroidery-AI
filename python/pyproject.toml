@@ -1,0 +1,21 @@
+[project]
+name = "embroidery-ai"
+version = "0.1.0"
+description = "Region proposals and validation tools for the embroidery engine. Stitch planning stays in Rust."
+requires-python = ">=3.11"
+dependencies = ["pydantic>=2"]
+
+[project.optional-dependencies]
+test = ["pytest>=7", "pyembroidery"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["embroidery_ai*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

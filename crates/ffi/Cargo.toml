@@ -1,0 +1,21 @@
+[package]
+name = "embroidery-ffi"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+description = "C ABI and optional WASM bindings for the embroidery engine"
+
+[lib]
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[features]
+default = []
+wasm = ["dep:wasm-bindgen"]
+
+[dependencies]
+embroidery-core = { path = "../core" }
+embroidery-dst = { path = "../dst" }
+embroidery-simulate = { path = "../simulate" }
+serde_json = "1"
+wasm-bindgen = { version = "0.2", optional = true }

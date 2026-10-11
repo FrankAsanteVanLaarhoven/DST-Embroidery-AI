@@ -1,0 +1,13 @@
+[package]
+name = "embroidery-core"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+description = "Deterministic embroidery stitch model, geometry, and generators"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+
+[lints.rust]
+unsafe_code = "forbid"

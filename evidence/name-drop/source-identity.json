@@ -1,0 +1,65 @@
+{
+  "record": "pre-edit source state for lettering L2 name-drop",
+  "date": "2026-10-11",
+  "head": "23bd144ac42ef4a6d3cc10088a5ecdd5ef4556d1",
+  "branch_note": "svg-geometry-intake remains at this HEAD. This record does not move main.",
+  "git_status_short": " M README.md\n M apps/twinlab/public/app.mjs\n M apps/twinlab/public/index.html\n M apps/twinlab/public/style.css\n M crates/core/src/capabilities.rs\n M crates/core/src/generators/mod.rs\n M crates/core/src/generators/satin.rs\n M crates/core/src/lib.rs\n M crates/core/src/project.rs\n M crates/dst/src/compile.rs\n M crates/ffi/src/lib.rs\n M crates/studio/src/lib.rs\n M crates/studio/tests/workflow.rs\n M crates/twin/src/lib.rs\n M docs/engine.md\n M docs/quality/gate.md\n M web/index.html\n M web/studio.css\n M web/studio.js\n?? crates/core/src/lettering.rs\n?? crates/studio/src/svg_import.rs\n?? docs/svg-geometry-intake.md\n?? evidence/lettering/\n?? evidence/satin-underlay/\n?? evidence/satin-variable/\n?? evidence/svg-import/\n?? evidence/svg-native-gate.json\n?? fixtures/svg-geometry/\n?? python/embroidery_ai/svg_geometry.py\n?? tests/studio/lettering_browser.py\n?? tests/studio/satin_browser.py\n?? tests/studio/svg_browser.py\n?? tests/studio/underlay_browser.py\n?? tests/svg_geometry/\n?? tests/twinlab/lettering_browser.py\n?? tests/twinlab/satin_widths_browser.py\n?? tests/twinlab/underlay_browser.py\n?? tools/check_svg_geometry_native.py\n?? tools/import_svg_geometry.py\n",
+  "listeners": [
+    "embroider 40352 favl    3u  IPv4 0x94fcdab447499340      0t0  TCP 127.0.0.1:4173 (LISTEN)",
+    "node      79091 favl   14u  IPv4 0x737e89991b116e41      0t0  TCP 127.0.0.1:4181 (LISTEN)",
+    "embroider 91445 favl    4u  IPv4 0xef8b1b4062b84b7e      0t0  TCP 127.0.0.1:4176 (LISTEN)"
+  ],
+  "port_4175": "not measured as a fresh availability check; leave it down",
+  "binaries_before_l2_edits": {
+    "target/debug/embroidery-studio": {
+      "sha256": "323aff13e424bb0581e1dc700c7e9cbb1e2a2e53662d9c851df433efe425bf34",
+      "bytes": 3593232,
+      "mtime": 1791748183.610869
+    },
+    "target/debug/embroidery-twin": {
+      "sha256": "cdb9e4310f1b73fca34eea2f6a294f125613b153c84076714ec8af0c78fce064",
+      "bytes": 2449760,
+      "mtime": 1791748214.1902292
+    }
+  },
+  "locked_files": {
+    "contracts/EmbroideryOS_Master_Capability_Register_0_3.xlsx": {
+      "sha256": "d1cd2147c9a282d36a9e0ff6fc812bf9f5a775bb2bac6cf92360c7f82ca32128",
+      "bytes": 54782
+    },
+    "contracts/compatibility-coverage.json": {
+      "sha256": "829295f1095ff5080b454e6b2a8a0893da531d300ad07e790e7383caac687db6",
+      "bytes": 32594
+    },
+    "contracts/inherited/compatibility-coverage-0.2.json": {
+      "sha256": "829295f1095ff5080b454e6b2a8a0893da531d300ad07e790e7383caac687db6",
+      "bytes": 32594
+    },
+    "evidence/lettering/source-identity.json": {
+      "sha256": "0dba53ea506e5f3bb155f4834cca3ec1eabddf96bff5f63a78de1f87fc1855b3",
+      "bytes": 6536
+    }
+  },
+  "f06": {
+    "id": "F06",
+    "feature": "Name Drop",
+    "acceptance_status": "NOT_RUN",
+    "implementation_status": "PLANNED",
+    "requirement": "Generate batch personalised names from validated tables.",
+    "positive_case": "No names are dropped or substituted; each job has its own revision/hash and glyph check.",
+    "negative_case": "Reject an unsupported input or configuration; preserve source and previous revision on failure.",
+    "acceptance_dependencies": [
+      "G01",
+      "G02",
+      "G03",
+      "G04"
+    ],
+    "this_changeset": "bounded implementation candidate only; do not mark F06 or F01-F11 accepted"
+  },
+  "preserved": [
+    "evidence/lettering L1 proofs are not rewritten by this record",
+    "font version 1 content hash stays aca657de98489950e35cb72d7c802d9a4d81958f2915b93307af7b9a4ca028bd",
+    "machine_release_allowed stays false",
+    "0/210 acceptance stays unchanged"
+  ]
+}

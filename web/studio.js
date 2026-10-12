@@ -8,6 +8,7 @@ const PALETTE = [
   { name: "Gold", ink: "#b08a3e" },
 ];
 const NOMINAL_SPM = 650;
+const SVG = "http://www.w3.org/2000/svg";
 const VIEWS = ["overview", "library", "studio", "validation", "approvals", "production", "materials", "insights", "settings"];
 
 const state = {
@@ -30,6 +31,11 @@ const state = {
   listening: false,
   recognition: null,
   attachedImage: null,
+  svgPreview: null,
+  font: null,
+  fonts: [],
+  designEpoch: 0,
+  batchInspection: null,
 };
 
 const objectsEl = document.querySelector("#objects");
@@ -70,7 +76,15 @@ document.querySelector("#appearance").addEventListener("change", saveAppearance)
 document.querySelector("#motion").addEventListener("change", savePreferences);
 document.querySelector("#opaque").addEventListener("change", savePreferences);
 document.querySelector("#add-object").addEventListener("click", addObject);
+document.querySelector("#add-text").addEventListener("click", addText);
 document.querySelector("#open-sample").addEventListener("click", openSample);
+document.querySelector("#save-project").addEventListener("click", downloadProject);
+document.querySelector("#open-project").addEventListener("change", (event) => {
+  const input = event.target;
+  const file = input.files && input.files[0];
+  input.value = "";
+  if (file) openProjectFile(file);
+});
 document.querySelector("#explore-proposal").addEventListener("click", exploreProposal);
 document.querySelector("#apply-proposal").addEventListener("click", applyProposal);
 document.querySelector("#record-review").addEventListener("click", recordReview);
@@ -91,6 +105,9 @@ document.querySelector("#voice-input").addEventListener("click", voiceInput);
 document.querySelector("#apply-design").addEventListener("click", () => applyDesign(false));
 document.querySelector("#apply-generate").addEventListener("click", () => applyDesign(true));
 document.querySelector("#discard-design").addEventListener("click", discardDesign);
+document.querySelector("#svg-form").addEventListener("submit", previewSvg);
+document.querySelector("#svg-apply").addEventListener("click", applySvg);
+document.querySelector("#svg-cancel").addEventListener("click", cancelSvg);
 document.querySelector("#design-prompt").addEventListener("paste", onPromptPaste);
 document.querySelector("#design-prompt").addEventListener("keydown", (event) => {
   if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
@@ -127,8 +144,12 @@ function snapshot() {
 }
 
 function restore(text) {
+  const selected = state.selected;
   state.project = JSON.parse(text);
-  state.selected = state.project.objects[0] ? state.project.objects[0].object_id : null;
+  const stillThere = state.project.objects.some((object) => object.object_id === selected);
+  state.selected = stillThere
+    ? selected
+    : (state.project.objects[0] ? state.project.objects[0].object_id : null);
   state.notice = "";
   showError("");
   render();
@@ -138,23 +159,41 @@ function undo() {
   if (!state.undo.length || state.busy) return;
   state.redo.push(snapshot());
   restore(state.undo.pop());
+  noteDesignChange();
 }
 
 function redo() {
   if (!state.redo.length || state.busy) return;
   state.undo.push(snapshot());
   restore(state.redo.pop());
+  noteDesignChange();
+}
+
+function syncFormat(project) {
+  if (!project) return;
+  project.format_version = project.objects.some((object) => object.kind === "text") ? "2" : "1";
 }
 
 function edit(mutator) {
+  if (edit.lock) {
+    mutator();
+    syncFormat(state.project);
+    edit.again = 1;
+    return;
+  }
   const before = snapshot();
   mutator();
-  if (snapshot() !== before) {
-    state.notice = "";
-    state.playing = false;
-    showError("");
-    remember(before);
-    render();
+  syncFormat(state.project);
+  if (snapshot() === before) return;
+  state.notice = "";
+  state.playing = false;
+  showError("");
+  remember(before);
+  noteDesignChange();
+  edit.lock = 1;
+  try { render(); } finally {
+    edit.lock = 0;
+    if (edit.again) { edit.again = 0; render(); }
   }
 }
 
@@ -206,6 +245,7 @@ function kindLabel(kind) {
   if (kind === "fill") return "Scanline fill";
   if (kind === "running") return "Running stitch";
   if (kind === "satin") return "Satin";
+  if (kind === "text") return "Text";
   return kind + " (unavailable)";
 }
 
@@ -233,7 +273,9 @@ function render() {
     const name = document.createElement("span");
     name.textContent = item.label;
     const kind = document.createElement("small");
-    kind.textContent = kindLabel(item.kind);
+    kind.textContent = item.kind === "text" && item.text
+      ? "Text · " + item.text.content
+      : kindLabel(item.kind);
     copy.append(name, kind);
     button.append(chip, copy);
     button.setAttribute("aria-pressed", item.object_id === state.selected ? "true" : "false");
@@ -265,6 +307,10 @@ function render() {
   document.querySelector("#voice-input").disabled = state.busy;
   document.querySelector("#apply-design").disabled = state.busy || !state.designProposal;
   document.querySelector("#apply-generate").disabled = state.busy || !state.designProposal;
+  document.querySelector("#svg-import").disabled = state.busy;
+  document.querySelector("#svg-apply").disabled = state.busy || !state.svgPreview;
+  document.querySelector("#svg-cancel").disabled = state.busy;
+  ensureNameDrop();
 }
 
 function renderChrome(project) {
@@ -414,18 +460,18 @@ function renderFields(object) {
     fieldsEl.append(empty);
     return;
   }
-  const known = object.kind === "running" || object.kind === "satin" || object.kind === "fill";
+  const known = object.kind === "running" || object.kind === "satin" || object.kind === "fill" || object.kind === "text";
   if (!known) {
     const warning = document.createElement("p");
     warning.className = "hint";
-    warning.textContent = object.kind + " is planned and unavailable. Choose running, satin, or fill.";
+    warning.textContent = object.kind + " is planned and unavailable. Choose running, satin, fill, or text.";
     fieldsEl.append(warning);
   }
   fieldsEl.append(field("Object name", "text", object.label, (value) => { object.label = value; }));
   const kind = document.createElement("label");
   kind.textContent = "Stitch type";
   const select = document.createElement("select");
-  ["running", "satin", "fill"].forEach((name) => {
+  ["running", "satin", "fill", "text"].forEach((name) => {
     const option = document.createElement("option");
     option.value = name;
     option.textContent = name;
@@ -439,10 +485,35 @@ function renderFields(object) {
     option.selected = true;
     select.append(option);
   }
-  select.addEventListener("change", () => edit(() => {
-    object.kind = select.value;
-    if (select.value !== "fill") delete object.holes;
-  }));
+  select.addEventListener("change", () => {
+    if (select.value === "text" && !(state.font && state.font.sha256)) {
+      showError("The EmbroideryOS Block 01 identity has not loaded. Reload the studio and try again. The object was not changed.");
+      select.value = object.kind;
+      return;
+    }
+    edit(() => {
+      const nextKind = select.value;
+      if (nextKind === "text") {
+        const origin = object.points && object.points.length ? bounds(object) : { x: 18, y: 40 };
+        object.kind = "text";
+        object.points = [];
+        delete object.holes;
+        delete object.column_widths_mm;
+        object.angle_degrees = 0;
+        object.underlay_spacing_mm = 0;
+        object.density_mm = object.density_mm > 0 ? object.density_mm : 0.6;
+        object.column_width_mm = object.column_width_mm > 0 ? object.column_width_mm : 1.92;
+        object.text = blankText(origin);
+      } else {
+        delete object.text;
+        object.kind = nextKind;
+        if (!object.points || object.points.length < 2) {
+          object.points = [{ x: 20, y: 20 }, { x: 40, y: 20 }];
+        }
+        if (nextKind !== "fill") delete object.holes;
+      }
+    });
+  });
   kind.append(select);
   fieldsEl.append(kind);
   if (object.kind === "fill") {
@@ -468,16 +539,72 @@ function renderFields(object) {
     fieldsEl.append(numberField("Station spacing · mm", object.density_mm, (value) => { object.density_mm = value; }));
     fieldsEl.append(numberField("Column width · mm", object.column_width_mm, (value) => { object.column_width_mm = value; }));
     fieldsEl.append(numberField("Pull compensation · mm", object.pull_compensation_mm, (value) => { object.pull_compensation_mm = value; }));
-    fieldsEl.append(numberField("Underlay stitch · mm", object.max_stitch_mm, (value) => { object.max_stitch_mm = value; }));
-    const paired = object.underlay.includes("centre_run") && object.underlay.includes("edge_run");
-    fieldsEl.append(check("Centre and edge underlay", paired, (checked) => {
-      object.underlay = checked ? ["centre_run", "edge_run"] : [];
-    }));
-    const pairNote = document.createElement("p");
-    pairNote.className = "hint";
-    pairNote.textContent = "The satin generator sews centre run and edge run together. Zigzag underlay is planned and unavailable.";
-    fieldsEl.append(pairNote);
+    fieldsEl.append(numberField("Inherited run length · mm", object.max_stitch_mm, (value) => {
+      object.max_stitch_mm = value;
+      if (Object.is(object.centre_run_max_stitch_mm, value)) delete object.centre_run_max_stitch_mm;
+      if (Object.is(object.edge_run_max_stitch_mm, value)) delete object.edge_run_max_stitch_mm;
+    }, "inherited-run-length"));
+    const centreOn = object.underlay.includes("centre_run");
+    const edgeOn = object.underlay.includes("edge_run");
+    fieldsEl.append(check("Centre run", centreOn, (checked) => {
+      setSatinPass(object, "centre_run", checked);
+    }, "centre-run"));
+    fieldsEl.append(check("Edge run", edgeOn, (checked) => {
+      setSatinPass(object, "edge_run", checked);
+    }, "edge-run"));
+    if (centreOn) {
+      fieldsEl.append(runLengthField(
+        object,
+        "Centre-run maximum stitch length · mm",
+        "centre_run_max_stitch_mm",
+        "centre-run-length",
+      ));
+    }
+    if (edgeOn) {
+      fieldsEl.append(runLengthField(
+        object,
+        "Edge-run maximum stitch length · mm",
+        "edge_run_max_stitch_mm",
+        "edge-run-length",
+      ));
+    }
+    const unsupported = object.underlay.filter((name) => name !== "centre_run" && name !== "edge_run");
+    if (unsupported.length) {
+      const warn = document.createElement("p");
+      warn.className = "hint";
+      warn.id = "underlay-unsupported";
+      warn.textContent = "This object requests " + unsupported.join(", ") + ", which this satin generator does not sew. It was not replaced.";
+      const clear = document.createElement("button");
+      clear.type = "button";
+      clear.id = "clear-unavailable-underlay";
+      clear.textContent = "Remove unavailable underlay";
+      clear.addEventListener("click", () => edit(() => {
+        object.underlay = object.underlay.filter((name) => name === "centre_run" || name === "edge_run");
+      }));
+      fieldsEl.append(warn, clear);
+    }
+    const widths = document.createElement("label");
+    widths.append(document.createTextNode("Column widths · mm"));
+    const widthList = document.createElement("textarea");
+    widthList.id = "column-widths";
+    widthList.rows = 3;
+    widthList.value = (object.column_widths_mm || []).join("\n");
+    widthList.addEventListener("change", () => {
+      const parsed = parseWidths(widthList.value);
+      if (!parsed) {
+        showError("Enter one column width per line, from just above 0 mm to 48 mm, or leave the list empty to keep the single column width.");
+        widthList.value = (object.column_widths_mm || []).join("\n");
+        return;
+      }
+      edit(() => { object.column_widths_mm = parsed; });
+    });
+    widths.append(widthList);
+    const widthNote = document.createElement("p");
+    widthNote.className = "hint";
+    widthNote.textContent = "One width for each centreline point varies the column. Leave this empty to keep the single column width. A sewing movement wider than 12 mm on an axis is split into at most 16 pieces. A satin segment shorter than 0.2 mm is omitted. Underlay running stitches keep their own length and are not omitted at 0.2 mm. A folded or crossing column is rejected with either pass off. Centre run and edge run can be selected alone or together.";
+    fieldsEl.append(widths, widthNote);
   }
+  if (object.kind === "text" && object.text) appendTextFields(object);
   if (object.kind !== "fill") fieldsEl.append(colourField(object));
   if (object.kind === "running") {
     fieldsEl.append(numberField("Maximum stitch · mm", object.max_stitch_mm, (value) => { object.max_stitch_mm = value; }));
@@ -507,11 +634,20 @@ function renderFields(object) {
   fieldsEl.append(order);
   const limit = document.createElement("p");
   limit.className = "hint";
-  limit.textContent = "Perpendicular underlay and satin pull compensation use the Rust generators. Stitch-level sculpting and a fabric simulation are not implemented. Unsupported controls are not shown as active.";
+  limit.textContent = "Centre run and edge run are separate satin passes. Perpendicular underlay is the fill pass. Zigzag underlay, offsets, and a fabric simulation are not implemented. Text uses explicit lines in EmbroideryOS Block 01. Unsupported controls are not shown as active.";
   fieldsEl.append(limit);
   const geometryTitle = document.createElement("h2");
   geometryTitle.textContent = "Geometry";
-  geometry.append(geometryTitle, pointsField(object));
+  geometry.append(geometryTitle);
+  if (object.kind === "text") {
+    const note = document.createElement("p");
+    note.className = "hint";
+    note.id = "text-geometry-note";
+    note.textContent = "This object stays text. Rust lays out EmbroideryOS Block 01 and returns the stitches. The preview does not use a browser font.";
+    geometry.append(note);
+  } else {
+    geometry.append(pointsField(object));
+  }
   if (object.kind === "fill") geometry.append(holesField(object));
   const nudgeRow = document.createElement("div");
   nudgeRow.className = "row";
@@ -552,43 +688,166 @@ function colourField(object) {
   return wrap;
 }
 
-function field(label, type, value, apply) {
+function field(label, type, value, apply, id) {
   const wrap = document.createElement("label");
   wrap.append(document.createTextNode(label));
   const input = document.createElement("input");
   input.type = type;
   input.value = value;
+  if (id) {
+    input.id = id;
+    wrap.htmlFor = id;
+  }
   input.addEventListener("change", () => edit(() => apply(input.value)));
   wrap.append(input);
   return wrap;
 }
 
-function numberField(label, value, apply) {
+function blankText(origin) {
+  const font = state.font;
+  return {
+    content: "ALPINE 08",
+    font_id: font.id,
+    font_version: font.version,
+    font_sha256: font.sha256,
+    origin_x_mm: origin.x,
+    origin_y_mm: origin.y,
+    cap_height_mm: 12,
+    letter_spacing_mm: 0.8,
+    word_spacing_mm: 3.6,
+  };
+}
+
+function appendTextFields(object) {
+  const pinned = object.text.font_sha256;
+  const pin = document.createElement("p");
+  pin.className = "hint";
+  pin.id = "font-pin";
+  const known = (state.fonts || []).some((font) => font.sha256 === pinned) || (state.font && state.font.sha256 === pinned);
+  pin.textContent = "Font " + object.text.font_id + " version " + object.text.font_version + ". Content " + String(pinned).slice(0, 12) + ". "
+    + (known
+      ? "Pinned to the engine recipe."
+      : "Pinned recipe differs from the loaded engine recipe. It was not retargeted.");
+  fieldsEl.append(pin);
+  letteringInspect(object, fieldsEl, edit);
+  fieldsEl.append(boundedNumber(
+    "Cap height · mm",
+    object.text.cap_height_mm,
+    (value) => { object.text.cap_height_mm = value; },
+    "cap-height",
+    (value) => value > 0 && value <= 200,
+    "Cap height must be greater than 0 mm and at most 200 mm. That is a software limit, not a measured sewing range. The design was not changed.",
+  ));
+  fieldsEl.append(boundedNumber(
+    "Letter spacing · mm",
+    object.text.letter_spacing_mm,
+    (value) => { object.text.letter_spacing_mm = value; },
+    "letter-spacing",
+    (value) => value >= 0 && value <= 1000,
+    "Letter spacing must be from 0 mm to 1000 mm. Text is not shrunk to fit. The design was not changed.",
+  ));
+  fieldsEl.append(boundedNumber(
+    "Word spacing · mm",
+    object.text.word_spacing_mm,
+    (value) => { object.text.word_spacing_mm = value; },
+    "word-spacing",
+    (value) => value >= 0 && value <= 1000,
+    "Word spacing must be from 0 mm to 1000 mm. A space only advances the line. The design was not changed.",
+  ));
+  fieldsEl.append(numberField("Station spacing · mm", object.density_mm, (value) => { object.density_mm = value; }, "station-spacing"));
+  fieldsEl.append(numberField("Column width · mm", object.column_width_mm, (value) => { object.column_width_mm = value; }, "column-width"));
+  fieldsEl.append(numberField("Pull compensation · mm", object.pull_compensation_mm, (value) => { object.pull_compensation_mm = value; }));
+  fieldsEl.append(numberField("Inherited run length · mm", object.max_stitch_mm, (value) => {
+    object.max_stitch_mm = value;
+    if (Object.is(object.centre_run_max_stitch_mm, value)) delete object.centre_run_max_stitch_mm;
+    if (Object.is(object.edge_run_max_stitch_mm, value)) delete object.edge_run_max_stitch_mm;
+  }, "inherited-run-length"));
+  const centreOn = object.underlay.includes("centre_run");
+  const edgeOn = object.underlay.includes("edge_run");
+  fieldsEl.append(check("Centre run", centreOn, (checked) => {
+    setSatinPass(object, "centre_run", checked);
+  }, "centre-run"));
+  fieldsEl.append(check("Edge run", edgeOn, (checked) => {
+    setSatinPass(object, "edge_run", checked);
+  }, "edge-run"));
+  if (centreOn) {
+    fieldsEl.append(runLengthField(object, "Centre-run maximum stitch length · mm", "centre_run_max_stitch_mm", "centre-run-length"));
+  }
+  if (edgeOn) {
+    fieldsEl.append(runLengthField(object, "Edge-run maximum stitch length · mm", "edge_run_max_stitch_mm", "edge-run-length"));
+  }
+}
+
+function numberField(label, value, apply, id) {
+  return boundedNumber(
+    label,
+    value,
+    apply,
+    id,
+    (next) => Number.isFinite(next),
+    "Enter a finite number for " + label + ", then generate again.",
+  );
+}
+
+function boundedNumber(label, value, apply, id, valid, problem) {
   const wrap = document.createElement("label");
   wrap.append(document.createTextNode(label));
   const input = document.createElement("input");
   input.type = "number";
   input.step = "0.1";
   input.value = String(Math.round(value * 1000) / 1000);
+  if (id) {
+    input.id = id;
+    wrap.htmlFor = id;
+  }
   input.addEventListener("change", () => {
     const next = Number(input.value);
-    if (!Number.isFinite(next)) {
-      showError("Enter a finite number for " + label + ", then generate again.");
-      input.value = String(value);
+    if (!valid(next)) {
+      showError(problem);
+      input.value = String(Math.round(value * 1000) / 1000);
       return;
     }
+    if (Object.is(next, value)) return;
     edit(() => apply(next));
   });
   wrap.append(input);
   return wrap;
 }
 
-function check(label, checked, apply) {
+function setSatinPass(object, name, on) {
+  const centre = name === "centre_run" ? on : object.underlay.includes("centre_run");
+  const edge = name === "edge_run" ? on : object.underlay.includes("edge_run");
+  const names = object.underlay.filter((item) => item !== "centre_run" && item !== "edge_run");
+  if (centre) names.push("centre_run");
+  if (edge) names.push("edge_run");
+  object.underlay = names;
+  if (!centre) delete object.centre_run_max_stitch_mm;
+  if (!edge) delete object.edge_run_max_stitch_mm;
+}
+
+function shownPassLength(object, field) {
+  return typeof object[field] === "number" ? object[field] : object.max_stitch_mm;
+}
+
+function runLengthField(object, label, field, id) {
+  const shown = shownPassLength(object, field);
+  return boundedNumber(label, shown, (value) => {
+    if (Object.is(value, object.max_stitch_mm)) delete object[field];
+    else object[field] = value;
+  }, id, (value) => Number.isFinite(value) && value > 0 && value <= 12.1,
+  label + " must be greater than 0 mm and at most 12.1 mm. Reduce that length and generate again. The design was not changed.");
+}
+
+function check(label, checked, apply, id) {
   const wrap = document.createElement("label");
   wrap.className = "choice";
   const input = document.createElement("input");
   input.type = "checkbox";
   input.checked = checked;
+  if (id) {
+    input.id = id;
+    wrap.htmlFor = id;
+  }
   input.addEventListener("change", () => edit(() => apply(input.checked)));
   wrap.append(input, document.createTextNode(label));
   return wrap;
@@ -611,6 +870,18 @@ function pointsField(object) {
   });
   wrap.append(area);
   return wrap;
+}
+
+function parseWidths(text) {
+  const widths = [];
+  for (const line of text.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    const value = Number(trimmed);
+    if (!Number.isFinite(value) || value <= 0 || value > 48) return null;
+    widths.push(value);
+  }
+  return widths;
 }
 
 function parsePoints(text) {
@@ -676,6 +947,9 @@ function parseHoles(text) {
 }
 
 function bounds(object) {
+  if (object.kind === "text" && object.text) {
+    return { x: object.text.origin_x_mm, y: object.text.origin_y_mm };
+  }
   return {
     x: Math.min(...object.points.map((point) => point.x)),
     y: Math.min(...object.points.map((point) => point.y)),
@@ -683,9 +957,18 @@ function bounds(object) {
 }
 
 function translate(object, dx, dy) {
+  const round = (value) => Math.round(value * 1000) / 1000;
+  if (object.kind === "text" && object.text) {
+    object.text.origin_x_mm = round(object.text.origin_x_mm + dx);
+    object.text.origin_y_mm = round(object.text.origin_y_mm + dy);
+    if (object.text.layout) {
+      object.text.layout.first_baseline_mm = round(object.text.layout.first_baseline_mm + dy);
+    }
+    return;
+  }
   const move = (point) => {
-    point.x = Math.round((point.x + dx) * 1000) / 1000;
-    point.y = Math.round((point.y + dy) * 1000) / 1000;
+    point.x = round(point.x + dx);
+    point.y = round(point.y + dy);
   };
   object.points.forEach(move);
   (object.holes || []).forEach((ring) => ring.forEach(move));
@@ -704,6 +987,33 @@ function reorder(direction) {
   edit(() => {
     const [item] = state.project.objects.splice(index, 1);
     state.project.objects.splice(next, 0, item);
+  });
+}
+
+function addText() {
+  if (!state.project) return;
+  if (!state.font || !state.font.sha256) {
+    showError("The EmbroideryOS Block 01 identity has not loaded. Reload the studio and try again. The design was not changed.");
+    return;
+  }
+  const next = state.project.objects.reduce((max, object) => Math.max(max, object.object_id), 0) + 1;
+  edit(() => {
+    state.project.objects.push({
+      object_id: next,
+      label: "Lettering",
+      kind: "text",
+      points: [],
+      angle_degrees: 0,
+      density_mm: 0.6,
+      column_width_mm: 1.92,
+      max_stitch_mm: 3,
+      underlay_spacing_mm: 0,
+      underlay: [],
+      pull_compensation_mm: 0,
+      color_index: 1,
+      text: blankText({ x: 18, y: 40 }),
+    });
+    state.selected = next;
   });
 }
 
@@ -749,7 +1059,7 @@ function renderCanvas() {
   canvas.setAttribute("viewBox", originX + " " + originY + " " + width + " " + height);
   document.querySelector("#zoom-label").textContent = Math.round(zoom * 100) + "%";
   canvas.replaceChildren(canvas.querySelector("title"), canvas.querySelector("desc"));
-  const hoop = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  const hoop = document.createElementNS(SVG, "rect");
   hoop.setAttribute("class", "hoop");
   hoop.setAttribute("x", "0");
   hoop.setAttribute("y", "0");
@@ -759,6 +1069,15 @@ function renderCanvas() {
   canvas.append(hoop);
   const plan = state.result && state.result.plan;
   for (const object of project.objects) {
+    if (object.kind === "text" && object.text) {
+      const marker = document.createElementNS(SVG, "circle");
+      marker.setAttribute("class", object.object_id === state.selected ? "region selected" : "region");
+      marker.setAttribute("cx", String(object.text.origin_x_mm));
+      marker.setAttribute("cy", String(object.text.origin_y_mm));
+      marker.setAttribute("r", "1.4");
+      marker.setAttribute("fill", "none");
+      canvas.append(marker);
+    }
     appendRing(object.points, object, false);
     for (const hole of object.holes || []) appendRing(hole, object, true);
     if (plan && state.mode === "artwork") drawObjectPlan(plan, object);
@@ -812,7 +1131,7 @@ function drawPlan(plan, mode) {
 
 function appendRing(points, object, hole) {
   if (!points || points.length < 2) return;
-  const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+  const polygon = document.createElementNS(SVG, "polygon");
   const selected = object && object.object_id === state.selected && !hole;
   polygon.setAttribute("class", selected ? "region selected" : "region");
   polygon.setAttribute("points", points.map((point) => point.x + "," + point.y).join(" "));
@@ -835,11 +1154,23 @@ function appendRing(points, object, hole) {
 }
 
 function appendSelection(object) {
-  if (!object || !object.points || !object.points.length) return;
+  if (!object) return;
+  if (object.kind === "text" && object.text) {
+    const pad = 3;
+    const rect = document.createElementNS(SVG, "rect");
+    rect.setAttribute("class", "selection");
+    rect.setAttribute("x", String(object.text.origin_x_mm - pad));
+    rect.setAttribute("y", String(object.text.origin_y_mm - pad));
+    rect.setAttribute("width", String(pad * 2));
+    rect.setAttribute("height", String(pad * 2 + (Number(object.text.cap_height_mm) || 0)));
+    canvas.append(rect);
+    return;
+  }
+  if (!object.points || !object.points.length) return;
   const xs = object.points.map((point) => point.x);
   const ys = object.points.map((point) => point.y);
   const pad = 4;
-  const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  const rect = document.createElementNS(SVG, "rect");
   rect.setAttribute("class", "selection");
   rect.setAttribute("x", String(Math.min(...xs) - pad));
   rect.setAttribute("y", String(Math.min(...ys) - pad));
@@ -849,7 +1180,7 @@ function appendSelection(object) {
 }
 
 function drawSegment(stitch, colour, jump, faint) {
-  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  const line = document.createElementNS(SVG, "line");
   line.setAttribute("class", faint ? "stitch faint" : (jump ? "jump" : "stitch"));
   line.setAttribute("x1", String(stitch.from.x));
   line.setAttribute("y1", String(stitch.from.y));
@@ -879,6 +1210,7 @@ function renderResult() {
     notesEl.replaceChildren();
     checksEl.replaceChildren();
     riskEl.replaceChildren();
+    showPhases("");
     return;
   }
   readinessEl.textContent = changed ? "Draft · edits are not generated yet" : result.readiness.label;
@@ -892,6 +1224,12 @@ function renderResult() {
   document.querySelector("#preview-note").textContent = changed
     ? "These edits are not in the stitch plan yet. Generate stitches to update the preview."
     : (state.notice || "Preview matches the generated revision. Machine release remains unavailable.");
+  if (changed) {
+    showPhases("Underlay phases belong to the last generated plan. Generate again to refresh them.");
+  } else {
+    const phases = (result.readiness.notes || []).filter((note) => note.includes("Centre-run underlay") || note.includes("EmbroideryOS Block 01"));
+    showPhases(phases.join(" "));
+  }
   notesEl.replaceChildren();
   (result.readiness.notes || []).forEach((note) => {
     const p = document.createElement("p");
@@ -926,6 +1264,11 @@ function addItem(list, message) {
 
 function showError(message) {
   errorsEl.textContent = message || "";
+}
+
+function showPhases(text) {
+  const phases = document.querySelector("#phases");
+  if (phases) phases.textContent = text || "";
 }
 
 function setPromptStatus(message) {
@@ -1127,6 +1470,156 @@ function applyDesign(andGenerate) {
   if (andGenerate) generate();
 }
 
+async function previewSvg(event) {
+  event.preventDefault();
+  if (state.busy || !state.project) return;
+  const input = document.querySelector("#svg-file");
+  const file = input.files && input.files[0];
+  if (!file) {
+    const message = "Choose an SVG file, then preview the import. The design was not changed.";
+    setSvgStatus(message);
+    showError(message);
+    return;
+  }
+  const widthText = document.querySelector("#svg-width").value.trim();
+  let widthMm = null;
+  if (widthText) {
+    widthMm = Number(widthText);
+    if (!Number.isFinite(widthMm) || widthMm <= 0 || widthMm > 10000) {
+      const message = "Artboard width must be a positive number of millimetres up to 10000. Enter the physical width and preview again. The design was not changed.";
+      setSvgStatus(message);
+      showError(message);
+      return;
+    }
+  }
+  state.busy = true;
+  clearSvgPreview();
+  const button = document.querySelector("#svg-import");
+  button.textContent = "Previewing…";
+  button.setAttribute("aria-busy", "true");
+  setSvgStatus("Reading the SVG as geometry. Stitches are not generated yet.");
+  showError("");
+  render();
+  const basis = canonical(state.project);
+  try {
+    const svgText = await file.text();
+    if (new TextEncoder().encode(svgText).length > 400000) {
+      throw new Error("This SVG is larger than 400000 bytes. Simplify it and preview again. The design was not changed.");
+    }
+    const stem = file.name.replace(/^.*[\\/]/, "").replace(/\.svg$/i, "").replace(/\s+/g, " ").trim().slice(0, 80);
+    const body = await post("/api/import-svg", {
+      svg_text: svgText,
+      width_mm: widthMm,
+      running_strokes: document.querySelector("#svg-strokes").checked,
+      name: stem || "Imported vector",
+    }, 20000);
+    state.svgPreview = { body, basis };
+    showSvgPreview(body);
+    setSvgStatus("Import preview ready. The current design is unchanged until you apply it.");
+  } catch (error) {
+    clearSvgPreview();
+    setSvgStatus(error.message);
+    showError(error.message);
+  } finally {
+    state.busy = false;
+    button.textContent = "Preview import";
+    button.removeAttribute("aria-busy");
+    render();
+  }
+}
+
+function showSvgPreview(body) {
+  const panel = document.querySelector("#svg-preview");
+  panel.hidden = false;
+  document.querySelector("#svg-summary").textContent = body.summary || "Geometry import ready.";
+  const sha = body.manifest && body.manifest.source_sha256;
+  document.querySelector("#svg-source").textContent = sha
+    ? "Source SHA-256 " + sha + ". This is the UTF-8 text converted for this preview."
+    : "The source hash was not returned.";
+  const objects = document.querySelector("#svg-objects");
+  objects.replaceChildren();
+  ((body.project && body.project.objects) || []).forEach((object) => {
+    const item = document.createElement("li");
+    const holes = object.holes && object.holes.length ? " · " + object.holes.length + " holes" : "";
+    item.textContent = object.label + " · " + kindLabel(object.kind) + " · " + object.points.length + " points" + holes;
+    objects.append(item);
+  });
+  const losses = document.querySelector("#svg-losses");
+  losses.replaceChildren();
+  (body.losses || []).forEach((loss) => {
+    const item = document.createElement("li");
+    item.textContent = loss;
+    losses.append(item);
+  });
+  const palette = document.querySelector("#svg-palette");
+  palette.replaceChildren();
+  ((body.manifest && body.manifest.palette) || []).forEach((colour) => {
+    const item = document.createElement("li");
+    const text = document.createElement("span");
+    text.textContent = "Colour " + (Number(colour.color_index) + 1) + " · " + colour.source;
+    if (typeof colour.source === "string" && /^#[0-9a-fA-F]{6}$/.test(colour.source)) {
+      const chip = document.createElement("span");
+      chip.className = "swatch";
+      chip.style.background = colour.source;
+      chip.setAttribute("aria-hidden", "true");
+      item.append(chip);
+    }
+    item.append(text);
+    palette.append(item);
+  });
+}
+
+function applySvg() {
+  if (!state.svgPreview || !state.svgPreview.body || !state.svgPreview.body.project) {
+    const message = "Preview an SVG before applying it. The design was not changed.";
+    setSvgStatus(message);
+    showError(message);
+    return;
+  }
+  if (canonical(state.project) !== state.svgPreview.basis) {
+    const message = "The design changed after this preview. Import the SVG again. Nothing was applied.";
+    clearSvgPreview();
+    setSvgStatus(message);
+    showError(message);
+    render();
+    return;
+  }
+  const project = JSON.parse(JSON.stringify(state.svgPreview.body.project));
+  clearSvgPreview();
+  edit(() => {
+    state.project = project;
+    state.selected = project.objects[0] ? project.objects[0].object_id : null;
+  });
+  setSvgStatus("The SVG geometry is now an edit. Generate stitches to update the Rust plan. This import did not approve itself.");
+}
+
+function cancelSvg() {
+  clearSvgPreview();
+  setSvgStatus("Import cancelled. The design was not changed.");
+  showError("");
+  render();
+}
+
+function clearSvgPreview() {
+  state.svgPreview = null;
+  const panel = document.querySelector("#svg-preview");
+  if (panel) panel.hidden = true;
+  const summary = document.querySelector("#svg-summary");
+  if (summary) summary.textContent = "";
+  const source = document.querySelector("#svg-source");
+  if (source) source.textContent = "";
+  const objects = document.querySelector("#svg-objects");
+  if (objects) objects.replaceChildren();
+  const losses = document.querySelector("#svg-losses");
+  if (losses) losses.replaceChildren();
+  const palette = document.querySelector("#svg-palette");
+  if (palette) palette.replaceChildren();
+}
+
+function setSvgStatus(message) {
+  document.querySelector("#svg-status").textContent = message || "";
+}
+
 function discardDesign() {
   state.designProposal = null;
   document.querySelector("#design-proposal").hidden = true;
@@ -1197,6 +1690,9 @@ async function post(url, payload, timeoutMs) {
     return body;
   } catch (error) {
     if (error.name === "AbortError") {
+      if (url === "/api/import-svg") {
+        throw new Error("The SVG import did not finish. Try a simpler file. The design was not changed.");
+      }
       if (limit > 30000) {
         throw new Error("The proposal did not finish within 100 seconds. Ask again. The design was not changed.");
       }
@@ -1222,6 +1718,10 @@ async function generate() {
     state.result = result;
     state.basis = canonical(state.project);
     state.cursor = result.plan.stitches.length;
+    const svgStatus = document.querySelector("#svg-status");
+    if (svgStatus && svgStatus.textContent.includes("now an edit")) {
+      setSvgStatus("Stitches were generated from the imported geometry. Machine release remains unavailable.");
+    }
     render();
   } catch (error) {
     showError(error.message);
@@ -1264,6 +1764,59 @@ function openTwinLab() {
     return;
   }
   window.location.href = "/twinlab";
+}
+
+function downloadProject() {
+  if (!state.project) return;
+  const blob = new Blob([JSON.stringify(state.project, null, 2)], { type: "application/json" });
+  const link = document.createElement("a");
+  const name = (state.project.name || "design").replace(/[^A-Za-z0-9._-]+/g, "_");
+  link.href = URL.createObjectURL(blob);
+  link.download = name + ".embroidery-project.json";
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+function projectShape(value) {
+  if (!value || value.format !== "embroidery-project") return false;
+  if (value.format_version !== "1" && value.format_version !== "2") return false;
+  if (typeof value.name !== "string" || !Array.isArray(value.objects)) return false;
+  if (value.objects.length === 0 || value.objects.length > 500) return false;
+  const hasText = value.objects.some((object) => object && object.kind === "text");
+  if (hasText && value.format_version !== "2") return false;
+  return value.objects.every((object) => {
+    if (!object || typeof object.object_id !== "number" || typeof object.kind !== "string") return false;
+    if (object.kind === "text") {
+      const text = object.text;
+      if (!text || typeof text.content !== "string") return false;
+      if (!Array.isArray(object.points) || object.points.length !== 0) return false;
+      if (typeof text.font_id !== "string" || typeof text.font_version !== "string" || typeof text.font_sha256 !== "string") return false;
+      return [text.origin_x_mm, text.origin_y_mm, text.cap_height_mm, text.letter_spacing_mm, text.word_spacing_mm].every(Number.isFinite);
+    }
+    if (object.text) return false;
+    if (!Array.isArray(object.points) || object.points.length < 2) return false;
+    return object.points.every((point) => point && Number.isFinite(point.x) && Number.isFinite(point.y));
+  });
+}
+
+async function openProjectFile(file) {
+  if (file.size > 1048576) {
+    showError("That project is larger than 1 MiB. The open design was not changed.");
+    return;
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(await file.text());
+  } catch (error) {
+    showError("That file is not JSON. The open design was not changed.");
+    return;
+  }
+  if (!projectShape(parsed)) {
+    showError("That file is not an embroidery-project version 1 or version 2 design. The open design was not changed.");
+    return;
+  }
+  if (unsavedEdits() && !window.confirm("Open this project and discard ungenerated edits?")) return;
+  adopt(parsed);
 }
 
 function downloadDst() {
@@ -1346,7 +1899,7 @@ function onKeydown(event) {
 
 function saveAppearance() {
   const value = document.querySelector("#appearance").value;
-  try { localStorage.setItem("embroideryos.appearance", value); } catch (error) { /* preference storage is optional */ }
+  try { localStorage.setItem("embroideryos.appearance", value); } catch (error) {}
   applyAppearance();
 }
 
@@ -1358,7 +1911,7 @@ function savePreferences() {
   try {
     localStorage.setItem("embroideryos.motion", motion);
     localStorage.setItem("embroideryos.opaque", opaque);
-  } catch (error) { /* preference storage is optional */ }
+  } catch (error) {}
 }
 
 function applyAppearance() {
@@ -1378,7 +1931,7 @@ function applyRail(collapsed, moveFocus) {
   const collapse = document.querySelector("#rail-collapse");
   collapse.setAttribute("aria-expanded", expanded);
   collapse.textContent = "Hide sidebar";
-  try { localStorage.setItem("embroideryos.rail", collapsed ? "collapsed" : "open"); } catch (error) { /* preference storage is optional */ }
+  try { localStorage.setItem("embroideryos.rail", collapsed ? "collapsed" : "open"); } catch (error) {}
   if (moveFocus && collapsed) toggle.focus();
 }
 
@@ -1394,7 +1947,7 @@ function loadPreferences() {
     appearance = localStorage.getItem("embroideryos.appearance") || appearance;
     motion = localStorage.getItem("embroideryos.motion") || motion;
     opaque = localStorage.getItem("embroideryos.opaque") || opaque;
-  } catch (error) { /* keep the defaults set in the page head */ }
+  } catch (error) {}
   document.querySelector("#appearance").value = appearance;
   document.querySelector("#motion").checked = motion === "reduce";
   document.querySelector("#opaque").checked = opaque !== "false";
@@ -1402,9 +1955,15 @@ function loadPreferences() {
   savePreferences();
 }
 
-function adopt(project) {
+function noteDesignChange() {
+  if (state.batchInspection && window.__nameDrop) window.__nameDrop.onItemEdit(state.batchInspection);
+  else if (!state.batchInspection) state.designEpoch += 1;
+}
+
+function loadSession(project, selected, inspection) {
   state.project = project;
-  state.selected = project.objects[0] ? project.objects[0].object_id : null;
+  state.selected = selected;
+  state.batchInspection = inspection;
   state.undo = [];
   state.redo = [];
   state.result = null;
@@ -1413,10 +1972,88 @@ function adopt(project) {
   state.cursor = null;
   state.playing = false;
   state.proposal = null;
+  clearSvgPreview();
+  setSvgStatus("");
   showError("");
   showView("studio");
   render();
   generate();
+}
+
+function ensureNameDrop() {
+  const host = document.querySelector("#name-drop");
+  if (!host) return;
+  const object = selectedObject();
+  const show = state.view === "studio" && !!(object && object.kind === "text");
+  host.hidden = !show;
+  const drop = window.__nameDrop;
+  if (drop) {
+    if (show) drop.sync();
+    else drop.onDesign();
+    return;
+  }
+  if (!show || host.dataset.loading) return;
+  host.dataset.loading = "1";
+  const script = document.createElement("script");
+  script.src = "/batch.js";
+  script.dataset.nameDrop = "";
+  script.onload = () => {
+    delete host.dataset.loading;
+    if (window.__nameDrop) window.__nameDrop.sync();
+  };
+  script.onerror = () => {
+    delete host.dataset.loading;
+    host.textContent = "Name drop did not load. Reload the studio and try again.";
+  };
+  document.body.appendChild(script);
+}
+
+function openDerived(project, objectId, itemId) {
+  const present = project.objects.some((object) => object.object_id === objectId);
+  const fallback = project.objects[0] ? project.objects[0].object_id : null;
+  loadSession(project, present ? objectId : fallback, itemId || null);
+}
+
+function applyInspectionText(text) {
+  if (!state.batchInspection) return;
+  const object = selectedObject();
+  if (!object || !object.text || object.text.content === text) return;
+  const before = snapshot();
+  object.text.content = text;
+  syncFormat(state.project);
+  remember(before);
+  state.result = null;
+  state.basis = null;
+  state.notice = "";
+  showError("");
+  render();
+}
+
+window.__studioDesign = {
+  snapshot() {
+    return {
+      project: state.project,
+      selected: state.selected,
+      epoch: state.designEpoch,
+      inspection: state.batchInspection,
+      fonts: state.fonts,
+    };
+  },
+  applyFontPin(pin) {
+    const object = selectedObject();
+    if (!object || !object.text || !pin || state.batchInspection) return false;
+    if (object.text.font_id === pin.id && object.text.font_version === pin.version && object.text.font_sha256 === pin.sha256) return false;
+    edit(() => { object.text.font_id = pin.id; object.text.font_version = pin.version; object.text.font_sha256 = pin.sha256; });
+    return true;
+  },
+  openDerived,
+  showTemplate(project, objectId) { openDerived(project, objectId, null); },
+  applyInspectionText,
+};
+
+function adopt(project) {
+  state.designEpoch += 1;
+  loadSession(project, project.objects[0] ? project.objects[0].object_id : null, null);
 }
 
 async function openLibrary(file) {
@@ -1446,6 +2083,12 @@ async function start() {
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyAppearance);
   showView(location.hash.slice(1) || "studio");
   try {
+    const capabilities = await fetch("/api/capabilities");
+    if (capabilities.ok) {
+      const body = await capabilities.json();
+      state.font = body.lettering_font || null;
+      state.fonts = body.lettering_fonts || [];
+    }
     const library = await fetch("/api/library");
     if (library.ok) state.library = await library.json();
     const alpine = state.library.find((item) => item.file === "13_alpine_club.json");

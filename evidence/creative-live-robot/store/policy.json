@@ -1,0 +1,22 @@
+{
+  "schema": "embroideryos-creative-policy/0.1",
+  "provider": "openrouter_images",
+  "model": "x-ai/grok-imagine-image-2.0",
+  "operation": "generate",
+  "route": "openrouter",
+  "remaining_calls": 1,
+  "transmit_permitted": true,
+  "spend_ceiling_usd": 1.0,
+  "estimated_output_cost_usd": 0.04,
+  "estimate_variant": "low_1k",
+  "allow_provider_fallbacks": false,
+  "provider_only": ["xai"],
+  "test_script": "",
+  "fallback_to_test_image": false,
+  "max_images": 1,
+  "automatic_retries": false,
+  "direct_xai_authorisation": "superseded_unused",
+  "authorisation_id": "original-robot-one-call",
+  "timeout_ms": 90000,
+  "max_stored_bytes": 8388608
+}

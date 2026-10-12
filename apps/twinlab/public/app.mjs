@@ -3,7 +3,7 @@ import {MachineScene} from './scene.mjs';
 import {bindingMatches,drawCompare,filenameRoute,mmPerPixel,placementValid} from './compare.mjs';
 const $=id=>document.getElementById(id);
 const clock=new Playback();
-let design=null,selected=1,vertex=0,ring=0,bundle=null,session=null,serial=0,dirty=true,redraw=true,compileTimer=null,history=[],future=[],dark=false,scene=null,cameraIndex=0;
+let design=null,selected=1,vertex=0,ring=0,bundle=null,session=null,serial=0,dirty=true,redraw=true,compileTimer=null,history=[],future=[],dark=false,scene=null,cameraIndex=0,letteringFont=null,nameDropReplay=null,nameDropProof=null;
 let original=null,originalImage=null,proof=null,proofBusy=false,compareView='original',compareCamera={panX:0,panY:0,zoom:null},overlay={opacity:.55,wipe:1,independent:false,colour:'all',flicker:false},colourKey='';
 const copy=value=>JSON.parse(JSON.stringify(value));
 const rgbToHex=rgb=>'#'+rgb.map(v=>v.toString(16).padStart(2,'0')).join('');
@@ -28,6 +28,7 @@ function invalidate(){
  clearProofFrame();
  for(const s of ['rust','export','decode','sync'])stage(s,'Pending');
  for(const id of ['stitches-stat','records-stat','size-stat','colours-stat'])$(id).textContent='—';
+ if($('phases')){$('phases').textContent='';$('phases').dataset.topSequence='';}
  $('hash').textContent='Current design has not been compiled';$('integrity').textContent='Previous export/replay invalidated';$('colour-stops').replaceChildren();
  redraw=true;updateControls();
  if(session?.engine_available&&session.mode==='native-rust')compileTimer=setTimeout(compileDesign,450);
@@ -40,7 +41,7 @@ function renderObjects(){
  for(const o of design.objects){const b=document.createElement('button');b.className='object'+(o.id===selected?' selected':'');b.setAttribute('aria-pressed',String(o.id===selected));b.dataset.objectId=o.id;
   const swatch=document.createElement('span');swatch.className='swatch';swatch.style.background=rgbToHex(o.rgb);
   const label=document.createElement('span');label.className='object-title';label.textContent=o.label;
-  const kind=document.createElement('span');kind.className='object-kind';kind.textContent=`${o.kind} · ${o.points.length} points${o.holes?.length?` · ${o.holes.length} hole${o.holes.length===1?'':'s'}`:''}`;label.append(kind);b.append(swatch,label);
+  const kind=document.createElement('span');kind.className='object-kind';kind.textContent=o.kind==='text'&&o.text?`text · ${o.text.content}`:`${o.kind} · ${o.points.length} points${o.holes?.length?` · ${o.holes.length} hole${o.holes.length===1?'':'s'}`:''}`;label.append(kind);b.append(swatch,label);
   b.onclick=()=>{selected=o.id;vertex=0;ring=0;renderObjects();renderInspector();redraw=true;};fragment.append(b);
  }
  $('objects').replaceChildren(fragment);updateControls();
@@ -65,15 +66,163 @@ function insetHole(points){
  const place=value=>Math.round(clamp(value,-60,60)*10)/10;
  return [{x:place(cx-radius),y:place(cy-radius)},{x:place(cx+radius),y:place(cy-radius)},{x:place(cx+radius),y:place(cy+radius)},{x:place(cx-radius),y:place(cy+radius)}];
 }
+function satinUnderlayView(object){
+ const listed=Array.isArray(object.underlay);
+ const unsupported=listed?object.underlay.filter(name=>name!=='centre_run'&&name!=='edge_run'):[];
+ const centre=listed?object.underlay.includes('centre_run'):object.underlay_mm>0;
+ const edge=listed?object.underlay.includes('edge_run'):object.underlay_mm>0;
+ const inherited=object.underlay_mm>0?object.underlay_mm:object.max_stitch_mm;
+ const centreLen=typeof object.centre_run_mm==='number'?object.centre_run_mm:inherited;
+ const edgeLen=typeof object.edge_run_mm==='number'?object.edge_run_mm:inherited;
+ return {centre,edge,centreLen,edgeLen,unsupported};
+}
+function desiredSatinUnderlay(object,centreOn,edgeOn,centreLen,edgeLen){
+ const unsupported=Array.isArray(object.underlay)?object.underlay.filter(name=>name!=='centre_run'&&name!=='edge_run'):[];
+ let next;
+ if(!centreOn&&!edgeOn)next={underlay_mm:0};
+ else if(centreOn&&edgeOn&&Object.is(centreLen,edgeLen))next={underlay_mm:centreLen};
+ else{
+  const underlay=[];
+  if(centreOn)underlay.push('centre_run');
+  if(edgeOn)underlay.push('edge_run');
+  const underlay_mm=centreOn?centreLen:edgeLen;
+  next={underlay,underlay_mm};
+  if(centreOn&&!Object.is(centreLen,underlay_mm))next.centre_run_mm=centreLen;
+  if(edgeOn&&!Object.is(edgeLen,underlay_mm))next.edge_run_mm=edgeLen;
+ }
+ if(unsupported.length){
+  const names=next.underlay?next.underlay.slice():(next.underlay_mm>0?['centre_run','edge_run']:[]);
+  next={...next,underlay:[...unsupported,...names]};
+ }
+ return next;
+}
+function satinUnderlayMatches(object,next){
+ if(!Object.is(object.underlay_mm,next.underlay_mm))return false;
+ const left=Array.isArray(object.underlay)?object.underlay:null;
+ const right=Array.isArray(next.underlay)?next.underlay:null;
+ if(!left!==!right)return false;
+ if(left&&(left.length!==right.length||left.some((name,index)=>name!==right[index])))return false;
+ const same=key=>{const a=object[key],b=next[key];return Object.is(a,b)||(a==null&&b==null);};
+ return same('centre_run_mm')&&same('edge_run_mm');
+}
+function passLengthOk(value){return Number.isFinite(value)&&value>=0.2&&value<=12.1;}
+function applySatinUnderlay(centreOn,edgeOn,centreLen,edgeLen){
+ if(centreOn&&!passLengthOk(centreLen)){message('Centre-run maximum stitch length must be from 0.2 mm to 12.1 mm. Reduce that length and compile again. The design was not changed.',true);renderInspector();return;}
+ if(edgeOn&&!passLengthOk(edgeLen)){message('Edge-run maximum stitch length must be from 0.2 mm to 12.1 mm. Reduce that length and compile again. The design was not changed.',true);renderInspector();return;}
+ const object=current();
+ const next=desiredSatinUnderlay(object,centreOn,edgeOn,centreLen,edgeLen);
+ if(satinUnderlayMatches(object,next))return;
+ edit(()=>{
+  const target=current();
+  target.underlay_mm=next.underlay_mm;
+  if(next.underlay)target.underlay=next.underlay.slice();else delete target.underlay;
+  if(next.centre_run_mm!=null)target.centre_run_mm=next.centre_run_mm;else delete target.centre_run_mm;
+  if(next.edge_run_mm!=null)target.edge_run_mm=next.edge_run_mm;else delete target.edge_run_mm;
+ });
+}
+function layoutNumber(label,value,id,valid,problem,apply){
+ return field(label,'number',value,next=>{
+  if(!valid(next)){message(problem,true);renderInspector();return;}
+  edit(()=>apply(next));
+ },{step:.1,id});
+}
+function letteringText(object){
+ const wrap=document.createElement('label');wrap.className='field full';wrap.textContent='Text';
+ const input=document.createElement('textarea');input.id='text-content';input.rows=4;input.value=object.text.content;input.setAttribute('aria-label','Lettering text');
+ let committed=object.text.content;
+ input.addEventListener('change',()=>{const next=input.value;if(Object.is(next,committed))return;committed=next;edit(()=>current().text.content=next);});
+ input.addEventListener('keydown',event=>{
+  if(event.key!=='Enter')return;
+  event.stopPropagation();
+  if(!(event.metaKey||event.ctrlKey))return;
+  event.preventDefault();
+  if(input.value!==current().text.content)edit(()=>current().text.content=input.value);
+  $('compile').click();
+ });
+ wrap.append(input);
+ return wrap;
+}
+function letteringLayout(object){
+ const nodes=[];
+ nodes.push(choice('Horizontal lines',!!object.text.layout,'line-layout',checked=>edit(()=>{
+  const text=current().text;
+  if(!checked){delete text.layout;return;}
+  const cap=Number(text.cap_height_mm)||10;
+  text.layout={policy:'embroideryos-line-layout/1',alignment:'left',block_width_mm:40,first_baseline_mm:Math.round((Number(text.origin_y_mm)+0.92*cap)*1000)/1000,baseline_spacing_mm:Math.round(cap*1.6*1000)/1000};
+ })));
+ const layout=object.text.layout;
+ if(!layout)return nodes;
+ const alignment=document.createElement('label');alignment.className='field';alignment.textContent='Alignment';
+ const select=document.createElement('select');select.id='line-alignment';
+ for(const name of ['left','centre','right'])select.append(new Option(name,name));
+ select.value=['left','centre','right'].includes(layout.alignment)?layout.alignment:'left';
+ select.addEventListener('change',()=>edit(()=>current().text.layout.alignment=select.value));
+ alignment.append(select);nodes.push(alignment);
+ nodes.push(layoutNumber('Block width · mm',layout.block_width_mm,'line-block-width',value=>value>0&&value<=10000,'Block width must be greater than 0 mm and at most 10000 mm. Text is not wrapped or shrunk. The design was not changed.',value=>{current().text.layout.block_width_mm=value;}));
+ nodes.push(layoutNumber('First baseline · mm',layout.first_baseline_mm,'line-baseline',value=>Number.isFinite(value)&&Math.abs(value)<=10000,'The first baseline must be from -10000 mm to 10000 mm. The design was not changed.',value=>{current().text.layout.first_baseline_mm=value;}));
+ nodes.push(layoutNumber('Baseline spacing · mm',layout.baseline_spacing_mm,'line-spacing',value=>Number.isFinite(value)&&Math.abs(value)<=1000,'Baseline spacing must be from -1000 mm to 1000 mm. Increase it when lines overlap. This is not a thread-collision measurement. The design was not changed.',value=>{current().text.layout.baseline_spacing_mm=value;}));
+ return nodes;
+}
+function choice(label,checked,id,onChange){
+ const wrap=document.createElement('label');wrap.className='check';
+ const input=document.createElement('input');input.type='checkbox';input.id=id;input.checked=checked;
+ let committed=checked;
+ input.addEventListener('change',()=>{const next=input.checked;if(Object.is(next,committed))return;committed=next;onChange(next);});
+ wrap.append(input,document.createTextNode(label));
+ return wrap;
+}
 function renderInspector(){
- const o=current();const pts=activeRing(o);vertex=clamp(vertex,0,pts.length-1);const grid=document.createElement('div');grid.className='inspector-grid';
+ const o=current();const pts=o.kind==='text'?[]:activeRing(o);if(pts.length)vertex=clamp(vertex,0,pts.length-1);const grid=document.createElement('div');grid.className='inspector-grid';
  const label=field('Object label','text',o.label,v=>edit(()=>current().label=v));label.classList.add('full');grid.append(label);
  grid.append(field('Thread colour','color',rgbToHex(o.rgb),v=>edit(()=>current().rgb=hexToRgb(v)),{id:'object-color'}));
  grid.append(field('Max stitch · mm','number',o.max_stitch_mm,v=>edit(()=>current().max_stitch_mm=v),{min:.5,max:10,step:.1,id:'max-stitch'}));
  if(o.kind!=='running')grid.append(field('Spacing · mm','number',o.spacing_mm,v=>edit(()=>current().spacing_mm=v),{min:.2,max:4,step:.1,id:'spacing'}));
  if(o.kind==='fill')grid.append(field('Fill angle · °','number',o.angle_degrees,v=>edit(()=>current().angle_degrees=v),{min:-360,max:360,step:5,id:'angle'}));
- if(o.kind==='satin')grid.append(field('Column width · mm','number',o.width_mm,v=>edit(()=>current().width_mm=v),{min:.5,max:10,step:.1,id:'width'}));
- if(o.kind!=='running')grid.append(field('Underlay · mm; 0 off','number',o.underlay_mm,v=>edit(()=>current().underlay_mm=v),{min:0,max:10,step:.2,id:'underlay'}));
+ if(o.kind==='satin'){
+  grid.append(field('Column width · mm','number',o.width_mm,v=>edit(()=>current().width_mm=v),{min:.5,max:10,step:.1,id:'width'}));
+  const widths=document.createElement('label');widths.className='field full';widths.textContent='Column widths · mm';
+  const list=document.createElement('textarea');list.id='column-widths';list.rows=3;list.value=(o.widths_mm||[]).join('\n');
+  list.addEventListener('change',()=>{
+   const parsed=[];
+   for(const line of list.value.split('\n')){const trimmed=line.trim();if(!trimmed)continue;const value=Number(trimmed);if(!Number.isFinite(value)||value<=0||value>48){message('Enter one width per line, from just above 0 mm to 48 mm, or leave the list empty. The design was not changed.',true);list.value=(current().widths_mm||[]).join('\n');return;}parsed.push(value);}
+   if(parsed.length&&parsed.length!==current().points.length){message('Enter one column width for each centreline point, or leave the list empty. The constant width was not substituted.',true);list.value=(current().widths_mm||[]).join('\n');return;}
+   const existing=current().widths_mm||[];
+   if(parsed.length===existing.length&&parsed.every((value,index)=>Object.is(value,existing[index])))return;
+   edit(()=>{if(parsed.length)current().widths_mm=parsed;else delete current().widths_mm;});
+  });
+  widths.append(list);grid.append(widths);
+  const note=document.createElement('p');note.className='hint';note.textContent='One width for each centreline point varies the column. An empty list keeps the single column width. Centre run and edge run can be selected alone or together. A folded column is still rejected when a pass is off. This profile is generic-flat-120-v1 and is not a native hoop project.';
+  grid.append(note);
+  const view=satinUnderlayView(o);
+  grid.append(choice('Centre run',view.centre,'centre-run',checked=>{const live=satinUnderlayView(current());applySatinUnderlay(checked,live.edge,live.centreLen,live.edgeLen);}));
+  grid.append(choice('Edge run',view.edge,'edge-run',checked=>{const live=satinUnderlayView(current());applySatinUnderlay(live.centre,checked,live.centreLen,live.edgeLen);}));
+  if(view.centre)grid.append(field('Centre-run maximum stitch length · mm','number',view.centreLen,value=>{const live=satinUnderlayView(current());applySatinUnderlay(true,live.edge,value,live.edgeLen);},{min:.2,max:12.1,step:.1,id:'centre-run-length'}));
+  if(view.edge)grid.append(field('Edge-run maximum stitch length · mm','number',view.edgeLen,value=>{const live=satinUnderlayView(current());applySatinUnderlay(live.centre,true,live.centreLen,value);},{min:.2,max:12.1,step:.1,id:'edge-run-length'}));
+  if(view.unsupported.length){
+   const warn=document.createElement('p');warn.className='hint';warn.id='underlay-unsupported';warn.textContent=`This object requests ${view.unsupported.join(', ')}, which is planned and unavailable. It was not replaced.`;
+   const clear=document.createElement('button');clear.type='button';clear.id='clear-unavailable-underlay';clear.textContent='Remove unavailable underlay';
+   clear.onclick=()=>edit(()=>{const object=current();object.underlay=(object.underlay||[]).filter(name=>name==='centre_run'||name==='edge_run');if(!object.underlay.length)delete object.underlay;});
+   grid.append(warn,clear);
+  }
+ }
+ if(o.kind==='text'&&o.text){
+  grid.append(letteringText(o),...letteringLayout(o));
+  grid.append(field('Cap height · mm','number',o.text.cap_height_mm,v=>edit(()=>current().text.cap_height_mm=v),{min:.1,max:200,step:.1,id:'cap-height'}));
+  grid.append(field('Letter spacing · mm','number',o.text.letter_spacing_mm,v=>edit(()=>current().text.letter_spacing_mm=v),{min:0,max:1000,step:.1,id:'letter-spacing'}));
+  grid.append(field('Word spacing · mm','number',o.text.word_spacing_mm,v=>edit(()=>current().text.word_spacing_mm=v),{min:0,max:1000,step:.1,id:'word-spacing'}));
+  grid.append(field('Origin X · mm','number',o.text.origin_x_mm,v=>edit(()=>current().text.origin_x_mm=v),{min:-60,max:60,step:.1,id:'text-origin-x'}));
+  grid.append(field('Origin Y · mm','number',o.text.origin_y_mm,v=>edit(()=>current().text.origin_y_mm=v),{min:-60,max:60,step:.1,id:'text-origin-y'}));
+  grid.append(field('Column width · mm','number',o.width_mm,v=>edit(()=>current().width_mm=v),{min:.5,max:10,step:.1,id:'width'}));
+  const view=satinUnderlayView(o);
+  grid.append(choice('Centre run',view.centre,'centre-run',checked=>{const live=satinUnderlayView(current());applySatinUnderlay(checked,live.edge,live.centreLen,live.edgeLen);}));
+  grid.append(choice('Edge run',view.edge,'edge-run',checked=>{const live=satinUnderlayView(current());applySatinUnderlay(live.centre,checked,live.centreLen,live.edgeLen);}));
+  if(view.centre)grid.append(field('Centre-run maximum stitch length · mm','number',view.centreLen,value=>{const live=satinUnderlayView(current());applySatinUnderlay(true,live.edge,value,live.edgeLen);},{min:.2,max:12.1,step:.1,id:'centre-run-length'}));
+  if(view.edge)grid.append(field('Edge-run maximum stitch length · mm','number',view.edgeLen,value=>{const live=satinUnderlayView(current());applySatinUnderlay(live.centre,true,live.centreLen,value);},{min:.2,max:12.1,step:.1,id:'edge-run-length'}));
+  const pin=document.createElement('p');pin.className='hint';pin.id='font-pin';
+  pin.textContent=`Font ${o.text.font_id} version ${o.text.font_version}. Content ${o.text.font_sha256.slice(0,12)}. The pinned recipe is not retargeted. Enter inserts a line. Ctrl or Command Enter compiles. One to four horizontal lines use alignment and baseline spacing. Cap height is a software size, not a measured sewing limit.`;
+  grid.append(pin);
+ }
+ if(o.kind==='fill')grid.append(field('Underlay · mm; 0 off','number',o.underlay_mm,v=>edit(()=>current().underlay_mm=v),{min:0,max:10,step:.2,id:'underlay'}));
  if(o.kind==='fill'){
   const ringLabel=document.createElement('label');ringLabel.className='field full';ringLabel.textContent='Geometry ring';
   const ringSelect=document.createElement('select');ringSelect.id='ring';ringSelect.append(new Option('Outer boundary','0'));
@@ -86,10 +235,12 @@ function renderInspector(){
   remove.onclick=()=>{if(ring===0)return;const index=ring-1;edit(()=>{const next=current();next.holes.splice(index,1);if(!next.holes.length)delete next.holes;});ring=0;vertex=0;renderInspector();redraw=true;};
   actions.append(add,remove);grid.append(actions);
  }
- const pointLabel=document.createElement('label');pointLabel.className='field full';pointLabel.textContent=ring>0?`Hole ${ring} point`:'Control point';const pointSelect=document.createElement('select');pointSelect.id='vertex';
- pts.forEach((_,i)=>{const option=new Option(`Point ${i+1}`,String(i));option.selected=i===vertex;pointSelect.append(option);});pointSelect.onchange=()=>{vertex=Number(pointSelect.value);renderInspector();redraw=true;};pointLabel.append(pointSelect);grid.append(pointLabel);
- grid.append(field('X · mm','number',pts[vertex].x,v=>edit(()=>{activeRing()[vertex].x=v;}),{min:-60,max:60,step:1,id:'point-x'}));
- grid.append(field('Y · mm','number',pts[vertex].y,v=>edit(()=>{activeRing()[vertex].y=v;}),{min:-60,max:60,step:1,id:'point-y'}));
+ if(o.kind!=='text'){
+  const pointLabel=document.createElement('label');pointLabel.className='field full';pointLabel.textContent=ring>0?`Hole ${ring} point`:'Control point';const pointSelect=document.createElement('select');pointSelect.id='vertex';
+  pts.forEach((_,i)=>{const option=new Option(`Point ${i+1}`,String(i));option.selected=i===vertex;pointSelect.append(option);});pointSelect.onchange=()=>{vertex=Number(pointSelect.value);renderInspector();redraw=true;};pointLabel.append(pointSelect);grid.append(pointLabel);
+  grid.append(field('X · mm','number',pts[vertex].x,v=>edit(()=>{activeRing()[vertex].x=v;}),{min:-60,max:60,step:1,id:'point-x'}));
+  grid.append(field('Y · mm','number',pts[vertex].y,v=>edit(()=>{activeRing()[vertex].y=v;}),{min:-60,max:60,step:1,id:'point-y'}));
+ }
  $('inspector').replaceChildren(grid);
 }
 async function digest(bytes){const hash=await crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -110,6 +261,15 @@ async function compileDesign(){
   $('hash').textContent=value.provenance.dst_sha256;$('integrity').textContent='Verified in this browser · not a signed release';
   $('scrub').max=value.trace.duration_ms;$('scrub').value=0;$('colour-stops').replaceChildren(...value.palette.map(p=>{const el=document.createElement('span');el.className='stop';el.style.background=rgbToHex(p.rgb);return el;}));
   $('engine-version').textContent=`${value.kernel.generation} → ${value.kernel.export} · ${value.kernel.version}`;
+  if(value.generation?.lettering_font?.sha256)letteringFont=value.generation.lettering_font;
+  const phase=value.generation&&value.generation.phase_summary||'';
+  const movement=value.generation&&value.generation.movement_summary||'';
+  const lettering=[value.generation?.lettering_summary,value.generation?.lettering_text].filter(Boolean).join(' ');
+  if($('phases')){
+   $('phases').textContent=[phase,movement,lettering].filter(Boolean).join(' ');
+   $('phases').dataset.topSequence=value.generation&&value.generation.top_sequence||'';
+   $('phases').dataset.letteringText=value.generation?.lettering_text||'';
+  }
   message(session.mode==='native-rust'?`Compiled ${value.trace.record_count.toLocaleString()} exact DST records. Playback uses decoded bytes, not design geometry.`:'Fixture replay only. Editing, compilation and Rust execution are not validated by this view.');
   redraw=true;updateControls();
  }catch(error){if(ticket===serial){message(error.message,true);dirty=true;bundle=null;clock.playing=false;clock.trace=null;scene?.setBundle(null);for(const id of ['rust','export','decode','sync'])stage(id,'Blocked');redraw=true;updateControls();}}
@@ -125,13 +285,15 @@ function draw2D(state){
  for(let n=-60;n<=60;n+=10){ctx.strokeStyle=n===0?(dark?'#526178':'#bcc9dc'):(dark?'#303b4a':'#dfe5ef');ctx.lineWidth=n===0?1:.6;ctx.beginPath();ctx.moveTo(cx+n*scale,cy-60*scale);ctx.lineTo(cx+n*scale,cy+60*scale);ctx.moveTo(cx-60*scale,cy+n*scale);ctx.lineTo(cx+60*scale,cy+n*scale);ctx.stroke();}
  ctx.strokeStyle=dark?'#8295ae':'#99abc2';ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.strokeRect(cx-60*scale,cy-60*scale,120*scale,120*scale);ctx.setLineDash([]);
  ctx.font='8px -apple-system, sans-serif';ctx.fillStyle=dark?'#a9b5c8':'#708199';for(const n of [-60,-30,0,30,60]){ctx.fillText(String(n),cx+n*scale-4,cy-60*scale-6);ctx.fillText(String(n),cx-60*scale-21,cy+n*scale+3);}
- const traceRing=(points)=>{points.forEach((p,i)=>{const q=at([p.x,p.y]);i?ctx.lineTo(...q):ctx.moveTo(...q);});ctx.closePath();};
- for(const o of design.objects){ctx.beginPath();traceRing(o.points);for(const hole of o.holes||[])traceRing(hole);if(o.kind==='fill'){ctx.fillStyle=rgbToHex(o.rgb)+(bundle?'0c':'25');ctx.fill('evenodd');}ctx.strokeStyle=rgbToHex(o.rgb);ctx.globalAlpha=bundle?.5:.9;ctx.lineWidth=o.id===selected?1.5:1;ctx.stroke();ctx.globalAlpha=1;}
+ const traceRing=(points)=>{if(!points||points.length<2)return;points.forEach((p,i)=>{const q=at([p.x,p.y]);i?ctx.lineTo(...q):ctx.moveTo(...q);});ctx.closePath();};
+ for(const o of design.objects){ctx.beginPath();traceRing(o.points);for(const hole of o.holes||[])traceRing(hole);if(o.kind==='fill'){ctx.fillStyle=rgbToHex(o.rgb)+(bundle?'0c':'25');ctx.fill('evenodd');}ctx.strokeStyle=rgbToHex(o.rgb);ctx.globalAlpha=bundle?.5:.9;ctx.lineWidth=o.id===selected?1.5:1;if(o.points.length>1)ctx.stroke();if(o.kind==='text'&&o.text){const p=at([o.text.origin_x_mm,o.text.origin_y_mm]);ctx.beginPath();ctx.arc(...p,o.id===selected?4:3,0,Math.PI*2);ctx.stroke();}ctx.globalAlpha=1;}
  if(bundle){
   let sewn=0;for(const e of bundle.trace.events){if(e.kind!=='stitch')continue;const complete=sewn<state.completed_stitches;sewn++;ctx.strokeStyle=rgbToHex(bundle.palette[e.color_index].rgb);ctx.globalAlpha=complete?.94:.13;ctx.lineWidth=complete?1.1:.6;ctx.beginPath();ctx.moveTo(...at(e.from_units.map(n=>n/10)));ctx.lineTo(...at(e.to_units.map(n=>n/10)));ctx.stroke();}ctx.globalAlpha=1;
   const p=at(state.position_mm);ctx.strokeStyle=dark?'#f6f9ff':'#1a2a41';ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(...p,5,0,Math.PI*2);ctx.moveTo(p[0]-9,p[1]);ctx.lineTo(p[0]+9,p[1]);ctx.moveTo(p[0],p[1]-9);ctx.lineTo(p[0],p[1]+9);ctx.stroke();
  }
- const o=current();[o.points,...(o.holes||[])].forEach((pts,ringIndex)=>{for(let i=0;i<pts.length;i++){const p=at([pts[i].x,pts[i].y]),active=ringIndex===ring&&i===vertex;ctx.beginPath();ctx.arc(...p,active?4:3,0,Math.PI*2);ctx.fillStyle=active?'#2464da':(dark?'#20252e':'#fff');ctx.fill();ctx.strokeStyle=ringIndex?'#9a5b12':'#2464da';ctx.lineWidth=1.1;ctx.stroke();}});
+ const o=current();
+ if(o.kind==='text'&&o.text){const p=at([o.text.origin_x_mm,o.text.origin_y_mm]);ctx.beginPath();ctx.arc(...p,4,0,Math.PI*2);ctx.fillStyle='#2464da';ctx.fill();}
+ else [o.points,...(o.holes||[])].forEach((pts,ringIndex)=>{for(let i=0;i<pts.length;i++){const p=at([pts[i].x,pts[i].y]),active=ringIndex===ring&&i===vertex;ctx.beginPath();ctx.arc(...p,active?4:3,0,Math.PI*2);ctx.fillStyle=active?'#2464da':(dark?'#20252e':'#fff');ctx.fill();ctx.strokeStyle=ringIndex?'#9a5b12':'#2464da';ctx.lineWidth=1.1;ctx.stroke();}});
  canvas.dataset.eventIndex=String(state.event_index);canvas.dataset.completedStitches=String(state.completed_stitches);
 }
 function paint(state){
@@ -180,7 +342,7 @@ function renderCompare(){
  stage('original',original?'Retained':'None',!!original);
  stage('proof',current?'Bound':'None',current);
  const list=$('editable-list');
- list.replaceChildren(...design.objects.map(object=>{const item=document.createElement('li');const holes=object.holes?.length?` · ${object.holes.length} holes`:'';item.textContent=`${object.label} · ${object.kind} · ${object.points.length} points${holes} · colour ${object.rgb.join(',')}`;return item;}));
+ list.replaceChildren(...design.objects.map(object=>{const item=document.createElement('li');const holes=object.holes?.length?` · ${object.holes.length} holes`:'';const detail=object.kind==='text'&&object.text?object.text.content:`${object.points.length} points${holes}`;item.textContent=`${object.label} · ${object.kind} · ${detail} · colour ${object.rgb.join(',')}`;return item;}));
  if(!bundle||dirty){
   $('machine-summary').textContent='Compile this revision to decode its DST. A previous export is not the current machine file.';
   $('machine-window').textContent='No current machine file.';
@@ -195,7 +357,10 @@ function renderCompare(){
  $('proof-generate').disabled=proofBusy||dirty||!bundle||!sourceReady||!placementValid(placement);
  $('proof-download').disabled=!current;
  $('proof-reopen').disabled=!current;
- if(current){
+ renderNameDrop();
+ if(nameDropReplay){
+  $('compare-status').textContent=importedReviewSentence(nameDropReplay, design.name);
+ }else if(current){
   $('compare-status').textContent=`Bound to revision ${design.revision}. DST ${bundle.provenance.dst_sha256.slice(0,12)} and original ${original.sha256.slice(0,12)}. Approval and machine release remain unavailable.`;
   $('proof-status').textContent=proof.binding.actual_size_panel?'The stored PDF includes a 1:1 panel. Print at Actual size / 100% and measure the 100 mm bar. This screen is not that measurement.':'The design does not fit the 1:1 panel. It was not shrunk. Use a tiled proof before treating the page as actual size.';
  }else if(original?.route.route==='unrecognised'){
@@ -211,6 +376,25 @@ function renderCompare(){
   $('compare-status').textContent='Original retained. Confirm its physical width, then generate a proof for this revision.';
   clearProofFrame();
  }
+ if(nameDropReplay&&nameDropCurrent()){
+  const source=importedSource(nameDropReplay);
+  const item=nameDropReplay.batch.item_id;
+  $('machine-summary').textContent=`Imported item ${item} from ${source}. DST SHA-256 ${nameDropReplay.provenance.dst_sha256}. This file was not generated by the open ${design.name} design.`;
+  $('hash').textContent=nameDropReplay.provenance.dst_sha256;
+  $('integrity').textContent=`Imported review of ${item}. Not generated by the open ${design.name} design. Not a signed release.`;
+ }else if(bundle&&!dirty){
+  $('hash').textContent=bundle.provenance.dst_sha256;
+  $('integrity').textContent='Verified in this browser · not a signed release';
+ }
+}
+function importedSource(replay){
+ const name=replay&&replay.design_summary&&replay.design_summary.name;
+ return typeof name==='string'&&name.trim()?name.trim():'the imported name-drop project';
+}
+function importedReviewSentence(replay, designName){
+ const item=replay.batch.item_id;
+ const source=importedSource(replay);
+ return `Imported review of ${item} from ${source}. The DST and PDF belong to that imported item. They were not generated by the open ${designName} design. The open design was not replaced.`;
 }
 function mountProof(url){
  const slot=$('proof-slot');if(!slot)return;
@@ -219,9 +403,39 @@ function mountProof(url){
  slot.replaceChildren(frame);
 }
 function clearProofFrame(){const slot=$('proof-slot');if(slot)slot.replaceChildren();}
+function nameDropCurrent(){
+ const replay=nameDropReplay,binding=nameDropProof;
+ if(!replay||!binding)return false;
+ const batch=replay.batch;
+ return binding.schema==='embroideryos-name-drop-binding/0.1'
+  && binding.snapshot_id===batch.snapshot_id
+  && binding.item_id===batch.item_id
+  && binding.project_revision===batch.project_revision
+  && binding.dst_sha256===replay.provenance?.dst_sha256
+  && binding.machine_release_allowed===false
+  && binding.physical_qualification===false;
+}
+function nameDropAcceptable(value){
+ if(!value||value.protocol!=='embroidery-project-replay/1'||value.kernel?.mode!=='native-rust')return false;
+ const batch=value.batch,trace=value.trace,events=trace?.events;
+ if(!batch||typeof batch.item_id!=='string'||typeof batch.snapshot_id!=='string'||typeof batch.text!=='string')return false;
+ if(!/^([a-f0-9]{64})$/.test(value.provenance?.dst_sha256||''))return false;
+ if(!Array.isArray(events)||!events.length||trace.record_count!==events.length||events.at(-1).kind!=='end')return false;
+ return true;
+}
+function renderNameDrop(){
+ const status=$('name-drop-status');if(!status)return;
+ if(!nameDropReplay){status.textContent='No name-drop bundle is loaded. Opening one does not replace the design.';return;}
+ const batch=nameDropReplay.batch;
+ const current=nameDropCurrent();
+ if(current)status.textContent=`Imported review of ${batch.item_id} from ${importedSource(nameDropReplay)}. Proof ${nameDropProof.item_id} is current for this snapshot and DST. These artifacts were not generated by the open design. The open design was not replaced. Machine release remains unavailable.`;
+ else if(nameDropProof)status.textContent=`Name-drop replay ${batch.item_id} is loaded. The opened proof binding is not current for this snapshot, item, and DST. The open design was not replaced.`;
+ else status.textContent=`Name-drop replay ${batch.item_id} is loaded. Text is kept in the bundle. No current proof binding is loaded. The open design was not replaced.`;
+}
 function drawOverlay(state){
  if($('compare-canvas').hidden)return;
- drawCompare($('compare-canvas'),{dark,design,bundle:bundle&&!dirty?bundle:null,image:originalImage,placement:readPlacement(),showSource:!!originalImage&&!overlay.flicker,showDesign:true,showTrace:!!bundle&&!dirty,opacity:Number($('overlay-opacity').value)/100,wipe:Number($('overlay-wipe').value)/100,colour:overlay.colour,followClock:!overlay.independent,completedStitches:state.completed_stitches,camera:compareCamera});
+ const replay=nameDropReplay;
+ drawCompare($('compare-canvas'),{dark,design:replay?null:design,bundle:replay||(bundle&&!dirty?bundle:null),image:originalImage,placement:readPlacement(),showSource:!!originalImage&&!overlay.flicker&&!replay,showDesign:!replay,showTrace:replay?true:!!bundle&&!dirty,opacity:Number($('overlay-opacity').value)/100,wipe:Number($('overlay-wipe').value)/100,colour:overlay.colour,followClock:!overlay.independent,completedStitches:state.completed_stitches,camera:compareCamera});
 }
 function bytesToBase64(bytes){let binary='';for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,i+0x8000));return btoa(binary);}
 async function adoptOriginal(name,bytes){
@@ -284,9 +498,13 @@ async function downloadProof(){
 function wireUI(){
  $('compile').onclick=compileDesign;$('name').onchange=()=>edit(()=>design.name=$('name').value);
  for(const kind of ['fill','satin','running'])$('add-'+kind).onclick=()=>edit(()=>{const id=Math.max(...design.objects.map(o=>o.id))+1;design.objects.push({id,label:`New ${kind}`,kind,points:kind==='fill'?[{x:-15,y:-15},{x:15,y:-15},{x:15,y:15},{x:-15,y:15}]:[{x:-20,y:0},{x:20,y:0}],rgb:[55,112,211],spacing_mm:.6,angle_degrees:30,max_stitch_mm:3,width_mm:3,compensation_mm:.1,underlay_mm:0});selected=id;vertex=0;ring=0;});
+ $('add-text').onclick=()=>{
+  if(!letteringFont?.sha256){message('Compile the open design once so Rust can provide the EmbroideryOS Block 01 identity. The design was not changed.',true);return;}
+  edit(()=>{const id=Math.max(...design.objects.map(o=>o.id))+1;design.objects.push({id,label:'Lettering',kind:'text',points:[],rgb:[30,90,160],spacing_mm:.6,angle_degrees:0,max_stitch_mm:3,width_mm:1.6,compensation_mm:0,underlay_mm:0,text:{content:'ALPINE 08',font_id:letteringFont.id,font_version:letteringFont.version,font_sha256:letteringFont.sha256,origin_x_mm:-52,origin_y_mm:-8,cap_height_mm:10,letter_spacing_mm:.8,word_spacing_mm:3.6}});selected=id;vertex=0;ring=0;});
+ };
  $('remove').onclick=()=>edit(()=>{design.objects=design.objects.filter(o=>o.id!==selected);selected=design.objects[0].id;vertex=0;ring=0;});
  for(const [id,offset] of [['up',-1],['down',1]])$(id).onclick=()=>{const i=design.objects.findIndex(o=>o.id===selected),j=i+offset;if(j>=0&&j<design.objects.length)edit(()=>{[design.objects[i],design.objects[j]]=[design.objects[j],design.objects[i]];});};
- for(const [id,source,target] of [['undo',history,future],['redo',future,history]])$(id).onclick=()=>{const from=id==='undo'?history:future,to=id==='undo'?future:history;if(!from.length)return;const rev=design.revision;to.push(copy(design));design=from.pop();design.revision=rev+1;selected=design.objects[0].id;vertex=0;ring=0;invalidate();renderObjects();renderInspector();persist();};
+ for(const [id,source,target] of [['undo',history,future],['redo',future,history]])$(id).onclick=()=>{const from=id==='undo'?history:future,to=id==='undo'?future:history;if(!from.length)return;const rev=design.revision,keep=selected;to.push(copy(design));design=from.pop();design.revision=rev+1;selected=design.objects.some(object=>object.id===keep)?keep:design.objects[0].id;vertex=0;ring=0;invalidate();renderObjects();renderInspector();persist();};
  $('save').onclick=()=>saveFile(`${design.name}.json`,JSON.stringify(design,null,2),'application/json');$('open').onclick=()=>$('file-input').click();
  $('file-input').onchange=async()=>{try{const file=$('file-input').files[0];if(!file)return;if(file.size>262144)throw new Error('Native project exceeds 256 KiB.');const d=JSON.parse(await file.text());if(!validDesign(d))throw new Error('Invalid native design. SVG, image and machine-file import are not part of M1.');for(const object of d.objects)if(!object.holes||!object.holes.length)delete object.holes;history.push(copy(design));future=[];design=d;selected=d.objects[0].id;vertex=0;ring=0;invalidate();renderObjects();renderInspector();persist();}catch(e){message(e.message,true);}finally{$('file-input').value='';}};
  $('play').onclick=()=>{if(!bundle)return;if(clock.time>=bundle.trace.duration_ms)clock.seek(0);clock.playing=!clock.playing;clock.last=null;redraw=true;updateControls();};
@@ -302,8 +520,8 @@ function wireUI(){
  new ResizeObserver(()=>redraw=true).observe($('viewports'));
  let drag=null;const canvas=$('design-canvas');
  const position=e=>{const r=canvas.getBoundingClientRect(),t=canvasTransform();return [(e.clientX-r.left-t.cx)/t.scale,(e.clientY-r.top-t.cy)/t.scale];};
- canvas.onpointerdown=e=>{const p=position(e),t=canvasTransform();let hit=null,best=9;for(const o of design.objects){[o.points,...(o.holes||[])].forEach((pts,ringIndex)=>{pts.forEach((q,i)=>{const distance=Math.hypot(q.x-p[0],q.y-p[1])*t.scale;if(distance<best){best=distance;hit={id:o.id,ring:ringIndex,vertex:i};}});});}if(!hit)return;history.push(copy(design));future=[];selected=hit.id;ring=hit.ring;vertex=hit.vertex;drag=true;canvas.setPointerCapture(e.pointerId);clearTimeout(compileTimer);invalidate();clearTimeout(compileTimer);renderObjects();renderInspector();};
- canvas.onpointermove=e=>{if(!drag)return;const p=position(e);const q=activeRing()[vertex];q.x=Math.round(clamp(p[0],-60,60)*10)/10;q.y=Math.round(clamp(p[1],-60,60)*10)/10;redraw=true;};
+ canvas.onpointerdown=e=>{const p=position(e),t=canvasTransform();let hit=null,best=9;for(const o of design.objects){if(o.kind==='text'&&o.text){const distance=Math.hypot(o.text.origin_x_mm-p[0],o.text.origin_y_mm-p[1])*t.scale;if(distance<best){best=distance;hit={id:o.id,text:true};}continue;}[o.points,...(o.holes||[])].forEach((pts,ringIndex)=>{pts.forEach((q,i)=>{const distance=Math.hypot(q.x-p[0],q.y-p[1])*t.scale;if(distance<best){best=distance;hit={id:o.id,ring:ringIndex,vertex:i,text:false};}});});}if(!hit)return;history.push(copy(design));future=[];selected=hit.id;ring=hit.ring||0;vertex=hit.vertex||0;drag=hit;canvas.setPointerCapture(e.pointerId);clearTimeout(compileTimer);invalidate();clearTimeout(compileTimer);renderObjects();renderInspector();};
+ canvas.onpointermove=e=>{if(!drag)return;const p=position(e);if(drag.text){const object=current();const nextX=Math.round(clamp(p[0],-60,60)*10)/10;const nextY=Math.round(clamp(p[1],-60,60)*10)/10;if(object.text.layout)object.text.layout.first_baseline_mm=Math.round((object.text.layout.first_baseline_mm+(nextY-object.text.origin_y_mm))*10)/10;object.text.origin_x_mm=nextX;object.text.origin_y_mm=nextY;}else{const q=activeRing()[vertex];q.x=Math.round(clamp(p[0],-60,60)*10)/10;q.y=Math.round(clamp(p[1],-60,60)*10)/10;}redraw=true;};
  const finish=()=>{if(!drag)return;drag=null;design.revision++;invalidate();renderInspector();renderObjects();persist();};canvas.onpointerup=finish;canvas.onpointercancel=finish;
  document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;if(e.code==='Space'){e.preventDefault();$('play').click();}if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();$(e.shiftKey?'redo':'undo').click();}});
  $('proof-generate').onclick=generateProof;$('proof-reopen').onclick=reopenProof;$('proof-download').onclick=downloadProof;
@@ -321,6 +539,11 @@ function wireUI(){
  $('overlay-colour').addEventListener('change',()=>{overlay.colour=$('overlay-colour').value==='all'?'all':Number($('overlay-colour').value);redraw=true;});
  $('overlay-flicker').onclick=()=>{overlay.flicker=!overlay.flicker;$('overlay-flicker').setAttribute('aria-pressed',String(overlay.flicker));redraw=true;};
  $('compare-reset').onclick=()=>{compareCamera={panX:0,panY:0,zoom:null};redraw=true;};
+ $('open-name-drop').onclick=()=>$('name-drop-input').click();
+ $('open-name-drop-proof').onclick=()=>$('name-drop-proof-input').click();
+ $('clear-name-drop').onclick=()=>{nameDropReplay=null;nameDropProof=null;redraw=true;renderCompare();};
+ $('name-drop-input').onchange=async()=>{try{const file=$('name-drop-input').files[0];if(!file)return;if(file.size>8*1024*1024)throw new Error('Name-drop bundle exceeds 8 MiB. The open design was not changed.');const value=JSON.parse(await file.text());if(!nameDropAcceptable(value))throw new Error('That file is not an embroidery-project-replay/1 bundle. The open design was not changed.');nameDropReplay=value;nameDropProof=null;message(`Name-drop replay ${value.batch.item_id} loaded. The open design was not replaced.`);redraw=true;renderCompare();}catch(error){message(error.message,true);}finally{$('name-drop-input').value='';}};
+ $('name-drop-proof-input').onchange=async()=>{try{const file=$('name-drop-proof-input').files[0];if(!file)return;if(!nameDropReplay)throw new Error('Open a name-drop replay before its proof binding.');const value=JSON.parse(await file.text());const binding=value.binding||value;if(binding.schema!=='embroideryos-name-drop-binding/0.1')throw new Error('That file is not a name-drop proof binding. It was not marked current.');nameDropProof=binding;redraw=true;renderCompare();message(nameDropCurrent()?'This proof binding matches the loaded name-drop replay.':'This proof binding does not match the loaded name-drop replay. It is not current.');}catch(error){message(error.message,true);}finally{$('name-drop-proof-input').value='';}};
  let comparePan=null;const overlayCanvas=$('compare-canvas');
  overlayCanvas.onpointerdown=event=>{comparePan={x:event.clientX,y:event.clientY};overlayCanvas.setPointerCapture(event.pointerId);};
  overlayCanvas.onpointermove=event=>{if(!comparePan)return;const scale=Number(overlayCanvas.dataset.pxPerMm)||1;compareCamera.panX+=(event.clientX-comparePan.x)/scale;compareCamera.panY+=(event.clientY-comparePan.y)/scale;comparePan={x:event.clientX,y:event.clientY};redraw=true;};
@@ -331,8 +554,23 @@ function finitePoint(point){return point&&Number.isFinite(point.x)&&Number.isFin
 function validDesign(value){
  if(value?.schema_version!==1||!Array.isArray(value.objects)||!value.objects.length||value.objects.length>16)return false;
  return value.objects.every(object=>{
-  if(!Array.isArray(object.points)||object.points.length<2||object.points.length>256||!object.points.every(finitePoint))return false;
   if(!Array.isArray(object.rgb)||object.rgb.length!==3||!object.rgb.every(n=>Number.isInteger(n)&&n>=0&&n<=255))return false;
+  if(object.kind==='text'){
+   const text=object.text;
+   if(!text||typeof text.content!=='string'||!text.content.length||text.content.length>256)return false;
+   if(!Array.isArray(object.points)||object.points.length!==0)return false;
+   if(object.holes?.length||object.widths_mm?.length)return false;
+   if(![text.font_id,text.font_version,text.font_sha256].every(item=>typeof item==='string'&&item))return false;
+   if(![text.origin_x_mm,text.origin_y_mm,text.cap_height_mm,text.letter_spacing_mm,text.word_spacing_mm].every(Number.isFinite))return false;
+   if(text.layout==null)return true;
+   const layout=text.layout;
+   if(typeof layout!=='object'||Array.isArray(layout))return false;
+   if(layout.policy!=='embroideryos-line-layout/1')return false;
+   if(!['left','centre','right'].includes(layout.alignment))return false;
+   return Number.isFinite(layout.block_width_mm)&&layout.block_width_mm>0&&layout.block_width_mm<=10000&&Number.isFinite(layout.first_baseline_mm)&&Math.abs(layout.first_baseline_mm)<=10000&&Number.isFinite(layout.baseline_spacing_mm)&&Math.abs(layout.baseline_spacing_mm)<=1000;
+  }
+  if(object.text)return false;
+  if(!Array.isArray(object.points)||object.points.length<2||object.points.length>256||!object.points.every(finitePoint))return false;
   if(object.holes===undefined)return true;
   if(!Array.isArray(object.holes)||(object.kind!=='fill'&&object.holes.length>0)||object.holes.length>8)return false;
   let total=object.points.length;
@@ -340,6 +578,56 @@ function validDesign(value){
   return total<=256;
  });
 }
+function acceptCompareHandoff(replay, binding) {
+ if (!nameDropAcceptable(replay) || !binding || typeof binding !== "object") return false;
+ if (binding.schema !== "embroideryos-name-drop-binding/0.1") return false;
+ if (!/^[a-f0-9]{64}$/.test(binding.pdf_sha256 || "")) return false;
+ const batch = replay.batch;
+ return binding.snapshot_id === batch.snapshot_id
+  && binding.item_id === batch.item_id
+  && binding.project_revision === batch.project_revision
+  && binding.dst_sha256 === replay.provenance.dst_sha256
+  && binding.machine_release_allowed === false
+  && binding.physical_qualification === false;
+}
+function replyCompare(source, origin, payload) {
+ if (!source || typeof source.postMessage !== "function") return;
+ source.postMessage(Object.assign({ type: "embroideryos-compare-handoff-result" }, payload), origin);
+}
+window.addEventListener("message", event => {
+ if (!/^http:\/\/127\.0\.0\.1:\d+$/.test(event.origin || "")) return;
+ const data = event.data;
+ if (!data || data.type !== "embroideryos-compare-handoff") return;
+ const replay = data.replay;
+ const binding = data.binding;
+ if (!acceptCompareHandoff(replay, binding)) {
+  replyCompare(event.source, event.origin, { ok: false, stale: true });
+  message("The handoff does not match the snapshot, item, DST, and PDF binding. It was not applied. The open design was not replaced.", true);
+  return;
+ }
+ nameDropReplay = replay;
+ nameDropProof = binding;
+ redraw = true;
+ if (design) renderCompare();
+ else renderNameDrop();
+ message(`Imported review of ${replay.batch.item_id} from ${importedSource(replay)}. The DST and PDF belong to that imported item. They were not generated by the open design. The open design was not replaced.`);
+ replyCompare(event.source, event.origin, {
+  ok: true,
+  item_id: replay.batch.item_id,
+  dst_sha256: replay.provenance.dst_sha256,
+  project_revision: replay.batch.project_revision,
+  proof_current: true,
+  pdf_sha256: binding.pdf_sha256,
+ });
+});
+function announceCompare() {
+ try {
+  if (window.opener && !window.opener.closed) window.opener.postMessage({ type: "embroideryos-compare-ready" }, "*");
+ } catch {
+  /* The opener cannot be read. The parent posts again when this page is ready. */
+ }
+}
+announceCompare();
 async function init(){
  try{design=await(await fetch('/example.json')).json();
   // A stored project is never loaded silently; explicit Open preserves predictable demos.
@@ -348,7 +636,7 @@ async function init(){
   session=await(await fetch('/api/session')).json();if(session.mode==='transport-test-fixture'){$('compile').textContent='Reload fixture';$('download').textContent='Download fixture .dst';}
   if(session.engine_available)await compileDesign();else{message('Rust binary not found. From the repository root run: cargo build -p embroidery-twin. No preview compiler is substituted.',true);updateControls();}
   function frame(t){const wasPlaying=clock.playing;const state=clock.tick(t);if(wasPlaying||redraw)paint(state);requestAnimationFrame(frame);}requestAnimationFrame(frame);
-  Object.defineProperty(window,'__twinlab',{value:Object.freeze({snapshot:()=>({design:copy(design),dirty,artifact_id:bundle?.artifact_id||null,provenance:bundle?.provenance||null,trace:bundle?.trace||null,state:clock.sample(),webgl:!!scene?.gl,renderer:scene?.backend||'unavailable',scene_ready:scene?.available||false,mode:session.mode,compare:{original_sha256:original?.sha256||null,original_name:original?.name||null,proof_id:proof?.id||null,proof_sha256:proof?.binding?.pdf_sha256||null,binding_current:!!(proof&&!dirty&&bindingMatches(proof.binding,compareFacts())),release_allowed:false,approval_allowed:false}})})});
+  Object.defineProperty(window,'__twinlab',{value:Object.freeze({snapshot:()=>({design:copy(design),dirty,artifact_id:bundle?.artifact_id||null,provenance:bundle?.provenance||null,trace:bundle?.trace||null,state:clock.sample(),webgl:!!scene?.gl,renderer:scene?.backend||'unavailable',scene_ready:scene?.available||false,mode:session.mode,compare:{original_sha256:original?.sha256||null,original_name:original?.name||null,proof_id:proof?.id||null,proof_sha256:proof?.binding?.pdf_sha256||null,binding_current:!!(proof&&!dirty&&bindingMatches(proof.binding,compareFacts())),release_allowed:false,approval_allowed:false},name_drop:nameDropReplay?{item_id:nameDropReplay.batch.item_id,snapshot_id:nameDropReplay.batch.snapshot_id,project_revision:nameDropReplay.batch.project_revision,dst_sha256:nameDropReplay.provenance?.dst_sha256||null,pdf_sha256:nameDropProof?.pdf_sha256||null,proof_current:nameDropCurrent(),design_replaced:false}:null})})});
  }catch(e){message('Startup failed: '+e.message,true);}
 }
 init();

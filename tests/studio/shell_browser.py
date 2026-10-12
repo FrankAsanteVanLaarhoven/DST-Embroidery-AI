@@ -56,7 +56,9 @@ def main() -> None:
         assert page.get_by_text("Machine release remains unavailable.").count() >= 1
         assert int(page.locator("#library-count").inner_text()) >= 13
         assert page.locator("a[href='/twinlab']").count() >= 1
-        assert page.locator("a[href='http://127.0.0.1:4175/']").count() >= 1
+        assert page.locator("a[data-compare-open]").count() >= 2
+        assert page.locator("a[href='http://127.0.0.1:4181/']").count() >= 2
+        assert page.locator("a[href='http://127.0.0.1:4175/']").count() == 0
         page.locator("#zoom-in").click()
         assert page.locator("#zoom-label").inner_text() == "125%"
         page.locator("#zoom-out").click()

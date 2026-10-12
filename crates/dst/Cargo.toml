@@ -8,6 +8,7 @@ description = "Tajima DST compiler and reader"
 
 [dependencies]
 embroidery-core = { path = "../core" }
+serde = { version = "1", features = ["derive"] }
 
 [lints.rust]
 unsafe_code = "forbid"

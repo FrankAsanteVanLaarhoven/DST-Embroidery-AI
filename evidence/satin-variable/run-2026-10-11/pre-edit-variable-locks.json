@@ -1,0 +1,328 @@
+{
+  "note": "DST hashes from target/debug/embroidery-twin ccb40ff2… before independent-underlay edits. Constant rectangle must stay 1267d41f…. Combined underlay is the historical both-passes path.",
+  "engine_sha256": "ccb40ff2c385ccfa6d394e88f81f3f7ffd33827b0a4890817f68fa09dda28209",
+  "locks": [
+    {
+      "name": "constant-rectangle-underlay-0",
+      "dst_sha256": "1267d41f8fdb70b6878222e5f33cda61af04ddd3022ce36e3d5252eb08e46398",
+      "dst_bytes": 1724,
+      "generated_stitch_count": 401,
+      "record_count": 404,
+      "design": {
+        "schema_version": 1,
+        "name": "Test",
+        "revision": 1,
+        "objects": [
+          {
+            "id": 1,
+            "label": "Test",
+            "kind": "satin",
+            "points": [
+              {
+                "x": -20,
+                "y": -10
+              },
+              {
+                "x": 20,
+                "y": -10
+              },
+              {
+                "x": 20,
+                "y": 10
+              },
+              {
+                "x": -20,
+                "y": 10
+              }
+            ],
+            "rgb": [
+              30,
+              90,
+              200
+            ],
+            "spacing_mm": 0.5,
+            "angle_degrees": 30,
+            "max_stitch_mm": 3,
+            "width_mm": 4,
+            "compensation_mm": 0.1,
+            "underlay_mm": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "variable-2-6-underlay-0",
+      "dst_sha256": "cd82ac5eee2d07e84e771a13cf9567b865ece1e15b4d8174e8d3d7b6e47c0cbc",
+      "dst_bytes": 644,
+      "generated_stitch_count": 41,
+      "record_count": 44,
+      "design": {
+        "schema_version": 1,
+        "name": "Test",
+        "revision": 1,
+        "objects": [
+          {
+            "id": 1,
+            "label": "Test",
+            "kind": "satin",
+            "points": [
+              {
+                "x": -20,
+                "y": 0
+              },
+              {
+                "x": 20,
+                "y": 0
+              }
+            ],
+            "rgb": [
+              30,
+              90,
+              200
+            ],
+            "spacing_mm": 2,
+            "angle_degrees": 30,
+            "max_stitch_mm": 3,
+            "width_mm": 4,
+            "compensation_mm": 0,
+            "underlay_mm": 0,
+            "widths_mm": [
+              2,
+              6
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "variable-2-6-underlay-2.5-combined",
+      "dst_sha256": "9de0dbdb2cb803c585be157e1b85e9df4f28216e97e045278493fe59761d4f71",
+      "dst_bytes": 830,
+      "generated_stitch_count": 97,
+      "record_count": 106,
+      "design": {
+        "schema_version": 1,
+        "name": "Test",
+        "revision": 1,
+        "objects": [
+          {
+            "id": 1,
+            "label": "Test",
+            "kind": "satin",
+            "points": [
+              {
+                "x": -20,
+                "y": 0
+              },
+              {
+                "x": 20,
+                "y": 0
+              }
+            ],
+            "rgb": [
+              30,
+              90,
+              200
+            ],
+            "spacing_mm": 2,
+            "angle_degrees": 30,
+            "max_stitch_mm": 3,
+            "width_mm": 4,
+            "compensation_mm": 0,
+            "underlay_mm": 2.5,
+            "widths_mm": [
+              2,
+              6
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "variable-taper-2-8-underlay-0",
+      "dst_sha256": "ae243f0c418650bf250ca0c53eb08ee271b3df9ddbf4d5f47c16afa54bc261e8",
+      "dst_bytes": 551,
+      "generated_stitch_count": 11,
+      "record_count": 13,
+      "design": {
+        "schema_version": 1,
+        "name": "Test",
+        "revision": 1,
+        "objects": [
+          {
+            "id": 1,
+            "label": "Test",
+            "kind": "satin",
+            "points": [
+              {
+                "x": 0,
+                "y": 10
+              },
+              {
+                "x": 20,
+                "y": 10
+              }
+            ],
+            "rgb": [
+              30,
+              90,
+              200
+            ],
+            "spacing_mm": 4,
+            "angle_degrees": 0,
+            "max_stitch_mm": 3,
+            "width_mm": 4,
+            "compensation_mm": 0,
+            "underlay_mm": 0,
+            "widths_mm": [
+              2,
+              8
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "variable-taper-2-8-underlay-4-combined",
+      "dst_sha256": "6f71c41c2e897b3340865fd3c45fe0c82f954fbe675cae3bf23e3802ccee33a5",
+      "dst_bytes": 620,
+      "generated_stitch_count": 29,
+      "record_count": 36,
+      "design": {
+        "schema_version": 1,
+        "name": "Test",
+        "revision": 1,
+        "objects": [
+          {
+            "id": 1,
+            "label": "Test",
+            "kind": "satin",
+            "points": [
+              {
+                "x": 0,
+                "y": 20
+              },
+              {
+                "x": 16,
+                "y": 20
+              }
+            ],
+            "rgb": [
+              30,
+              90,
+              200
+            ],
+            "spacing_mm": 4,
+            "angle_degrees": 0,
+            "max_stitch_mm": 3,
+            "width_mm": 4,
+            "compensation_mm": 0,
+            "underlay_mm": 4,
+            "widths_mm": [
+              2,
+              6
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "variable-bend-underlay-0",
+      "dst_sha256": "f9cc27a09f60d3cec19ca898e97d49578eb7955f5b93105e881089096a32d3f3",
+      "dst_bytes": 557,
+      "generated_stitch_count": 13,
+      "record_count": 15,
+      "design": {
+        "schema_version": 1,
+        "name": "Test",
+        "revision": 1,
+        "objects": [
+          {
+            "id": 1,
+            "label": "Test",
+            "kind": "satin",
+            "points": [
+              {
+                "x": 0,
+                "y": 10
+              },
+              {
+                "x": 12,
+                "y": 10
+              },
+              {
+                "x": 20,
+                "y": 16
+              }
+            ],
+            "rgb": [
+              30,
+              90,
+              200
+            ],
+            "spacing_mm": 4,
+            "angle_degrees": 0,
+            "max_stitch_mm": 3,
+            "width_mm": 3,
+            "compensation_mm": 0,
+            "underlay_mm": 0,
+            "widths_mm": [
+              3,
+              3,
+              3
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "variable-bend-underlay-2.5-combined",
+      "dst_sha256": "24c171ee6dbef21e98bbf5245f41ced2477abd24294747b127502ba73083e298",
+      "dst_bytes": 668,
+      "generated_stitch_count": 46,
+      "record_count": 52,
+      "design": {
+        "schema_version": 1,
+        "name": "Test",
+        "revision": 1,
+        "objects": [
+          {
+            "id": 1,
+            "label": "Test",
+            "kind": "satin",
+            "points": [
+              {
+                "x": 0,
+                "y": 10
+              },
+              {
+                "x": 12,
+                "y": 10
+              },
+              {
+                "x": 20,
+                "y": 16
+              }
+            ],
+            "rgb": [
+              30,
+              90,
+              200
+            ],
+            "spacing_mm": 4,
+            "angle_degrees": 0,
+            "max_stitch_mm": 3,
+            "width_mm": 3,
+            "compensation_mm": 0,
+            "underlay_mm": 2.5,
+            "widths_mm": [
+              3,
+              3,
+              3
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "url": "http://127.0.0.1:4181/",
+  "twin_binary_sha256": "cdb9e4310f1b73fca34eea2f6a294f125613b153c84076714ec8af0c78fce064",
+  "engine_sha256": "cdb9e4310f1b73fca34eea2f6a294f125613b153c84076714ec8af0c78fce064",
+  "schema_version": 1,
+  "alpine_08_revision": 8,
+  "alpine_08_dst_sha256": "9975176af363a70bcbfeac23051b81bc1660e159d75866fa969f2445c9c75672",
+  "alpine_08_artifact_id": "ed1e20399b44b8d866251f6231cbb11f4bd9430b361302473b5c0c96606c4ae6",
+  "alpine_09_revision": 9,
+  "alpine_09_dst_sha256": "887a46640127b6bb7dbcfbb9ba8f6a483fb4416586c678142a349fd7869658eb",
+  "restored_dst_matches_08": true,
+  "restored_revision": 10,
+  "first_proof_not_current_after_undo": true,
+  "rebound_proof_id": "5cc11ccea8f36d2e5ed149f463f534c385783823bbfb078bfd6bd099a3c92590",
+  "rebound_proof_sha256": "c0dca9e16f178d9a8d5dacbd096a853e2b13e99383b07db8468a397f01a4189c",
+  "top_sequence_equal_across_underlay": true,
+  "font_sha256": "aca657de98489950e35cb72d7c802d9a4d81958f2915b93307af7b9a4ca028bd",
+  "machine_release_allowed": false,
+  "curly_apostrophe_rejected": "U+2019"
+}

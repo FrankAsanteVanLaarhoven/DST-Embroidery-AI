@@ -1,0 +1,143 @@
+{
+  "name": "Alpine mark",
+  "objects": [
+    {
+      "angle_degrees": 30,
+      "compensation_mm": 0.1,
+      "id": 1,
+      "kind": "fill",
+      "label": "Mountain field",
+      "max_stitch_mm": 3.5,
+      "points": [
+        {
+          "x": -40,
+          "y": 24
+        },
+        {
+          "x": -18,
+          "y": -8
+        },
+        {
+          "x": 0,
+          "y": -28
+        },
+        {
+          "x": 22,
+          "y": -6
+        },
+        {
+          "x": 40,
+          "y": 24
+        }
+      ],
+      "rgb": [
+        53,
+        106,
+        210
+      ],
+      "spacing_mm": 0.6,
+      "underlay_mm": 3,
+      "width_mm": 2.4
+    },
+    {
+      "angle_degrees": 30,
+      "compensation_mm": 0.1,
+      "id": 2,
+      "kind": "satin",
+      "label": "Shield border",
+      "max_stitch_mm": 3.5,
+      "points": [
+        {
+          "x": -45,
+          "y": -38
+        },
+        {
+          "x": 45,
+          "y": -38
+        },
+        {
+          "x": 45,
+          "y": 35
+        },
+        {
+          "x": 0,
+          "y": 48
+        },
+        {
+          "x": -45,
+          "y": 35
+        },
+        {
+          "x": -45,
+          "y": -38
+        }
+      ],
+      "rgb": [
+        211,
+        147,
+        71
+      ],
+      "spacing_mm": 0.5,
+      "underlay_mm": 2.5,
+      "width_mm": 2.4
+    },
+    {
+      "angle_degrees": 30,
+      "compensation_mm": 0.1,
+      "id": 3,
+      "kind": "running",
+      "label": "Baseline",
+      "max_stitch_mm": 2.4,
+      "points": [
+        {
+          "x": -25,
+          "y": 27
+        },
+        {
+          "x": 25,
+          "y": 27
+        }
+      ],
+      "rgb": [
+        50,
+        76,
+        110
+      ],
+      "spacing_mm": 0.6,
+      "underlay_mm": 0,
+      "width_mm": 2.4
+    },
+    {
+      "angle_degrees": 30,
+      "compensation_mm": 0.1,
+      "id": 4,
+      "kind": "satin",
+      "label": "New satin",
+      "max_stitch_mm": 3,
+      "points": [
+        {
+          "x": -20,
+          "y": 0
+        },
+        {
+          "x": 20,
+          "y": 0
+        }
+      ],
+      "rgb": [
+        55,
+        112,
+        211
+      ],
+      "spacing_mm": 0.6,
+      "underlay_mm": 0,
+      "width_mm": 3,
+      "widths_mm": [
+        2,
+        8
+      ]
+    }
+  ],
+  "revision": 6,
+  "schema_version": 1
+}

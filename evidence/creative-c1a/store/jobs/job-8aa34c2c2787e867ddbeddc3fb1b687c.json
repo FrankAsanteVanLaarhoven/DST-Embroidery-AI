@@ -1,0 +1,46 @@
+{
+  "application": "selected",
+  "artifact_ids": [
+    "art-4b0cd47934858b15d809141db44bfc35"
+  ],
+  "attempts": 1,
+  "billable": false,
+  "billable_uncertain": false,
+  "brief": {
+    "agents": [
+      "creative-director"
+    ],
+    "art_direction": "cartoon",
+    "embroidery_geometry": false,
+    "height": 64,
+    "preserves_subject": true,
+    "profile_instruction": "Illustrate the subject as a colourful cartoon character. Use a clean background and keep the silhouette readable.",
+    "provider_prompt": "Illustrate the subject as a colourful cartoon character. Use a clean background and keep the silhouette readable.\n\nSubject and direction, kept as requested:\nCreate an original friendly exploration robot, illustrated as a colourful cartoon character. Use a clean background and keep the silhouette readable.\n\nOutput a single 64 by 64 pixel raster image. Preserve the requested subject, artistic direction, and output dimensions. Do not convert the image into embroidery geometry, a stitch plan, vector paths, or a simplified mark unless the request itself asks for that.",
+    "reference_hashes": [],
+    "width": 64
+  },
+  "cancel_requested": false,
+  "client_request_id": "c1a-mv4lhwy2-jgln31",
+  "code": null,
+  "embroidery_project_changed": false,
+  "error": null,
+  "exact_request": "Create an original friendly exploration robot, illustrated as a colourful cartoon character. Use a clean background and keep the silhouette readable.",
+  "execution": "succeeded",
+  "job_id": "job-8aa34c2c2787e867ddbeddc3fb1b687c",
+  "machine_release_allowed": false,
+  "master_id": "mas-f5fc44c83a97166a60209385f2f0ec08",
+  "prompt_transmitted": false,
+  "provider": {
+    "endpoint": "",
+    "id": "test_image",
+    "live": false,
+    "model": "test-raster",
+    "operation": "generate",
+    "script": "png"
+  },
+  "provider_stop_confirmed": false,
+  "schema": "embroideryos-creative-job/0.1",
+  "source_revision": "1-09bdc436be1fd57c55d4b7ff6c6aabb5",
+  "stale_artifact_ids": [],
+  "transmit_requested": false
+}

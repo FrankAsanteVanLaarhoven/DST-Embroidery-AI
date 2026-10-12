@@ -1,0 +1,47 @@
+{
+  "schema": "embroideryos-creative-live-preflight/0.1",
+  "status": "BLOCKED",
+  "submitted": false,
+  "provider_calls": 0,
+  "block_reason": "missing_credentials",
+  "case_id": "cartoon",
+  "exact_request": "Create an original friendly exploration robot, illustrated as a colourful cartoon character. Use a clean background and keep the silhouette readable.",
+  "art_direction": "cartoon",
+  "references": [],
+  "images": 1,
+  "generation_submissions": 1,
+  "automatic_retry": false,
+  "creative_adapter": "openrouter_images",
+  "model": "x-ai/grok-imagine-image-2.0",
+  "external_route": "OpenRouter to the selected upstream image provider",
+  "endpoint": "https://openrouter.ai/api/v1/images",
+  "request_shape": {
+    "n": 1,
+    "resolution": "1K",
+    "aspect_ratio": "1:1",
+    "quality": "low",
+    "output_format": "not_sent",
+    "provider": {"only": ["xai"], "allow_fallbacks": false}
+  },
+  "estimated_output_cost_usd": 0.04,
+  "estimate_source": "evidence/creative-live-robot/endpoint.json variant low_1k, fetched from the public OpenRouter endpoints record",
+  "spend_ceiling_usd": 1.0,
+  "direct_xai_authorisation": "superseded_unused",
+  "live_switch": {
+    "name": "EMBROIDERY_CREATIVE_LIVE",
+    "accepted_value": "1",
+    "process_value": "ABSENT"
+  },
+  "credentials": {
+    "process_OPENROUTER_API_KEY": "ABSENT",
+    "process_XAI_API_KEY": "ABSENT",
+    "xai_key_used_for_openrouter": false
+  },
+  "store": "evidence/creative-live-robot/store",
+  "proof_store_policy_sha256": "c846ceb9a9a0bb34b54784c709594a6cde569a0c0f047043ece09bf550c2255a",
+  "blocked_case_record_sha256": "60e6b0cd09821ca71ed45c7b203df4de43c9f5655fea5ae30a73bfb5d6e1343a",
+  "vercel": "This checkout has no Vercel project. No secret was added and no deployment was made. A Vercel environment variable would not configure the local studio process.",
+  "missing_prerequisites": [
+    "OPENROUTER_API_KEY is absent from this process. The prompt was not sent."
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "studio": "http://127.0.0.1:4192/",
+  "pid": 26797,
+  "binary_sha256": "9a59fd354ee9b3ae5b98679934ae44c30aba429b9f14db5d376edc4e8e7a325d",
+  "store": "evidence/creative-c1a/store",
+  "artifact_ids": [
+    "art-4b0cd47934858b15d809141db44bfc35",
+    "art-ad1a8c5e2c80eed0e3b5e28f59cdebbf"
+  ],
+  "sha256": "97ec83a5205e3283b546991e6573b32aaf4234fc439fd22e52cbddf09e358422",
+  "byte_length": 12420,
+  "png": true,
+  "master_id": "mas-f5fc44c83a97166a60209385f2f0ec08",
+  "application": "selected",
+  "embroidery_project_changed": false,
+  "machine_release_allowed": false,
+  "provider": "test_image",
+  "live_ready": false,
+  "note": "Both artifact URLs were downloaded after the 4192 process was stopped and started again on the same store. The bytes match the browser download. This file is a local test raster, not a live illustration. No temporary provider URL was kept as the only copy."
+}

@@ -2,7 +2,8 @@
 import http from 'node:http';
 import {readFile} from 'node:fs/promises';
 import {existsSync} from 'node:fs';
-import {spawn} from 'node:child_process';
+import {spawn, execFile} from 'node:child_process';
+import {promisify} from 'node:util';
 import {createHash, randomBytes, timingSafeEqual} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
@@ -21,13 +22,38 @@ async function readLimited(req,limit){
   if(size!==len){const error=new Error('Incomplete request body.');error.status=422;throw error;}
   return Buffer.concat(parts);
 }
+const execFileAsync=promisify(execFile);
 export const sha256=data=>createHash('sha256').update(data).digest('hex');
+function txtPath(output){
+  let textFile=false;
+  for(const line of String(output).split('\n')){
+    if(line.startsWith('ftxt')){textFile=true;continue;}
+    if(textFile&&line.startsWith('n'))return line.slice(1);
+    if(line.startsWith('f'))textFile=false;
+  }
+  return '';
+}
+async function identifyWorker(pid){
+  let detail='lsof produced no text image';
+  for(let attempt=0;attempt<12;attempt++){
+    try{
+      const {stdout}=await execFileAsync('/usr/sbin/lsof',['-a','-p',String(pid),'-d','txt','-Fn'],{timeout:2000});
+      const exe=txtPath(stdout);
+      if(exe&&existsSync(exe))return {pid,exe,sha256:sha256(await readFile(exe))};
+      detail=stdout.slice(0,400)||detail;
+    }catch(error){detail=String(error.stderr||error.message).slice(0,400);}
+    await new Promise(resolve=>setTimeout(resolve,25));
+  }
+  const failure=new Error('The worker image was not recorded before this compile. '+detail);
+  failure.status=422;
+  throw failure;
+}
 export function stable(value){
   if(Array.isArray(value))return '['+value.map(stable).join(',')+']';
   if(value!==null&&typeof value==='object')return '{'+Object.keys(value).sort().map(k=>JSON.stringify(k)+':'+stable(value[k])).join(',')+'}';
   return JSON.stringify(value);
 }
-export function runRust(input,enginePath){
+export function runRust(input,enginePath,onWorker){
   return new Promise((resolve,reject)=>{
     const child=spawn(enginePath,[],{stdio:['pipe','pipe','pipe'],cwd:ROOT,windowsHide:true});
     let out=[],err=[],size=0,settled=false;
@@ -41,7 +67,10 @@ export function runRust(input,enginePath){
       if(code!==0)return finish(new Error(Buffer.concat(err).toString().slice(0,16384)||'Rust worker failed.'));
       try{finish(null,JSON.parse(Buffer.concat(out).toString()));}catch{finish(new Error('Rust returned an invalid response.'));}
     });
-    child.stdin.end(JSON.stringify(input));
+    const send=()=>{if(!settled)child.stdin.end(JSON.stringify(input));};
+    if(typeof onWorker==='function'){
+      identifyWorker(child.pid).then(image=>{onWorker(image);send();}).catch(error=>{child.kill('SIGKILL');finish(error);});
+    }else send();
   });
 }
 export function sealResult(result,request,engineSha,expectedMode='native-rust'){
@@ -105,7 +134,15 @@ export function createTwinServer({enginePath=process.env.EMBROIDERY_TWIN_BIN||pa
           if(size!==len)throw new Error('Incomplete request body.');
           const request=JSON.parse(Buffer.concat(parts).toString());
           const identity=engineSha||sha256(await readFile(enginePath));
-          const sealed=sealResult(await runner(request,enginePath),request,identity,runner===runRust?'native-rust':'transport-test-fixture');
+          const trace=process.env.EMBROIDERY_WORKER_TRACE==='1'||req.headers['x-worker-trace']==='1';
+          let worker=null;
+          const sealed=sealResult(await runner(request,enginePath,trace?image=>{worker=image;}:undefined),request,identity,runner===runRust?'native-rust':'transport-test-fixture');
+          if(trace){
+            if(!worker||!Number.isInteger(worker.pid)||typeof worker.exe!=='string'||!/^[a-f0-9]{64}$/.test(worker.sha256||''))throw new Error('Worker identity was not recorded for this compile.');
+            res.setHeader('X-Worker-Pid',String(worker.pid));
+            res.setHeader('X-Worker-Exe',worker.exe);
+            res.setHeader('X-Worker-Sha256',worker.sha256);
+          }
           artifacts.set(sealed.bundle.artifact_id,sealed);
           while(artifacts.size>8)artifacts.delete(artifacts.keys().next().value);
           return reply(200,sealed.bundle);

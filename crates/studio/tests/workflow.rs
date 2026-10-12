@@ -159,9 +159,95 @@ fn an_empty_proposal_does_not_call_the_model() {
 }
 
 #[test]
+fn svg_import_previews_geometry_and_rejects_text() {
+    let svg = r##"<svg xmlns="http://www.w3.org/2000/svg" width="40mm" height="30mm" viewBox="0 0 40 30"><rect x="5" y="5" width="20" height="10" fill="#1e4d3c"/></svg>"##;
+    let payload = serde_json::json!({
+        "svg_text": svg,
+        "name": "Trial rect",
+        "width_mm": null,
+        "running_strokes": false,
+    });
+    let bytes = serde_json::to_vec(&payload).unwrap();
+    let response = route("POST", "/api/import-svg", &bytes);
+    assert_eq!(
+        response.status,
+        200,
+        "{}",
+        String::from_utf8_lossy(&response.body)
+    );
+    let body: Value = serde_json::from_slice(&response.body).unwrap();
+    assert_eq!(body["ok"], true);
+    assert!(body.get("dst_hex").is_none());
+    assert!(body.get("stitches").is_none());
+    assert!(body["project"].get("machine_release_allowed").is_none());
+    assert_eq!(body["project"]["review"], Value::Null);
+    assert_eq!(body["project"]["name"], "Trial rect");
+    assert_eq!(body["manifest"]["machine_release_allowed"], false);
+    assert_eq!(body["manifest"]["approval_allowed"], false);
+    assert_eq!(
+        body["manifest"]["not_interchangeable_with"],
+        "twinlab-generic-flat-120-v1"
+    );
+    assert_eq!(body["manifest"]["timing_model"], Value::Null);
+    assert_eq!(
+        body["manifest"]["coordinate_frame"],
+        "native-hoop-nonnegative-v1"
+    );
+    let summary = body["summary"].as_str().unwrap();
+    assert!(summary.contains("No stitches were generated"));
+    assert!(summary.contains("does not approve itself"));
+    assert!(summary.contains("No curves were flattened"));
+    let project = parse_project(&body["project"].to_string()).unwrap();
+    assert!(project.review.is_none());
+    assert_eq!(project.objects.len(), 1);
+    assert_eq!(project.objects[0].kind, "fill");
+    assert!(project.objects[0].holes.is_empty());
+    let home = String::from_utf8(route("GET", "/", b"").body).unwrap();
+    assert!(home.contains("id=\"svg-form\""));
+    assert!(home.contains("Preview import"));
+
+    let text = serde_json::json!({
+        "svg_text": r#"<svg xmlns="http://www.w3.org/2000/svg" width="40mm" height="40mm" viewBox="0 0 40 40"><text x="4" y="20">Hi</text></svg>"#,
+    });
+    let rejected = route(
+        "POST",
+        "/api/import-svg",
+        &serde_json::to_vec(&text).unwrap(),
+    );
+    assert_eq!(rejected.status, 422);
+    let rejected = String::from_utf8(rejected.body).unwrap();
+    assert!(rejected.contains("text"));
+    assert!(rejected.contains("The design was not changed"));
+    assert!(!rejected.contains("dst_hex"));
+
+    let empty = route("POST", "/api/import-svg", br#"{"svg_text":"   "}"#);
+    assert_eq!(empty.status, 400);
+    let bad_width = route(
+        "POST",
+        "/api/import-svg",
+        br#"{"svg_text":"<svg></svg>","width_mm":"wide"}"#,
+    );
+    assert_eq!(bad_width.status, 400);
+}
+
+#[test]
 fn the_browser_does_not_plan_stitches() {
     let source = fs::read_to_string(repo_root().join("web/studio.js")).unwrap();
+    let batch = fs::read_to_string(repo_root().join("web/batch.js")).unwrap();
+    let lettering = fs::read_to_string(repo_root().join("web/lettering.js")).unwrap();
+    let creative = fs::read_to_string(repo_root().join("web/creative.js")).unwrap();
     assert!(source.contains("/api/generate"));
+    assert!(batch.contains("/api/batch/item"));
+    assert!(
+        source.len() <= 80 * 1024,
+        "studio.js is {} bytes",
+        source.len()
+    );
+    assert!(
+        batch.len() <= 48 * 1024,
+        "batch.js is {} bytes",
+        batch.len()
+    );
     for forbidden in [
         "generate_satin",
         "generate_fill",
@@ -175,7 +261,23 @@ fn the_browser_does_not_plan_stitches() {
             !source.contains(forbidden),
             "{forbidden} found in studio.js"
         );
+        assert!(!batch.contains(forbidden), "{forbidden} found in batch.js");
+        assert!(
+            !lettering.contains(forbidden),
+            "{forbidden} found in lettering.js"
+        );
+        assert!(
+            !creative.contains(forbidden),
+            "{forbidden} found in creative.js"
+        );
     }
+    assert!(
+        creative.len() <= 32 * 1024,
+        "creative.js is {} bytes",
+        creative.len()
+    );
+    assert!(creative.contains("/api/creative/jobs"));
+    assert!(!creative.contains("/api/propose"));
 }
 
 #[test]

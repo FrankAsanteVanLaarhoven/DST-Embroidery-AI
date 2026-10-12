@@ -11,6 +11,7 @@
 
 mod compile;
 mod read;
+mod replay;
 mod ternary;
 
 pub use compile::{
@@ -18,4 +19,5 @@ pub use compile::{
     write_dst_with, ExportLink, WriteOptions,
 };
 pub use read::{read_dst, read_dst_with, ReadOptions};
+pub use replay::{illustrative_replay, IllustrativeReplay, ReplayEvent};
 pub use ternary::{decode_record, encode_record, DecodedRecord, RecordCommand};

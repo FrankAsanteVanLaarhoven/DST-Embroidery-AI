@@ -1,0 +1,73 @@
+{
+  "format": "embroidery-project",
+  "format_version": "2",
+  "hoop_height_mm": 80,
+  "hoop_width_mm": 120,
+  "name": "Name drop badge",
+  "objects": [
+    {
+      "angle_degrees": 0,
+      "color_index": 0,
+      "column_width_mm": 1,
+      "density_mm": 4,
+      "kind": "running",
+      "label": "Outline",
+      "max_stitch_mm": 4,
+      "object_id": 1,
+      "points": [
+        {
+          "x": 8,
+          "y": 8
+        },
+        {
+          "x": 112,
+          "y": 8
+        },
+        {
+          "x": 112,
+          "y": 72
+        },
+        {
+          "x": 8,
+          "y": 72
+        }
+      ],
+      "pull_compensation_mm": 0,
+      "underlay": [],
+      "underlay_spacing_mm": 0
+    },
+    {
+      "angle_degrees": 0,
+      "color_index": 1,
+      "column_width_mm": 1.6,
+      "density_mm": 4,
+      "kind": "text",
+      "label": "Lettering",
+      "max_stitch_mm": 3,
+      "object_id": 2,
+      "points": [],
+      "pull_compensation_mm": 0,
+      "text": {
+        "cap_height_mm": 8,
+        "content": "Café\nAlpine 08",
+        "font_id": "embroideryos-block-01",
+        "font_sha256": "78e8506438960cc575d896ba338d65d711144bb5acc956205dbb28c081074a89",
+        "font_version": "2",
+        "layout": {
+          "alignment": "centre",
+          "baseline_spacing_mm": 18,
+          "block_width_mm": 100,
+          "first_baseline_mm": 15.36,
+          "policy": "embroideryos-line-layout/1"
+        },
+        "letter_spacing_mm": 0.8,
+        "origin_x_mm": 18,
+        "origin_y_mm": 8,
+        "word_spacing_mm": 3.6
+      },
+      "underlay": [],
+      "underlay_spacing_mm": 0
+    }
+  ],
+  "review": null
+}

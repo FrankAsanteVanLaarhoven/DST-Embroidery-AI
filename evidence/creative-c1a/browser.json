@@ -1,0 +1,22 @@
+{
+  "studio": "http://127.0.0.1:4192/",
+  "project_name": "Alpine Club",
+  "project_unchanged": true,
+  "provider": "test_image",
+  "live": false,
+  "sha256": "97ec83a5205e3283b546991e6573b32aaf4234fc439fd22e52cbddf09e358422",
+  "byte_length": 12420,
+  "artifact_href": "http://127.0.0.1:4192/api/creative/artifacts/art-4b0cd47934858b15d809141db44bfc35",
+  "portrait_without_reference": "blocked",
+  "portrait_with_reference": "blocked_generation_does_not_edit",
+  "expected_portrait_422_console_lines": 2,
+  "policy": {
+    "provider": "test_image",
+    "live_ready": false,
+    "key_configured": false,
+    "remaining_calls": 0,
+    "transmit_permitted": false,
+    "live_process_enabled": false
+  },
+  "machine_release_allowed": false
+}

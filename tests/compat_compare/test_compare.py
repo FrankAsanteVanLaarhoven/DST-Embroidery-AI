@@ -1,5 +1,5 @@
 from __future__ import annotations
-import copy, importlib.util, json, math, sys, tempfile, unittest
+import base64, copy, hashlib, importlib.util, json, math, sys, tempfile, unittest
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tools/compat_compare'))
@@ -40,6 +40,12 @@ class ProofTests(unittest.TestCase):
         b=copy.deepcopy(self.bundle);mutate(b)
         with self.assertRaises(ValueError):validate_bundle(b)
     def test_valid_fixture(self):self.assertEqual(len(validate_bundle(self.bundle)),524)
+    def test_native_project_replay_protocol(self):
+        bundle=copy.deepcopy(self.bundle)
+        bundle['protocol']='embroidery-project-replay/1'
+        self.assertEqual(bundle['protocol'],'embroidery-project-replay/1')
+        self.assertEqual(len(validate_bundle(bundle)),524)
+        self.assertEqual(self.bundle['protocol'],'twinlab-m1/1')
     def test_wrong_hash(self):self.reject(lambda b:b['provenance'].update(dst_sha256='0'*64))
     def test_changed_raw(self):self.reject(lambda b:b['trace']['events'][0].update(raw=[0,0,3]))
     def test_cardinality(self):self.reject(lambda b:b['trace'].update(record_count=5))
@@ -90,6 +96,67 @@ class ProofTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             m=make_proof(ROOT/'fixtures/compat/square.replay.json',ROOT/'fixtures/compat/reference-square.png',Path(t)/'p.pdf',500)
             self.assertFalse(m['actual_size_panel'])
+
+    def test_saved_lettering_proof_shows_the_selected_row(self):
+        """Binding hash stays. Parsed labels and the rendered replay are extra."""
+        import fitz
+        batch_path=ROOT/'evidence/lettering-v2/name-drop-batch.json'
+        before=batch_path.read_bytes()
+        batch=json.loads(before)
+        rows={item['item_id']:item for item in batch['items']}
+        expected={
+            'N-03':'Café',
+            'N-04':'Cafe\u0301',
+            'N-17':'O\u2019Neil',
+            'N-18':"O'Neil",
+        }
+        rendered={}
+        for item_id, source in expected.items():
+            item=rows[item_id]
+            self.assertEqual(item['text'], source)
+            project_text=next(obj['text']['content'] for obj in item['project']['objects'] if obj['kind']=='text')
+            self.assertEqual(project_text, source)
+            pdf=base64.b64decode(item['pdf_base64'])
+            self.assertTrue(pdf.startswith(b'%PDF'))
+            self.assertEqual(hashlib.sha256(pdf).hexdigest(), item['binding']['pdf_sha256'])
+            self.assertEqual(item['binding']['dst_sha256'], item['dst_sha256'])
+            self.assertEqual(item['binding']['item_id'], item_id)
+            with fitz.open(stream=pdf, filetype='pdf') as doc:
+                self.assertEqual(len(doc), 2)
+                text=doc[0].get_text()+doc[1].get_text()
+                self.assertIn('DST replay view', text)
+                self.assertIn('Engineering review only', text)
+                self.assertIn('SUPPLIED NATIVE REPLAY', text)
+                # Stitch lettering is drawn. Extraction is not the stored source.
+                self.assertNotEqual(text, source)
+                rendered[item_id]=self.replay_panel(doc[0])
+            self.assertGreater(rendered[item_id][0], 20)
+        self.assertEqual(rows['N-03']['pdf_base64'], rows['N-04']['pdf_base64'])
+        self.assertEqual(rendered['N-03'][1], rendered['N-04'][1])
+        self.assertNotEqual(rows['N-03']['text'], rows['N-04']['text'])
+        self.assertNotEqual(rows['N-03']['proof_id'], rows['N-04']['proof_id'])
+        self.assertNotEqual(rendered['N-17'][1], rendered['N-18'][1])
+        self.assertIn('\u0301', rows['N-04']['text'])
+        standalone=ROOT/'evidence/lettering-v2/N-03.proof.pdf'
+        self.assertEqual(standalone.read_bytes(), base64.b64decode(rows['N-03']['pdf_base64']))
+        self.assertEqual(batch_path.read_bytes(), before)
+
+    @staticmethod
+    def replay_panel(page):
+        import fitz
+        box=page.rect
+        width, height=box.width, box.height
+        panel_width=(width-88)/2
+        panel_height=288
+        reportlab_y=height-386
+        clip=fitz.Rect(52+panel_width, height-(reportlab_y+panel_height), 52+panel_width*2, height-reportlab_y)
+        pix=page.get_pixmap(matrix=fitz.Matrix(2, 2), clip=clip, alpha=False)
+        ink=0
+        samples=pix.samples
+        for index in range(0, len(samples), 3):
+            if samples[index]<230 or samples[index+1]<230 or samples[index+2]<230:
+                ink+=1
+        return ink, bytes(samples)
 
 
 class RegisterTests(unittest.TestCase):

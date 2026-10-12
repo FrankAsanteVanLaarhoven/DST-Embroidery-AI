@@ -1,0 +1,37 @@
+{
+  "record": "lettering-l4-worker",
+  "date": "2026-10-12",
+  "url": "http://127.0.0.1:4187/",
+  "node_pid_before": 14602,
+  "node_pid_after": 14602,
+  "node_pid_unchanged": true,
+  "expected_engine_sha256": "6d5c61bfacd6a612b8d7dec7713cd1e07624510af48c6e8780627516ce6292ca",
+  "plain_artifact_id": "efb2559e6ae395eba43d1e05731fdcd31843632f576d6fb9643a1a07382c3629",
+  "plain_engine_sha256": "6d5c61bfacd6a612b8d7dec7713cd1e07624510af48c6e8780627516ce6292ca",
+  "runs": [
+    {
+      "pid": 14849,
+      "exe": "/Users/favl/embroidery-engine/target/debug/embroidery-twin",
+      "header_sha256": "6d5c61bfacd6a612b8d7dec7713cd1e07624510af48c6e8780627516ce6292ca",
+      "image_sha256": "6d5c61bfacd6a612b8d7dec7713cd1e07624510af48c6e8780627516ce6292ca",
+      "artifact_id": "efb2559e6ae395eba43d1e05731fdcd31843632f576d6fb9643a1a07382c3629",
+      "engine_sha256": "6d5c61bfacd6a612b8d7dec7713cd1e07624510af48c6e8780627516ce6292ca",
+      "still_alive": false,
+      "body_has_worker": false,
+      "node_pid": 14602
+    },
+    {
+      "pid": 14855,
+      "exe": "/Users/favl/embroidery-engine/target/debug/embroidery-twin",
+      "header_sha256": "6d5c61bfacd6a612b8d7dec7713cd1e07624510af48c6e8780627516ce6292ca",
+      "image_sha256": "6d5c61bfacd6a612b8d7dec7713cd1e07624510af48c6e8780627516ce6292ca",
+      "artifact_id": "efb2559e6ae395eba43d1e05731fdcd31843632f576d6fb9643a1a07382c3629",
+      "engine_sha256": "6d5c61bfacd6a612b8d7dec7713cd1e07624510af48c6e8780627516ce6292ca",
+      "still_alive": false,
+      "body_has_worker": false,
+      "node_pid": 14602
+    }
+  ],
+  "passed": true,
+  "problems": []
+}

@@ -1,0 +1,16 @@
+{
+  "item_id": "CMP-001",
+  "snapshot_id": "ea05ca45ef521e331e53ec109df9d8d9c8896781a68b2cccd79997010b79c768",
+  "project_revision": "3a2eaa44582645c538612785dec6c689b9e2a6430629a99586510f11b46e52a4",
+  "dst_sha256": "6569b2e57cc4bc3704cfe2939dbbe845be09f176b908985cfe801961030fd135",
+  "pdf_sha256": "b73d9541ad6cd157b45d1c1c5ea16068185b3100b89911df7809e33665ee717f",
+  "replay_sha256": "a69772f338b7bbf09813ea979deb786f9f7b404743e36dece43204d2438ef751",
+  "machine_release_allowed": false,
+  "physical_qualification": false,
+  "studio_project": "Name drop badge",
+  "compare_design_kept": "Alpine mark",
+  "bad_destination_rejected": true,
+  "unavailable_rejected": true,
+  "stale_handoff_rejected": true,
+  "sidebar_and_production_opened": true
+}

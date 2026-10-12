@@ -1,0 +1,132 @@
+{
+  "purpose": "Source state immediately before native lettering L1. This is not an underlay rerun.",
+  "head": "23bd144ac42ef4a6d3cc10088a5ecdd5ef4556d1",
+  "git_status_short": " M README.md\n M apps/twinlab/public/app.mjs\n M apps/twinlab/public/index.html\n M apps/twinlab/public/style.css\n M crates/core/src/capabilities.rs\n M crates/core/src/generators/mod.rs\n M crates/core/src/generators/satin.rs\n M crates/core/src/lib.rs\n M crates/core/src/project.rs\n M crates/dst/src/compile.rs\n M crates/studio/src/lib.rs\n M crates/studio/tests/workflow.rs\n M crates/twin/src/lib.rs\n M docs/engine.md\n M docs/quality/gate.md\n M web/index.html\n M web/studio.css\n M web/studio.js\n?? crates/studio/src/svg_import.rs\n?? docs/svg-geometry-intake.md\n?? evidence/satin-underlay/\n?? evidence/satin-variable/\n?? evidence/svg-import/\n?? evidence/svg-native-gate.json\n?? fixtures/svg-geometry/\n?? python/embroidery_ai/svg_geometry.py\n?? tests/studio/satin_browser.py\n?? tests/studio/svg_browser.py\n?? tests/studio/underlay_browser.py\n?? tests/svg_geometry/\n?? tests/twinlab/satin_widths_browser.py\n?? tests/twinlab/underlay_browser.py\n?? tools/check_svg_geometry_native.py\n?? tools/import_svg_geometry.py\n",
+  "tracked_source_hashes": {
+    "crates/core/src/project.rs": {
+      "sha256": "1a3846328f5f3c060de6bae81d8959f47934665c043ad7e6b9fa3f60096b1a6f",
+      "bytes": 28179
+    },
+    "crates/core/src/capabilities.rs": {
+      "sha256": "72f7b4f8854e0e767fcce625276aeda485993ac24634b3d3924132b943258e55",
+      "bytes": 6497
+    },
+    "crates/core/src/lib.rs": {
+      "sha256": "4e3c37d6bf8b18d9f70ff73773271daa86a5ae80acd7a2b64c1b60cc3f3f3cde",
+      "bytes": 1285
+    },
+    "crates/core/src/generators/satin.rs": {
+      "sha256": "9fb418dd78bfa4724a65cc7141f967d2b99c4be6a25bffe3f6bacedb80122117",
+      "bytes": 53528
+    },
+    "crates/twin/src/lib.rs": {
+      "sha256": "5c3007da5a0c46a4167384c0f521480f78797bd4b2e6530643550f238ff8ce02",
+      "bytes": 37126
+    },
+    "web/studio.js": {
+      "sha256": "f7368e1f686e579c6c2e1814842b000a38ab0442afa3ef9b1acac4241c2d60a3",
+      "bytes": 70461
+    },
+    "apps/twinlab/public/app.mjs": {
+      "sha256": "454237d583ef7b235faa92c48c1976ee6d9930bdea0f23a14dfcf8abcaf73d50",
+      "bytes": 46969
+    },
+    "docs/quality/gate.md": {
+      "sha256": "a0ed99132cc02caf02ece2aa837e96586e2b037fe12e3a5053884473c5971d85",
+      "bytes": 82760
+    },
+    "README.md": {
+      "sha256": "b96b1f3dad15346dce775ccdfad99f5cd595d19c85fb7a733df510c2e7b6db42",
+      "bytes": 7467
+    },
+    "docs/engine.md": {
+      "sha256": "10aced27865e0890eb5b1b14633ad3671437cae5b2bfb7af747aa4de5a9c714d",
+      "bytes": 11550
+    }
+  },
+  "lettering_requirement_rows": [
+    {
+      "id": "SRC05",
+      "acceptance_status": "NOT_RUN",
+      "requirement": "Preserve all supplied totals; resolve categories before publishing a competitive count.",
+      "notes": "The current Brother regional page also contains all three formulations; unresolved source inconsistency."
+    },
+    {
+      "id": "F01",
+      "acceptance_status": "NOT_RUN",
+      "requirement": "Build a licensed digitised-font catalogue with clearly counted categories; target at least 130 qualified families for a parity release.",
+      "notes": "Counts are targets for an original/licensed catalogue, not delivered assets."
+    },
+    {
+      "id": "F02",
+      "acceptance_status": "NOT_RUN",
+      "requirement": "Filter fonts by script, style, material/size evidence and glyph availability.",
+      "notes": "Counts are targets for an original/licensed catalogue, not delivered assets."
+    },
+    {
+      "id": "F03",
+      "acceptance_status": "NOT_RUN",
+      "requirement": "Create editable glyph geometry, metrics and stitch strategies from authorised sources.",
+      "notes": "Counts are targets for an original/licensed catalogue, not delivered assets."
+    },
+    {
+      "id": "F04",
+      "acceptance_status": "NOT_RUN",
+      "requirement": "Map authorised stitch glyphs to characters with baseline, advance, kerning and scale limits.",
+      "notes": "Counts are targets for an original/licensed catalogue, not delivered assets."
+    },
+    {
+      "id": "F05",
+      "acceptance_status": "NOT_RUN",
+      "requirement": "Provide at least two independently created configurable monogram layout families.",
+      "notes": "Counts are targets for an original/licensed catalogue, not delivered assets."
+    },
+    {
+      "id": "F06",
+      "acceptance_status": "NOT_RUN",
+      "requirement": "Generate batch personalised names from validated tables.",
+      "notes": "Counts are targets for an original/licensed catalogue, not delivered assets."
+    },
+    {
+      "id": "F07",
+      "acceptance_status": "NOT_RUN",
+      "requirement": "Add robust contours/offsets around shaped text while preserving counters.",
+      "notes": "Counts are targets for an original/licensed catalogue, not delivered assets."
+    },
+    {
+      "id": "F08",
+      "acceptance_status": "NOT_RUN",
+      "requirement": "Develop at least ten licensed digitised small-text families with scoped size evidence.",
+      "notes": "Counts are targets for an original/licensed catalogue, not delivered assets."
+    },
+    {
+      "id": "F09",
+      "acceptance_status": "NOT_RUN",
+      "requirement": "Support baseline curves, envelope/arc placement, spacing and per-glyph transforms.",
+      "notes": "Counts are targets for an original/licensed catalogue, not delivered assets."
+    },
+    {
+      "id": "F10",
+      "acceptance_status": "NOT_RUN",
+      "requirement": "Import authorised outline fonts and generate embroidery using a shaping/digitising pipeline.",
+      "notes": "Counts are targets for an original/licensed catalogue, not delivered assets."
+    },
+    {
+      "id": "F11",
+      "acceptance_status": "NOT_RUN",
+      "requirement": "Add script shaping, combining marks, bidirectional text and explicit fallback controls.",
+      "notes": "Counts are targets for an original/licensed catalogue, not delivered assets."
+    },
+    {
+      "id": "X11",
+      "acceptance_status": "NOT_RUN",
+      "requirement": "Isolate untrusted SVG/PDF/CAD/font/embroidery parsing with bounds, cancellation and provenance.",
+      "notes": ""
+    }
+  ],
+  "preserved": {
+    "workbook_sha256": "d1cd2147c9a282d36a9e0ff6fc812bf9f5a775bb2bac6cf92360c7f82ca32128",
+    "coverage_sha256": "829295f1095ff5080b454e6b2a8a0893da531d300ad07e790e7383caac687db6",
+    "port_4175": "left down; not measured and not restarted"
+  }
+}

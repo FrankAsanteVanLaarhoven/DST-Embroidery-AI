@@ -1,0 +1,53 @@
+{
+  "format": "embroidery-project",
+  "format_version": "2",
+  "name": "Name drop badge",
+  "hoop_width_mm": 120.0,
+  "hoop_height_mm": 80.0,
+  "objects": [
+    {
+      "object_id": 1,
+      "label": "Outline",
+      "kind": "running",
+      "points": [
+        {"x": 8.0, "y": 8.0},
+        {"x": 112.0, "y": 8.0},
+        {"x": 112.0, "y": 72.0},
+        {"x": 8.0, "y": 72.0}
+      ],
+      "angle_degrees": 0.0,
+      "density_mm": 4.0,
+      "column_width_mm": 1.0,
+      "max_stitch_mm": 4.0,
+      "underlay_spacing_mm": 0.0,
+      "underlay": [],
+      "pull_compensation_mm": 0.0,
+      "color_index": 0
+    },
+    {
+      "object_id": 2,
+      "label": "Lettering",
+      "kind": "text",
+      "points": [],
+      "angle_degrees": 0.0,
+      "density_mm": 4.0,
+      "column_width_mm": 1.6,
+      "max_stitch_mm": 3.0,
+      "underlay_spacing_mm": 0.0,
+      "underlay": [],
+      "pull_compensation_mm": 0.0,
+      "color_index": 1,
+      "text": {
+        "content": "ALPINE 08",
+        "font_id": "embroideryos-block-01",
+        "font_version": "1",
+        "font_sha256": "aca657de98489950e35cb72d7c802d9a4d81958f2915b93307af7b9a4ca028bd",
+        "origin_x_mm": 18.0,
+        "origin_y_mm": 28.0,
+        "cap_height_mm": 8.0,
+        "letter_spacing_mm": 0.8,
+        "word_spacing_mm": 3.6
+      }
+    }
+  ]
+}

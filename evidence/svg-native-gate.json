@@ -1,0 +1,45 @@
+{
+  "gate": "svg-geometry-native-smoke",
+  "status": "PASS",
+  "cases_passed": 2,
+  "cases_expected": 2,
+  "python": "3.11.4 (v3.11.4:d2340ef257, Jun  6 2023, 19:15:51) [Clang 13.0.0 (clang-1300.0.29.30)]",
+  "platform": "macOS-26.3.1-arm64-arm-64bit",
+  "head": "23bd144ac42ef4a6d3cc10088a5ecdd5ef4556d1",
+  "converter_sha256": "42d20e46784580f03d6e7c3babc2be9b9b3c4ed4192f6506697411c2664ffb44",
+  "note": "Geometry intake only. Machine release stays false. A08, G02, and G03 are not accepted.",
+  "cases": [
+    {
+      "name": "badge-hole.svg",
+      "source_sha256": "166a2fd6b55fa61fd4324a9e7b4a30dd5c2dd4fa2f4a236364d8916419211c4c",
+      "status": "PASS",
+      "revision": "665f912eb3cec64df0cf4c81acec30c8b7ed3a760de26a28926fe1ed9a1fa68f",
+      "dst_sha256": "62e97ba0a9548c8e8ace1504d5f3d41c69929829d175b1e0f214f20f6a859060",
+      "dst_bytes": 5252,
+      "plan_sewing_stitches": 1380,
+      "reader_sewing_stitches": 1380,
+      "machine_release_allowed": false,
+      "validation_warnings": [
+        "Plan starts at (10.00, 10.60) mm rather than the origin. The DST compiler will insert a jump from 0,0."
+      ],
+      "objects": 1,
+      "holes": 1
+    },
+    {
+      "name": "cubic-leaf.svg",
+      "source_sha256": "8054cf4cd14d48622432c0fe60fdc5b88990d9956d4bcc5ebad2ac9f519d5023",
+      "status": "PASS",
+      "revision": "cd291861c5b687cbfc196516361a988447f6c09d9fdcd00e29a01acfcb4a3823",
+      "dst_sha256": "82881461a7443fb174acb30a2488699563b6e2519433813a921bfe5ccb55c9b7",
+      "dst_bytes": 2375,
+      "plan_sewing_stitches": 564,
+      "reader_sewing_stitches": 564,
+      "machine_release_allowed": false,
+      "validation_warnings": [
+        "Plan starts at (38.51, 8.60) mm rather than the origin. The DST compiler will insert a jump from 0,0."
+      ],
+      "objects": 1,
+      "holes": 0
+    }
+  ]
+}

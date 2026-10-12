@@ -4,7 +4,7 @@ mod satin;
 
 pub use fill::{generate_fill, generate_fill_with_holes, validate_fill_region, FillConfig};
 pub use running::{generate_running, RunningConfig};
-pub use satin::{generate_satin, SatinConfig};
+pub use satin::{generate_satin, generate_satin_variable, SatinConfig};
 
 use crate::error::PlanError;
 use crate::model::{mm_to_units, Point, Stitch, StitchKind, StitchPlan, DST_MAX_DELTA_UNITS};

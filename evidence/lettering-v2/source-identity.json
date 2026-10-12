@@ -1,0 +1,26 @@
+{
+  "record": "lettering-l3-run",
+  "date": "2026-10-11",
+  "head": "23bd144ac42ef4a6d3cc10088a5ecdd5ef4556d1",
+  "does_not_replace": [
+    "evidence/lettering/source-identity.json",
+    "evidence/name-drop/source-identity.json"
+  ],
+  "font_version_1_sha256": "aca657de98489950e35cb72d7c802d9a4d81958f2915b93307af7b9a4ca028bd",
+  "font_version_2_sha256": "78e8506438960cc575d896ba338d65d711144bb5acc956205dbb28c081074a89",
+  "unicode_normalization": "=0.1.24",
+  "unicode_segmentation": "=1.12.0",
+  "unicode_data": "16.0.0",
+  "normalization": "NFC",
+  "listeners": {
+    "127.0.0.1:4173": "embroidery-studio PID 40352, not used",
+    "127.0.0.1:4175": "not listening, not started",
+    "127.0.0.1:4176": "embroidery-studio PID 4961",
+    "127.0.0.1:4181": "node PID 79091, not restarted"
+  },
+  "studio_binary_sha256": "4c2ff89721477e2335034a12b1d73c47ae356227de625b7765e97eabdec8f2c4",
+  "twin_binary_sha256": "6b12abfc7bc96a87124e8a040c4e547632a832696e7309dbb61d91ce7eb9b900",
+  "machine_release_allowed": false,
+  "acceptance": "0 of 210",
+  "physical_stitch_out": "NOT RUN"
+}

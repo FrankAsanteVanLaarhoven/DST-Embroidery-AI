@@ -43,8 +43,8 @@ def finite(value, name, positive=False):
 
 
 def validate_bundle(bundle: dict) -> bytes:
-    if not isinstance(bundle,dict) or bundle.get('protocol')!='twinlab-m1/1':
-        raise ValueError('expected a twinlab-m1/1 evidence bundle')
+    if not isinstance(bundle,dict) or bundle.get('protocol') not in ('twinlab-m1/1','embroidery-project-replay/1'):
+        raise ValueError('expected a twinlab-m1/1 or embroidery-project-replay/1 evidence bundle')
     if bundle.get('kernel',{}).get('mode') not in ('native-rust','transport-test-fixture'):
         raise ValueError('unsupported provenance mode')
     payload=bundle.get('dst_base64')

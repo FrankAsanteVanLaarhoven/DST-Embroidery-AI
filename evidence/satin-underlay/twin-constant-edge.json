@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "name": "Alpine mark",
+  "revision": 5,
+  "objects": [
+    {
+      "id": 1,
+      "label": "Mountain field",
+      "kind": "fill",
+      "points": [
+        {
+          "x": -40,
+          "y": 24
+        },
+        {
+          "x": -18,
+          "y": -8
+        },
+        {
+          "x": 0,
+          "y": -28
+        },
+        {
+          "x": 22,
+          "y": -6
+        },
+        {
+          "x": 40,
+          "y": 24
+        }
+      ],
+      "rgb": [
+        53,
+        106,
+        210
+      ],
+      "spacing_mm": 0.6,
+      "angle_degrees": 30,
+      "max_stitch_mm": 3.5,
+      "width_mm": 2.4,
+      "compensation_mm": 0.1,
+      "underlay_mm": 3
+    },
+    {
+      "id": 2,
+      "label": "Shield border",
+      "kind": "satin",
+      "points": [
+        {
+          "x": -45,
+          "y": -38
+        },
+        {
+          "x": 45,
+          "y": -38
+        },
+        {
+          "x": 45,
+          "y": 35
+        },
+        {
+          "x": 0,
+          "y": 48
+        },
+        {
+          "x": -45,
+          "y": 35
+        },
+        {
+          "x": -45,
+          "y": -38
+        }
+      ],
+      "rgb": [
+        211,
+        147,
+        71
+      ],
+      "spacing_mm": 0.5,
+      "angle_degrees": 30,
+      "max_stitch_mm": 3.5,
+      "width_mm": 2.4,
+      "compensation_mm": 0.1,
+      "underlay_mm": 2.5
+    },
+    {
+      "id": 3,
+      "label": "Baseline",
+      "kind": "running",
+      "points": [
+        {
+          "x": -25,
+          "y": 27
+        },
+        {
+          "x": 25,
+          "y": 27
+        }
+      ],
+      "rgb": [
+        50,
+        76,
+        110
+      ],
+      "spacing_mm": 0.6,
+      "angle_degrees": 30,
+      "max_stitch_mm": 2.4,
+      "width_mm": 2.4,
+      "compensation_mm": 0.1,
+      "underlay_mm": 0
+    },
+    {
+      "id": 4,
+      "label": "New satin",
+      "kind": "satin",
+      "points": [
+        {
+          "x": -20,
+          "y": 0
+        },
+        {
+          "x": 20,
+          "y": 0
+        }
+      ],
+      "rgb": [
+        55,
+        112,
+        211
+      ],
+      "spacing_mm": 0.6,
+      "angle_degrees": 30,
+      "max_stitch_mm": 3,
+      "width_mm": 3,
+      "compensation_mm": 0.1,
+      "underlay_mm": 3,
+      "underlay": [
+        "edge_run"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "proof_id": "2c6a294e097f07c0d6cc9182cb26d1c7da216e00740034a232fe8a26b1548ac5",
+  "binding": {
+    "schema": "embroideryos-compare-binding/0.2",
+    "artifact_id": "ba19d83dd5ae63062f0d8ea6f6f028311c08fdb112e3a51c8d34120d223b0ffc",
+    "design_revision": 6,
+    "design_sha256": "849e47d195898e74ab43852049517eae8ab2f56b15a790156b6e4170e9f57b51",
+    "dst_sha256": "61c472cdbe01a922eded6dddd31ae531b85d0fb4172ade2f80cb24977bcaed77",
+    "source_sha256": "3499f537b294079f259c0b7c1a04d9485e671e55def24d542a93ed9b7bb3d091",
+    "source_name": "preservation-run-2026-10-11-reference-square.png",
+    "source_role": "original",
+    "width_mm": 14,
+    "height_mm": 14,
+    "x_mm": -2,
+    "y_mm": -2,
+    "page": 1,
+    "pdf_sha256": "52959306ffd0e75dd433c84326e6eaedd50d889285448dd1effbd162388233dc",
+    "kernel_mode_reported": "native-rust",
+    "machine_release_allowed": false,
+    "approval_allowed": false,
+    "coordinate_semantics_independently_verified": false,
+    "historical_source_association_verified": false,
+    "physical_qualification": false,
+    "actual_size_panel": false
+  },
+  "checks": {
+    "dst_hash": true,
+    "record_byte_binding": true,
+    "trace_structure": true,
+    "rust_executed": false,
+    "decoder_semantics_independently_verified": false,
+    "historical_source_association_verified": false,
+    "physical_qualification": false
+  }
+}

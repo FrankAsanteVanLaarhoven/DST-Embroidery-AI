@@ -1,0 +1,11 @@
+{
+  "application": "selected",
+  "artifact_id": "art-4b0cd47934858b15d809141db44bfc35",
+  "embroidery_project_changed": false,
+  "job_id": "job-8aa34c2c2787e867ddbeddc3fb1b687c",
+  "machine_release_allowed": false,
+  "master_id": "mas-f5fc44c83a97166a60209385f2f0ec08",
+  "schema": "embroideryos-artwork-master/0.1",
+  "sha256": "97ec83a5205e3283b546991e6573b32aaf4234fc439fd22e52cbddf09e358422",
+  "source_revision": "1-09bdc436be1fd57c55d4b7ff6c6aabb5"
+}

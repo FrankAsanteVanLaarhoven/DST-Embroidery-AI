@@ -1,0 +1,51 @@
+{
+  "record": "Studio export reproduced on 4176 before underlay edits",
+  "service": "http://127.0.0.1:4176/",
+  "studio_binary_sha256": "079ebbeb840d32697b51966bb39208935a808f412eb6847e179bb5e6bec205b8",
+  "expected_revision": "646eccd46b22fcae9732dc023412d6cb18eada977c6a75463cdf2e46246771b3",
+  "expected_dst_sha256": "7e6c7a7a65a0dbd98878edbe185110b5ba6861bee6ffee4d4488e7c4908683bf",
+  "observed_revision": "646eccd46b22fcae9732dc023412d6cb18eada977c6a75463cdf2e46246771b3",
+  "observed_dst_sha256": "7e6c7a7a65a0dbd98878edbe185110b5ba6861bee6ffee4d4488e7c4908683bf",
+  "match": true,
+  "sewing_total": 4768,
+  "by_object": {
+    "1": {
+      "sewing": 2486,
+      "travel": 85
+    },
+    "2": {
+      "sewing": 408,
+      "travel": 43
+    },
+    "3": {
+      "sewing": 641,
+      "travel": 70
+    },
+    "4": {
+      "sewing": 416,
+      "travel": 36
+    },
+    "5": {
+      "sewing": 142,
+      "travel": 23
+    },
+    "6": {
+      "sewing": 464,
+      "travel": 48
+    },
+    "7": {
+      "sewing": 144,
+      "travel": 2
+    },
+    "8": {
+      "sewing": 67,
+      "travel": 2
+    }
+  },
+  "machine_release_allowed": false,
+  "notes_with_12mm": [
+    "Object 8 variable satin uses the 12 mm axis split, at most 16 pieces, and omits satin sewing shorter than 0.2 mm. Top 67, underlay 0, travel 1, split pieces 0, omitted 0."
+  ],
+  "dst_file": "studio-alpine-satin-2-8.dst",
+  "project_file": "studio-alpine-satin-2-8.project.json"
+}

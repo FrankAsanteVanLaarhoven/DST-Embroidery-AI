@@ -9,7 +9,9 @@ use std::ffi::CStr;
 use std::os::raw::{c_char, c_int};
 
 use embroidery_core::{
-    capability_manifest, generate_project, parse_project, underlay_rules, validate, StitchPlan,
+    capability_manifest, font_content_sha256, font_v2_content_sha256, generate_project,
+    parse_project, underlay_rules, validate, StitchPlan, FONT_ID, FONT_NAME, FONT_VERSION,
+    FONT_VERSION_2, REPERTOIRE,
 };
 use embroidery_dst::compile_to_vec;
 use embroidery_simulate::score;
@@ -70,6 +72,30 @@ pub fn capabilities_json() -> String {
         "engine_version": "0.1.0",
         "capabilities": capability_manifest(),
         "underlay": underlay_rules(),
+        "lettering_font": {
+            "id": FONT_ID,
+            "version": FONT_VERSION,
+            "name": FONT_NAME,
+            "sha256": font_content_sha256(),
+            "repertoire": REPERTOIRE,
+            "scaling": "Software test sizes such as 8, 12, and 20 mm are not measured sewing limits.",
+        },
+        "lettering_fonts": [
+            {
+                "id": FONT_ID,
+                "version": FONT_VERSION,
+                "name": FONT_NAME,
+                "sha256": font_content_sha256(),
+                "selection": "default",
+            },
+            {
+                "id": FONT_ID,
+                "version": FONT_VERSION_2,
+                "name": FONT_NAME,
+                "sha256": font_v2_content_sha256(),
+                "selection": "explicit",
+            }
+        ],
     }))
     .expect("capability manifest")
 }

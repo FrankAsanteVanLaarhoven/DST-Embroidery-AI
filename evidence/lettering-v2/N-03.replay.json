@@ -1,0 +1,2914 @@
+{
+  "batch": {
+    "font_id": "embroideryos-block-01",
+    "font_sha256": "78e8506438960cc575d896ba338d65d711144bb5acc956205dbb28c081074a89",
+    "font_version": "2",
+    "item_id": "N-03",
+    "profile_id": "native-hoop-v1",
+    "project_revision": "3190aa3f2925df8edf1daea03db7e5777a9f56a1f2910a28922d028274fd04ad",
+    "snapshot_id": "8e97b736c866c64a0d3e08b989c4c3ca8db91b9e53a8ce4980b5b48f050ba476",
+    "text": "Café"
+  },
+  "design_summary": {
+    "hoop_height_mm": 80,
+    "hoop_width_mm": 120,
+    "name": "Name drop badge",
+    "text_object_id": 2
+  },
+  "dst_base64": "TEE6TmFtZSBkcm9wIGJhZGdlIA1TVDogICAgMTM2DUNPOiAgMQ0rWDogMTEyMA0tWDogICA4MA0rWTogIDcyMA0tWTogICA4MA1BWDorICAzNTYNQVk6LSAgMjgyDU1YOisgICAgMA1NWTorICAgIDANUEQ6KioqKioqDRogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICCCAJcFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQMFBQNQUANQUANQUANQUANQUANQUANQUANQUANQUANQUANQUANQUANQUANQUANQUANQUAMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMKCgMAAMOBZqNCJKNCJKNCJKMJBgMGKRMJBgNJEKOQYANilQOQYAMBSpOQYANilQOQYANJKocJBgNWmQMJBgMRaoOQYANolQOQYAORCoMJBgOGmQMJBgOZAIOQYANolQOQYAMgVKMJBgNWmQMJBgNWmQMJBgMmWKOQYANilgOQYAOBqZOQYANilgOQYAMJlYOQYANolQOQYAORCoMJBgOGGQMJBgNpQIOQYANolAOQYAOEWIOQYANolQOQYANgqYMaYQNGRgMYYQMAAPM=",
+  "kernel": {
+    "export": "embroidery-dst",
+    "generation": "embroidery-core",
+    "mode": "native-rust",
+    "version": "0.1.0"
+  },
+  "palette": [
+    {
+      "needle": 1,
+      "rgb": [
+        30,
+        77,
+        60
+      ]
+    },
+    {
+      "needle": 2,
+      "rgb": [
+        109,
+        139,
+        120
+      ]
+    }
+  ],
+  "protocol": "embroidery-project-replay/1",
+  "provenance": {
+    "dst_sha256": "fb48287b4ce88b8076e3088d03dd79747e89982f38821ab70c2016d95b6bfb2e"
+  },
+  "trace": {
+    "decoder": "embroidery-dst::decode_record",
+    "duration_ms": 13674.31905692777,
+    "events": [
+      {
+        "byte_offset": 512,
+        "color_index": 0,
+        "end_ms": 113.13708498984761,
+        "from_units": [
+          0,
+          0
+        ],
+        "index": 0,
+        "kind": "jump",
+        "raw": [
+          130,
+          0,
+          151
+        ],
+        "start_ms": 0,
+        "to_units": [
+          80,
+          80
+        ]
+      },
+      {
+        "byte_offset": 515,
+        "color_index": 0,
+        "end_ms": 213.1370849898476,
+        "from_units": [
+          80,
+          80
+        ],
+        "index": 1,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 113.13708498984761,
+        "to_units": [
+          120,
+          80
+        ]
+      },
+      {
+        "byte_offset": 518,
+        "color_index": 0,
+        "end_ms": 313.1370849898476,
+        "from_units": [
+          120,
+          80
+        ],
+        "index": 2,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 213.1370849898476,
+        "to_units": [
+          160,
+          80
+        ]
+      },
+      {
+        "byte_offset": 521,
+        "color_index": 0,
+        "end_ms": 413.1370849898476,
+        "from_units": [
+          160,
+          80
+        ],
+        "index": 3,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 313.1370849898476,
+        "to_units": [
+          200,
+          80
+        ]
+      },
+      {
+        "byte_offset": 524,
+        "color_index": 0,
+        "end_ms": 513.1370849898476,
+        "from_units": [
+          200,
+          80
+        ],
+        "index": 4,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 413.1370849898476,
+        "to_units": [
+          240,
+          80
+        ]
+      },
+      {
+        "byte_offset": 527,
+        "color_index": 0,
+        "end_ms": 613.1370849898476,
+        "from_units": [
+          240,
+          80
+        ],
+        "index": 5,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 513.1370849898476,
+        "to_units": [
+          280,
+          80
+        ]
+      },
+      {
+        "byte_offset": 530,
+        "color_index": 0,
+        "end_ms": 713.1370849898476,
+        "from_units": [
+          280,
+          80
+        ],
+        "index": 6,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 613.1370849898476,
+        "to_units": [
+          320,
+          80
+        ]
+      },
+      {
+        "byte_offset": 533,
+        "color_index": 0,
+        "end_ms": 813.1370849898476,
+        "from_units": [
+          320,
+          80
+        ],
+        "index": 7,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 713.1370849898476,
+        "to_units": [
+          360,
+          80
+        ]
+      },
+      {
+        "byte_offset": 536,
+        "color_index": 0,
+        "end_ms": 913.1370849898476,
+        "from_units": [
+          360,
+          80
+        ],
+        "index": 8,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 813.1370849898476,
+        "to_units": [
+          400,
+          80
+        ]
+      },
+      {
+        "byte_offset": 539,
+        "color_index": 0,
+        "end_ms": 1013.1370849898476,
+        "from_units": [
+          400,
+          80
+        ],
+        "index": 9,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 913.1370849898476,
+        "to_units": [
+          440,
+          80
+        ]
+      },
+      {
+        "byte_offset": 542,
+        "color_index": 0,
+        "end_ms": 1113.1370849898476,
+        "from_units": [
+          440,
+          80
+        ],
+        "index": 10,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 1013.1370849898476,
+        "to_units": [
+          480,
+          80
+        ]
+      },
+      {
+        "byte_offset": 545,
+        "color_index": 0,
+        "end_ms": 1213.1370849898476,
+        "from_units": [
+          480,
+          80
+        ],
+        "index": 11,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 1113.1370849898476,
+        "to_units": [
+          520,
+          80
+        ]
+      },
+      {
+        "byte_offset": 548,
+        "color_index": 0,
+        "end_ms": 1313.1370849898476,
+        "from_units": [
+          520,
+          80
+        ],
+        "index": 12,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 1213.1370849898476,
+        "to_units": [
+          560,
+          80
+        ]
+      },
+      {
+        "byte_offset": 551,
+        "color_index": 0,
+        "end_ms": 1413.1370849898476,
+        "from_units": [
+          560,
+          80
+        ],
+        "index": 13,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 1313.1370849898476,
+        "to_units": [
+          600,
+          80
+        ]
+      },
+      {
+        "byte_offset": 554,
+        "color_index": 0,
+        "end_ms": 1513.1370849898476,
+        "from_units": [
+          600,
+          80
+        ],
+        "index": 14,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 1413.1370849898476,
+        "to_units": [
+          640,
+          80
+        ]
+      },
+      {
+        "byte_offset": 557,
+        "color_index": 0,
+        "end_ms": 1613.1370849898476,
+        "from_units": [
+          640,
+          80
+        ],
+        "index": 15,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 1513.1370849898476,
+        "to_units": [
+          680,
+          80
+        ]
+      },
+      {
+        "byte_offset": 560,
+        "color_index": 0,
+        "end_ms": 1713.1370849898476,
+        "from_units": [
+          680,
+          80
+        ],
+        "index": 16,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 1613.1370849898476,
+        "to_units": [
+          720,
+          80
+        ]
+      },
+      {
+        "byte_offset": 563,
+        "color_index": 0,
+        "end_ms": 1813.1370849898476,
+        "from_units": [
+          720,
+          80
+        ],
+        "index": 17,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 1713.1370849898476,
+        "to_units": [
+          760,
+          80
+        ]
+      },
+      {
+        "byte_offset": 566,
+        "color_index": 0,
+        "end_ms": 1913.1370849898476,
+        "from_units": [
+          760,
+          80
+        ],
+        "index": 18,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 1813.1370849898476,
+        "to_units": [
+          800,
+          80
+        ]
+      },
+      {
+        "byte_offset": 569,
+        "color_index": 0,
+        "end_ms": 2013.1370849898476,
+        "from_units": [
+          800,
+          80
+        ],
+        "index": 19,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 1913.1370849898476,
+        "to_units": [
+          840,
+          80
+        ]
+      },
+      {
+        "byte_offset": 572,
+        "color_index": 0,
+        "end_ms": 2113.1370849898476,
+        "from_units": [
+          840,
+          80
+        ],
+        "index": 20,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 2013.1370849898476,
+        "to_units": [
+          880,
+          80
+        ]
+      },
+      {
+        "byte_offset": 575,
+        "color_index": 0,
+        "end_ms": 2213.1370849898476,
+        "from_units": [
+          880,
+          80
+        ],
+        "index": 21,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 2113.1370849898476,
+        "to_units": [
+          920,
+          80
+        ]
+      },
+      {
+        "byte_offset": 578,
+        "color_index": 0,
+        "end_ms": 2313.1370849898476,
+        "from_units": [
+          920,
+          80
+        ],
+        "index": 22,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 2213.1370849898476,
+        "to_units": [
+          960,
+          80
+        ]
+      },
+      {
+        "byte_offset": 581,
+        "color_index": 0,
+        "end_ms": 2413.1370849898476,
+        "from_units": [
+          960,
+          80
+        ],
+        "index": 23,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 2313.1370849898476,
+        "to_units": [
+          1000,
+          80
+        ]
+      },
+      {
+        "byte_offset": 584,
+        "color_index": 0,
+        "end_ms": 2513.1370849898476,
+        "from_units": [
+          1000,
+          80
+        ],
+        "index": 24,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 2413.1370849898476,
+        "to_units": [
+          1040,
+          80
+        ]
+      },
+      {
+        "byte_offset": 587,
+        "color_index": 0,
+        "end_ms": 2613.1370849898476,
+        "from_units": [
+          1040,
+          80
+        ],
+        "index": 25,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 2513.1370849898476,
+        "to_units": [
+          1080,
+          80
+        ]
+      },
+      {
+        "byte_offset": 590,
+        "color_index": 0,
+        "end_ms": 2713.1370849898476,
+        "from_units": [
+          1080,
+          80
+        ],
+        "index": 26,
+        "kind": "stitch",
+        "raw": [
+          5,
+          5,
+          3
+        ],
+        "start_ms": 2613.1370849898476,
+        "to_units": [
+          1120,
+          80
+        ]
+      },
+      {
+        "byte_offset": 593,
+        "color_index": 0,
+        "end_ms": 2813.1370849898476,
+        "from_units": [
+          1120,
+          80
+        ],
+        "index": 27,
+        "kind": "stitch",
+        "raw": [
+          80,
+          80,
+          3
+        ],
+        "start_ms": 2713.1370849898476,
+        "to_units": [
+          1120,
+          120
+        ]
+      },
+      {
+        "byte_offset": 596,
+        "color_index": 0,
+        "end_ms": 2913.1370849898476,
+        "from_units": [
+          1120,
+          120
+        ],
+        "index": 28,
+        "kind": "stitch",
+        "raw": [
+          80,
+          80,
+          3
+        ],
+        "start_ms": 2813.1370849898476,
+        "to_units": [
+          1120,
+          160
+        ]
+      },
+      {
+        "byte_offset": 599,
+        "color_index": 0,
+        "end_ms": 3013.1370849898476,
+        "from_units": [
+          1120,
+          160
+        ],
+        "index": 29,
+        "kind": "stitch",
+        "raw": [
+          80,
+          80,
+          3
+        ],
+        "start_ms": 2913.1370849898476,
+        "to_units": [
+          1120,
+          200
+        ]
+      },
+      {
+        "byte_offset": 602,
+        "color_index": 0,
+        "end_ms": 3113.1370849898476,
+        "from_units": [
+          1120,
+          200
+        ],
+        "index": 30,
+        "kind": "stitch",
+        "raw": [
+          80,
+          80,
+          3
+        ],
+        "start_ms": 3013.1370849898476,
+        "to_units": [
+          1120,
+          240
+        ]
+      },
+      {
+        "byte_offset": 605,
+        "color_index": 0,
+        "end_ms": 3213.1370849898476,
+        "from_units": [
+          1120,
+          240
+        ],
+        "index": 31,
+        "kind": "stitch",
+        "raw": [
+          80,
+          80,
+          3
+        ],
+        "start_ms": 3113.1370849898476,
+        "to_units": [
+          1120,
+          280
+        ]
+      },
+      {
+        "byte_offset": 608,
+        "color_index": 0,
+        "end_ms": 3313.1370849898476,
+        "from_units": [
+          1120,
+          280
+        ],
+        "index": 32,
+        "kind": "stitch",
+        "raw": [
+          80,
+          80,
+          3
+        ],
+        "start_ms": 3213.1370849898476,
+        "to_units": [
+          1120,
+          320
+        ]
+      },
+      {
+        "byte_offset": 611,
+        "color_index": 0,
+        "end_ms": 3413.1370849898476,
+        "from_units": [
+          1120,
+          320
+        ],
+        "index": 33,
+        "kind": "stitch",
+        "raw": [
+          80,
+          80,
+          3
+        ],
+        "start_ms": 3313.1370849898476,
+        "to_units": [
+          1120,
+          360
+        ]
+      },
+      {
+        "byte_offset": 614,
+        "color_index": 0,
+        "end_ms": 3513.1370849898476,
+        "from_units": [
+          1120,
+          360
+        ],
+        "index": 34,
+        "kind": "stitch",
+        "raw": [
+          80,
+          80,
+          3
+        ],
+        "start_ms": 3413.1370849898476,
+        "to_units": [
+          1120,
+          400
+        ]
+      },
+      {
+        "byte_offset": 617,
+        "color_index": 0,
+        "end_ms": 3613.1370849898476,
+        "from_units": [
+          1120,
+          400
+        ],
+        "index": 35,
+        "kind": "stitch",
+        "raw": [
+          80,
+          80,
+          3
+        ],
+        "start_ms": 3513.1370849898476,
+        "to_units": [
+          1120,
+          440
+        ]
+      },
+      {
+        "byte_offset": 620,
+        "color_index": 0,
+        "end_ms": 3713.1370849898476,
+        "from_units": [
+          1120,
+          440
+        ],
+        "index": 36,
+        "kind": "stitch",
+        "raw": [
+          80,
+          80,
+          3
+        ],
+        "start_ms": 3613.1370849898476,
+        "to_units": [
+          1120,
+          480
+        ]
+      },
+      {
+        "byte_offset": 623,
+        "color_index": 0,
+        "end_ms": 3813.1370849898476,
+        "from_units": [
+          1120,
+          480
+        ],
+        "index": 37,
+        "kind": "stitch",
+        "raw": [
+          80,
+          80,
+          3
+        ],
+        "start_ms": 3713.1370849898476,
+        "to_units": [
+          1120,
+          520
+        ]
+      },
+      {
+        "byte_offset": 626,
+        "color_index": 0,
+        "end_ms": 3913.1370849898476,
+        "from_units": [
+          1120,
+          520
+        ],
+        "index": 38,
+        "kind": "stitch",
+        "raw": [
+          80,
+          80,
+          3
+        ],
+        "start_ms": 3813.1370849898476,
+        "to_units": [
+          1120,
+          560
+        ]
+      },
+      {
+        "byte_offset": 629,
+        "color_index": 0,
+        "end_ms": 4013.1370849898476,
+        "from_units": [
+          1120,
+          560
+        ],
+        "index": 39,
+        "kind": "stitch",
+        "raw": [
+          80,
+          80,
+          3
+        ],
+        "start_ms": 3913.1370849898476,
+        "to_units": [
+          1120,
+          600
+        ]
+      },
+      {
+        "byte_offset": 632,
+        "color_index": 0,
+        "end_ms": 4113.137084989848,
+        "from_units": [
+          1120,
+          600
+        ],
+        "index": 40,
+        "kind": "stitch",
+        "raw": [
+          80,
+          80,
+          3
+        ],
+        "start_ms": 4013.1370849898476,
+        "to_units": [
+          1120,
+          640
+        ]
+      },
+      {
+        "byte_offset": 635,
+        "color_index": 0,
+        "end_ms": 4213.137084989848,
+        "from_units": [
+          1120,
+          640
+        ],
+        "index": 41,
+        "kind": "stitch",
+        "raw": [
+          80,
+          80,
+          3
+        ],
+        "start_ms": 4113.137084989848,
+        "to_units": [
+          1120,
+          680
+        ]
+      },
+      {
+        "byte_offset": 638,
+        "color_index": 0,
+        "end_ms": 4313.137084989848,
+        "from_units": [
+          1120,
+          680
+        ],
+        "index": 42,
+        "kind": "stitch",
+        "raw": [
+          80,
+          80,
+          3
+        ],
+        "start_ms": 4213.137084989848,
+        "to_units": [
+          1120,
+          720
+        ]
+      },
+      {
+        "byte_offset": 641,
+        "color_index": 0,
+        "end_ms": 4413.137084989848,
+        "from_units": [
+          1120,
+          720
+        ],
+        "index": 43,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 4313.137084989848,
+        "to_units": [
+          1080,
+          720
+        ]
+      },
+      {
+        "byte_offset": 644,
+        "color_index": 0,
+        "end_ms": 4513.137084989848,
+        "from_units": [
+          1080,
+          720
+        ],
+        "index": 44,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 4413.137084989848,
+        "to_units": [
+          1040,
+          720
+        ]
+      },
+      {
+        "byte_offset": 647,
+        "color_index": 0,
+        "end_ms": 4613.137084989848,
+        "from_units": [
+          1040,
+          720
+        ],
+        "index": 45,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 4513.137084989848,
+        "to_units": [
+          1000,
+          720
+        ]
+      },
+      {
+        "byte_offset": 650,
+        "color_index": 0,
+        "end_ms": 4713.137084989848,
+        "from_units": [
+          1000,
+          720
+        ],
+        "index": 46,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 4613.137084989848,
+        "to_units": [
+          960,
+          720
+        ]
+      },
+      {
+        "byte_offset": 653,
+        "color_index": 0,
+        "end_ms": 4813.137084989848,
+        "from_units": [
+          960,
+          720
+        ],
+        "index": 47,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 4713.137084989848,
+        "to_units": [
+          920,
+          720
+        ]
+      },
+      {
+        "byte_offset": 656,
+        "color_index": 0,
+        "end_ms": 4913.137084989848,
+        "from_units": [
+          920,
+          720
+        ],
+        "index": 48,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 4813.137084989848,
+        "to_units": [
+          880,
+          720
+        ]
+      },
+      {
+        "byte_offset": 659,
+        "color_index": 0,
+        "end_ms": 5013.137084989848,
+        "from_units": [
+          880,
+          720
+        ],
+        "index": 49,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 4913.137084989848,
+        "to_units": [
+          840,
+          720
+        ]
+      },
+      {
+        "byte_offset": 662,
+        "color_index": 0,
+        "end_ms": 5113.137084989848,
+        "from_units": [
+          840,
+          720
+        ],
+        "index": 50,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 5013.137084989848,
+        "to_units": [
+          800,
+          720
+        ]
+      },
+      {
+        "byte_offset": 665,
+        "color_index": 0,
+        "end_ms": 5213.137084989848,
+        "from_units": [
+          800,
+          720
+        ],
+        "index": 51,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 5113.137084989848,
+        "to_units": [
+          760,
+          720
+        ]
+      },
+      {
+        "byte_offset": 668,
+        "color_index": 0,
+        "end_ms": 5313.137084989848,
+        "from_units": [
+          760,
+          720
+        ],
+        "index": 52,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 5213.137084989848,
+        "to_units": [
+          720,
+          720
+        ]
+      },
+      {
+        "byte_offset": 671,
+        "color_index": 0,
+        "end_ms": 5413.137084989848,
+        "from_units": [
+          720,
+          720
+        ],
+        "index": 53,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 5313.137084989848,
+        "to_units": [
+          680,
+          720
+        ]
+      },
+      {
+        "byte_offset": 674,
+        "color_index": 0,
+        "end_ms": 5513.137084989848,
+        "from_units": [
+          680,
+          720
+        ],
+        "index": 54,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 5413.137084989848,
+        "to_units": [
+          640,
+          720
+        ]
+      },
+      {
+        "byte_offset": 677,
+        "color_index": 0,
+        "end_ms": 5613.137084989848,
+        "from_units": [
+          640,
+          720
+        ],
+        "index": 55,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 5513.137084989848,
+        "to_units": [
+          600,
+          720
+        ]
+      },
+      {
+        "byte_offset": 680,
+        "color_index": 0,
+        "end_ms": 5713.137084989848,
+        "from_units": [
+          600,
+          720
+        ],
+        "index": 56,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 5613.137084989848,
+        "to_units": [
+          560,
+          720
+        ]
+      },
+      {
+        "byte_offset": 683,
+        "color_index": 0,
+        "end_ms": 5813.137084989848,
+        "from_units": [
+          560,
+          720
+        ],
+        "index": 57,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 5713.137084989848,
+        "to_units": [
+          520,
+          720
+        ]
+      },
+      {
+        "byte_offset": 686,
+        "color_index": 0,
+        "end_ms": 5913.137084989848,
+        "from_units": [
+          520,
+          720
+        ],
+        "index": 58,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 5813.137084989848,
+        "to_units": [
+          480,
+          720
+        ]
+      },
+      {
+        "byte_offset": 689,
+        "color_index": 0,
+        "end_ms": 6013.137084989848,
+        "from_units": [
+          480,
+          720
+        ],
+        "index": 59,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 5913.137084989848,
+        "to_units": [
+          440,
+          720
+        ]
+      },
+      {
+        "byte_offset": 692,
+        "color_index": 0,
+        "end_ms": 6113.137084989848,
+        "from_units": [
+          440,
+          720
+        ],
+        "index": 60,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 6013.137084989848,
+        "to_units": [
+          400,
+          720
+        ]
+      },
+      {
+        "byte_offset": 695,
+        "color_index": 0,
+        "end_ms": 6213.137084989848,
+        "from_units": [
+          400,
+          720
+        ],
+        "index": 61,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 6113.137084989848,
+        "to_units": [
+          360,
+          720
+        ]
+      },
+      {
+        "byte_offset": 698,
+        "color_index": 0,
+        "end_ms": 6313.137084989848,
+        "from_units": [
+          360,
+          720
+        ],
+        "index": 62,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 6213.137084989848,
+        "to_units": [
+          320,
+          720
+        ]
+      },
+      {
+        "byte_offset": 701,
+        "color_index": 0,
+        "end_ms": 6413.137084989848,
+        "from_units": [
+          320,
+          720
+        ],
+        "index": 63,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 6313.137084989848,
+        "to_units": [
+          280,
+          720
+        ]
+      },
+      {
+        "byte_offset": 704,
+        "color_index": 0,
+        "end_ms": 6513.137084989848,
+        "from_units": [
+          280,
+          720
+        ],
+        "index": 64,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 6413.137084989848,
+        "to_units": [
+          240,
+          720
+        ]
+      },
+      {
+        "byte_offset": 707,
+        "color_index": 0,
+        "end_ms": 6613.137084989848,
+        "from_units": [
+          240,
+          720
+        ],
+        "index": 65,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 6513.137084989848,
+        "to_units": [
+          200,
+          720
+        ]
+      },
+      {
+        "byte_offset": 710,
+        "color_index": 0,
+        "end_ms": 6713.137084989848,
+        "from_units": [
+          200,
+          720
+        ],
+        "index": 66,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 6613.137084989848,
+        "to_units": [
+          160,
+          720
+        ]
+      },
+      {
+        "byte_offset": 713,
+        "color_index": 0,
+        "end_ms": 6813.137084989848,
+        "from_units": [
+          160,
+          720
+        ],
+        "index": 67,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 6713.137084989848,
+        "to_units": [
+          120,
+          720
+        ]
+      },
+      {
+        "byte_offset": 716,
+        "color_index": 0,
+        "end_ms": 6913.137084989848,
+        "from_units": [
+          120,
+          720
+        ],
+        "index": 68,
+        "kind": "stitch",
+        "raw": [
+          10,
+          10,
+          3
+        ],
+        "start_ms": 6813.137084989848,
+        "to_units": [
+          80,
+          720
+        ]
+      },
+      {
+        "byte_offset": 719,
+        "color_index": 1,
+        "end_ms": 7913.137084989848,
+        "from_units": [
+          80,
+          720
+        ],
+        "index": 69,
+        "kind": "color_change",
+        "raw": [
+          0,
+          0,
+          195
+        ],
+        "start_ms": 6913.137084989848,
+        "to_units": [
+          80,
+          720
+        ]
+      },
+      {
+        "byte_offset": 722,
+        "color_index": 1,
+        "end_ms": 8022.045303228877,
+        "from_units": [
+          80,
+          720
+        ],
+        "index": 70,
+        "kind": "jump",
+        "raw": [
+          129,
+          102,
+          163
+        ],
+        "start_ms": 7913.137084989848,
+        "to_units": [
+          105,
+          614
+        ]
+      },
+      {
+        "byte_offset": 725,
+        "color_index": 1,
+        "end_ms": 8132.158880956603,
+        "from_units": [
+          105,
+          614
+        ],
+        "index": 71,
+        "kind": "jump",
+        "raw": [
+          66,
+          36,
+          163
+        ],
+        "start_ms": 8022.045303228877,
+        "to_units": [
+          131,
+          507
+        ]
+      },
+      {
+        "byte_offset": 728,
+        "color_index": 1,
+        "end_ms": 8242.272458684329,
+        "from_units": [
+          131,
+          507
+        ],
+        "index": 72,
+        "kind": "jump",
+        "raw": [
+          66,
+          36,
+          163
+        ],
+        "start_ms": 8132.158880956603,
+        "to_units": [
+          157,
+          400
+        ]
+      },
+      {
+        "byte_offset": 731,
+        "color_index": 1,
+        "end_ms": 8352.386036412056,
+        "from_units": [
+          157,
+          400
+        ],
+        "index": 73,
+        "kind": "jump",
+        "raw": [
+          66,
+          36,
+          163
+        ],
+        "start_ms": 8242.272458684329,
+        "to_units": [
+          183,
+          293
+        ]
+      },
+      {
+        "byte_offset": 734,
+        "color_index": 1,
+        "end_ms": 8452.386036412056,
+        "from_units": [
+          183,
+          293
+        ],
+        "index": 74,
+        "kind": "stitch",
+        "raw": [
+          9,
+          6,
+          3
+        ],
+        "start_ms": 8352.386036412056,
+        "to_units": [
+          199,
+          293
+        ]
+      },
+      {
+        "byte_offset": 737,
+        "color_index": 1,
+        "end_ms": 8552.386036412056,
+        "from_units": [
+          199,
+          293
+        ],
+        "index": 75,
+        "kind": "stitch",
+        "raw": [
+          6,
+          41,
+          19
+        ],
+        "start_ms": 8452.386036412056,
+        "to_units": [
+          183,
+          347
+        ]
+      },
+      {
+        "byte_offset": 740,
+        "color_index": 1,
+        "end_ms": 8652.386036412056,
+        "from_units": [
+          183,
+          347
+        ],
+        "index": 76,
+        "kind": "stitch",
+        "raw": [
+          9,
+          6,
+          3
+        ],
+        "start_ms": 8552.386036412056,
+        "to_units": [
+          199,
+          347
+        ]
+      },
+      {
+        "byte_offset": 743,
+        "color_index": 1,
+        "end_ms": 8705.986409545085,
+        "from_units": [
+          199,
+          347
+        ],
+        "index": 77,
+        "kind": "jump",
+        "raw": [
+          73,
+          16,
+          163
+        ],
+        "start_ms": 8652.386036412056,
+        "to_units": [
+          191,
+          294
+        ]
+      },
+      {
+        "byte_offset": 746,
+        "color_index": 1,
+        "end_ms": 8805.986409545085,
+        "from_units": [
+          191,
+          294
+        ],
+        "index": 78,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 8705.986409545085,
+        "to_units": [
+          191,
+          278
+        ]
+      },
+      {
+        "byte_offset": 749,
+        "color_index": 1,
+        "end_ms": 8905.986409545085,
+        "from_units": [
+          191,
+          278
+        ],
+        "index": 79,
+        "kind": "stitch",
+        "raw": [
+          98,
+          149,
+          3
+        ],
+        "start_ms": 8805.986409545085,
+        "to_units": [
+          220,
+          294
+        ]
+      },
+      {
+        "byte_offset": 752,
+        "color_index": 1,
+        "end_ms": 9005.986409545085,
+        "from_units": [
+          220,
+          294
+        ],
+        "index": 80,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 8905.986409545085,
+        "to_units": [
+          220,
+          278
+        ]
+      },
+      {
+        "byte_offset": 755,
+        "color_index": 1,
+        "end_ms": 9094.85147579724,
+        "from_units": [
+          220,
+          278
+        ],
+        "index": 81,
+        "kind": "jump",
+        "raw": [
+          1,
+          74,
+          147
+        ],
+        "start_ms": 9005.986409545085,
+        "to_units": [
+          191,
+          362
+        ]
+      },
+      {
+        "byte_offset": 758,
+        "color_index": 1,
+        "end_ms": 9194.85147579724,
+        "from_units": [
+          191,
+          362
+        ],
+        "index": 82,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 9094.85147579724,
+        "to_units": [
+          191,
+          346
+        ]
+      },
+      {
+        "byte_offset": 761,
+        "color_index": 1,
+        "end_ms": 9294.85147579724,
+        "from_units": [
+          191,
+          346
+        ],
+        "index": 83,
+        "kind": "stitch",
+        "raw": [
+          98,
+          149,
+          3
+        ],
+        "start_ms": 9194.85147579724,
+        "to_units": [
+          220,
+          362
+        ]
+      },
+      {
+        "byte_offset": 764,
+        "color_index": 1,
+        "end_ms": 9394.85147579724,
+        "from_units": [
+          220,
+          362
+        ],
+        "index": 84,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 9294.85147579724,
+        "to_units": [
+          220,
+          346
+        ]
+      },
+      {
+        "byte_offset": 767,
+        "color_index": 1,
+        "end_ms": 9445.100853902844,
+        "from_units": [
+          220,
+          346
+        ],
+        "index": 85,
+        "kind": "jump",
+        "raw": [
+          73,
+          42,
+          135
+        ],
+        "start_ms": 9394.85147579724,
+        "to_units": [
+          263,
+          320
+        ]
+      },
+      {
+        "byte_offset": 770,
+        "color_index": 1,
+        "end_ms": 9545.100853902844,
+        "from_units": [
+          263,
+          320
+        ],
+        "index": 86,
+        "kind": "stitch",
+        "raw": [
+          9,
+          6,
+          3
+        ],
+        "start_ms": 9445.100853902844,
+        "to_units": [
+          279,
+          320
+        ]
+      },
+      {
+        "byte_offset": 773,
+        "color_index": 1,
+        "end_ms": 9645.100853902844,
+        "from_units": [
+          279,
+          320
+        ],
+        "index": 87,
+        "kind": "stitch",
+        "raw": [
+          86,
+          153,
+          3
+        ],
+        "start_ms": 9545.100853902844,
+        "to_units": [
+          263,
+          354
+        ]
+      },
+      {
+        "byte_offset": 776,
+        "color_index": 1,
+        "end_ms": 9745.100853902844,
+        "from_units": [
+          263,
+          354
+        ],
+        "index": 88,
+        "kind": "stitch",
+        "raw": [
+          9,
+          6,
+          3
+        ],
+        "start_ms": 9645.100853902844,
+        "to_units": [
+          279,
+          354
+        ]
+      },
+      {
+        "byte_offset": 779,
+        "color_index": 1,
+        "end_ms": 9777.750509337473,
+        "from_units": [
+          279,
+          354
+        ],
+        "index": 89,
+        "kind": "jump",
+        "raw": [
+          17,
+          106,
+          131
+        ],
+        "start_ms": 9745.100853902844,
+        "to_units": [
+          250,
+          339
+        ]
+      },
+      {
+        "byte_offset": 782,
+        "color_index": 1,
+        "end_ms": 9877.750509337473,
+        "from_units": [
+          250,
+          339
+        ],
+        "index": 90,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 9777.750509337473,
+        "to_units": [
+          250,
+          323
+        ]
+      },
+      {
+        "byte_offset": 785,
+        "color_index": 1,
+        "end_ms": 9977.750509337473,
+        "from_units": [
+          250,
+          323
+        ],
+        "index": 91,
+        "kind": "stitch",
+        "raw": [
+          104,
+          149,
+          3
+        ],
+        "start_ms": 9877.750509337473,
+        "to_units": [
+          271,
+          339
+        ]
+      },
+      {
+        "byte_offset": 788,
+        "color_index": 1,
+        "end_ms": 10077.750509337473,
+        "from_units": [
+          271,
+          339
+        ],
+        "index": 92,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 9977.750509337473,
+        "to_units": [
+          271,
+          323
+        ]
+      },
+      {
+        "byte_offset": 791,
+        "color_index": 1,
+        "end_ms": 10107.833727250456,
+        "from_units": [
+          271,
+          323
+        ],
+        "index": 93,
+        "kind": "jump",
+        "raw": [
+          145,
+          10,
+          131
+        ],
+        "start_ms": 10077.750509337473,
+        "to_units": [
+          242,
+          331
+        ]
+      },
+      {
+        "byte_offset": 794,
+        "color_index": 1,
+        "end_ms": 10207.833727250456,
+        "from_units": [
+          242,
+          331
+        ],
+        "index": 94,
+        "kind": "stitch",
+        "raw": [
+          9,
+          6,
+          3
+        ],
+        "start_ms": 10107.833727250456,
+        "to_units": [
+          258,
+          331
+        ]
+      },
+      {
+        "byte_offset": 797,
+        "color_index": 1,
+        "end_ms": 10307.833727250456,
+        "from_units": [
+          258,
+          331
+        ],
+        "index": 95,
+        "kind": "stitch",
+        "raw": [
+          134,
+          153,
+          3
+        ],
+        "start_ms": 10207.833727250456,
+        "to_units": [
+          242,
+          354
+        ]
+      },
+      {
+        "byte_offset": 800,
+        "color_index": 1,
+        "end_ms": 10407.833727250456,
+        "from_units": [
+          242,
+          354
+        ],
+        "index": 96,
+        "kind": "stitch",
+        "raw": [
+          9,
+          6,
+          3
+        ],
+        "start_ms": 10307.833727250456,
+        "to_units": [
+          258,
+          354
+        ]
+      },
+      {
+        "byte_offset": 803,
+        "color_index": 1,
+        "end_ms": 10427.833727250456,
+        "from_units": [
+          258,
+          354
+        ],
+        "index": 97,
+        "kind": "jump",
+        "raw": [
+          153,
+          0,
+          131
+        ],
+        "start_ms": 10407.833727250456,
+        "to_units": [
+          250,
+          362
+        ]
+      },
+      {
+        "byte_offset": 806,
+        "color_index": 1,
+        "end_ms": 10527.833727250456,
+        "from_units": [
+          250,
+          362
+        ],
+        "index": 98,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 10427.833727250456,
+        "to_units": [
+          250,
+          346
+        ]
+      },
+      {
+        "byte_offset": 809,
+        "color_index": 1,
+        "end_ms": 10627.833727250456,
+        "from_units": [
+          250,
+          346
+        ],
+        "index": 99,
+        "kind": "stitch",
+        "raw": [
+          104,
+          149,
+          3
+        ],
+        "start_ms": 10527.833727250456,
+        "to_units": [
+          271,
+          362
+        ]
+      },
+      {
+        "byte_offset": 812,
+        "color_index": 1,
+        "end_ms": 10727.833727250456,
+        "from_units": [
+          271,
+          362
+        ],
+        "index": 100,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 10627.833727250456,
+        "to_units": [
+          271,
+          346
+        ]
+      },
+      {
+        "byte_offset": 815,
+        "color_index": 1,
+        "end_ms": 10793.62886384884,
+        "from_units": [
+          271,
+          346
+        ],
+        "index": 101,
+        "kind": "jump",
+        "raw": [
+          32,
+          84,
+          163
+        ],
+        "start_ms": 10727.833727250456,
+        "to_units": [
+          298,
+          286
+        ]
+      },
+      {
+        "byte_offset": 818,
+        "color_index": 1,
+        "end_ms": 10893.62886384884,
+        "from_units": [
+          298,
+          286
+        ],
+        "index": 102,
+        "kind": "stitch",
+        "raw": [
+          9,
+          6,
+          3
+        ],
+        "start_ms": 10793.62886384884,
+        "to_units": [
+          314,
+          286
+        ]
+      },
+      {
+        "byte_offset": 821,
+        "color_index": 1,
+        "end_ms": 10993.62886384884,
+        "from_units": [
+          314,
+          286
+        ],
+        "index": 103,
+        "kind": "stitch",
+        "raw": [
+          86,
+          153,
+          3
+        ],
+        "start_ms": 10893.62886384884,
+        "to_units": [
+          298,
+          320
+        ]
+      },
+      {
+        "byte_offset": 824,
+        "color_index": 1,
+        "end_ms": 11093.62886384884,
+        "from_units": [
+          298,
+          320
+        ],
+        "index": 104,
+        "kind": "stitch",
+        "raw": [
+          9,
+          6,
+          3
+        ],
+        "start_ms": 10993.62886384884,
+        "to_units": [
+          314,
+          320
+        ]
+      },
+      {
+        "byte_offset": 827,
+        "color_index": 1,
+        "end_ms": 11193.62886384884,
+        "from_units": [
+          314,
+          320
+        ],
+        "index": 105,
+        "kind": "stitch",
+        "raw": [
+          86,
+          153,
+          3
+        ],
+        "start_ms": 11093.62886384884,
+        "to_units": [
+          298,
+          354
+        ]
+      },
+      {
+        "byte_offset": 830,
+        "color_index": 1,
+        "end_ms": 11293.62886384884,
+        "from_units": [
+          298,
+          354
+        ],
+        "index": 106,
+        "kind": "stitch",
+        "raw": [
+          9,
+          6,
+          3
+        ],
+        "start_ms": 11193.62886384884,
+        "to_units": [
+          314,
+          354
+        ]
+      },
+      {
+        "byte_offset": 833,
+        "color_index": 1,
+        "end_ms": 11356.56533975908,
+        "from_units": [
+          314,
+          354
+        ],
+        "index": 107,
+        "kind": "jump",
+        "raw": [
+          38,
+          88,
+          163
+        ],
+        "start_ms": 11293.62886384884,
+        "to_units": [
+          295,
+          294
+        ]
+      },
+      {
+        "byte_offset": 836,
+        "color_index": 1,
+        "end_ms": 11456.56533975908,
+        "from_units": [
+          295,
+          294
+        ],
+        "index": 108,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 11356.56533975908,
+        "to_units": [
+          295,
+          278
+        ]
+      },
+      {
+        "byte_offset": 839,
+        "color_index": 1,
+        "end_ms": 11556.56533975908,
+        "from_units": [
+          295,
+          278
+        ],
+        "index": 109,
+        "kind": "stitch",
+        "raw": [
+          98,
+          150,
+          3
+        ],
+        "start_ms": 11456.56533975908,
+        "to_units": [
+          318,
+          294
+        ]
+      },
+      {
+        "byte_offset": 842,
+        "color_index": 1,
+        "end_ms": 11656.56533975908,
+        "from_units": [
+          318,
+          294
+        ],
+        "index": 110,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 11556.56533975908,
+        "to_units": [
+          318,
+          278
+        ]
+      },
+      {
+        "byte_offset": 845,
+        "color_index": 1,
+        "end_ms": 11711.601691382348,
+        "from_units": [
+          318,
+          278
+        ],
+        "index": 111,
+        "kind": "jump",
+        "raw": [
+          129,
+          169,
+          147
+        ],
+        "start_ms": 11656.56533975908,
+        "to_units": [
+          295,
+          328
+        ]
+      },
+      {
+        "byte_offset": 848,
+        "color_index": 1,
+        "end_ms": 11811.601691382348,
+        "from_units": [
+          295,
+          328
+        ],
+        "index": 112,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 11711.601691382348,
+        "to_units": [
+          295,
+          312
+        ]
+      },
+      {
+        "byte_offset": 851,
+        "color_index": 1,
+        "end_ms": 11911.601691382348,
+        "from_units": [
+          295,
+          312
+        ],
+        "index": 113,
+        "kind": "stitch",
+        "raw": [
+          98,
+          150,
+          3
+        ],
+        "start_ms": 11811.601691382348,
+        "to_units": [
+          318,
+          328
+        ]
+      },
+      {
+        "byte_offset": 854,
+        "color_index": 1,
+        "end_ms": 12011.601691382348,
+        "from_units": [
+          318,
+          328
+        ],
+        "index": 114,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 11911.601691382348,
+        "to_units": [
+          318,
+          312
+        ]
+      },
+      {
+        "byte_offset": 857,
+        "color_index": 1,
+        "end_ms": 12044.159332574547,
+        "from_units": [
+          318,
+          312
+        ],
+        "index": 115,
+        "kind": "jump",
+        "raw": [
+          9,
+          149,
+          131
+        ],
+        "start_ms": 12011.601691382348,
+        "to_units": [
+          340,
+          336
+        ]
+      },
+      {
+        "byte_offset": 860,
+        "color_index": 1,
+        "end_ms": 12144.159332574547,
+        "from_units": [
+          340,
+          336
+        ],
+        "index": 116,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 12044.159332574547,
+        "to_units": [
+          340,
+          320
+        ]
+      },
+      {
+        "byte_offset": 863,
+        "color_index": 1,
+        "end_ms": 12244.159332574547,
+        "from_units": [
+          340,
+          320
+        ],
+        "index": 117,
+        "kind": "stitch",
+        "raw": [
+          104,
+          149,
+          3
+        ],
+        "start_ms": 12144.159332574547,
+        "to_units": [
+          361,
+          336
+        ]
+      },
+      {
+        "byte_offset": 866,
+        "color_index": 1,
+        "end_ms": 12344.159332574547,
+        "from_units": [
+          361,
+          336
+        ],
+        "index": 118,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 12244.159332574547,
+        "to_units": [
+          361,
+          320
+        ]
+      },
+      {
+        "byte_offset": 869,
+        "color_index": 1,
+        "end_ms": 12374.24255048753,
+        "from_units": [
+          361,
+          320
+        ],
+        "index": 119,
+        "kind": "jump",
+        "raw": [
+          145,
+          10,
+          131
+        ],
+        "start_ms": 12344.159332574547,
+        "to_units": [
+          332,
+          328
+        ]
+      },
+      {
+        "byte_offset": 872,
+        "color_index": 1,
+        "end_ms": 12474.24255048753,
+        "from_units": [
+          332,
+          328
+        ],
+        "index": 120,
+        "kind": "stitch",
+        "raw": [
+          9,
+          6,
+          3
+        ],
+        "start_ms": 12374.24255048753,
+        "to_units": [
+          348,
+          328
+        ]
+      },
+      {
+        "byte_offset": 875,
+        "color_index": 1,
+        "end_ms": 12574.24255048753,
+        "from_units": [
+          348,
+          328
+        ],
+        "index": 121,
+        "kind": "stitch",
+        "raw": [
+          134,
+          25,
+          3
+        ],
+        "start_ms": 12474.24255048753,
+        "to_units": [
+          332,
+          354
+        ]
+      },
+      {
+        "byte_offset": 878,
+        "color_index": 1,
+        "end_ms": 12674.24255048753,
+        "from_units": [
+          332,
+          354
+        ],
+        "index": 122,
+        "kind": "stitch",
+        "raw": [
+          9,
+          6,
+          3
+        ],
+        "start_ms": 12574.24255048753,
+        "to_units": [
+          348,
+          354
+        ]
+      },
+      {
+        "byte_offset": 881,
+        "color_index": 1,
+        "end_ms": 12694.24255048753,
+        "from_units": [
+          348,
+          354
+        ],
+        "index": 123,
+        "kind": "jump",
+        "raw": [
+          105,
+          64,
+          131
+        ],
+        "start_ms": 12674.24255048753,
+        "to_units": [
+          340,
+          349
+        ]
+      },
+      {
+        "byte_offset": 884,
+        "color_index": 1,
+        "end_ms": 12794.24255048753,
+        "from_units": [
+          340,
+          349
+        ],
+        "index": 124,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 12694.24255048753,
+        "to_units": [
+          340,
+          333
+        ]
+      },
+      {
+        "byte_offset": 887,
+        "color_index": 1,
+        "end_ms": 12894.24255048753,
+        "from_units": [
+          340,
+          333
+        ],
+        "index": 125,
+        "kind": "stitch",
+        "raw": [
+          104,
+          148,
+          3
+        ],
+        "start_ms": 12794.24255048753,
+        "to_units": [
+          358,
+          349
+        ]
+      },
+      {
+        "byte_offset": 890,
+        "color_index": 1,
+        "end_ms": 12994.24255048753,
+        "from_units": [
+          358,
+          349
+        ],
+        "index": 126,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 12894.24255048753,
+        "to_units": [
+          358,
+          333
+        ]
+      },
+      {
+        "byte_offset": 893,
+        "color_index": 1,
+        "end_ms": 13028.374646819282,
+        "from_units": [
+          358,
+          333
+        ],
+        "index": 127,
+        "kind": "jump",
+        "raw": [
+          132,
+          88,
+          131
+        ],
+        "start_ms": 12994.24255048753,
+        "to_units": [
+          340,
+          362
+        ]
+      },
+      {
+        "byte_offset": 896,
+        "color_index": 1,
+        "end_ms": 13128.374646819282,
+        "from_units": [
+          340,
+          362
+        ],
+        "index": 128,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 13028.374646819282,
+        "to_units": [
+          340,
+          346
+        ]
+      },
+      {
+        "byte_offset": 899,
+        "color_index": 1,
+        "end_ms": 13228.374646819282,
+        "from_units": [
+          340,
+          346
+        ],
+        "index": 129,
+        "kind": "stitch",
+        "raw": [
+          104,
+          149,
+          3
+        ],
+        "start_ms": 13128.374646819282,
+        "to_units": [
+          361,
+          362
+        ]
+      },
+      {
+        "byte_offset": 902,
+        "color_index": 1,
+        "end_ms": 13328.374646819282,
+        "from_units": [
+          361,
+          362
+        ],
+        "index": 130,
+        "kind": "stitch",
+        "raw": [
+          144,
+          96,
+          3
+        ],
+        "start_ms": 13228.374646819282,
+        "to_units": [
+          361,
+          346
+        ]
+      },
+      {
+        "byte_offset": 905,
+        "color_index": 1,
+        "end_ms": 13373.31905692777,
+        "from_units": [
+          361,
+          346
+        ],
+        "index": 131,
+        "kind": "jump",
+        "raw": [
+          96,
+          169,
+          131
+        ],
+        "start_ms": 13328.374646819282,
+        "to_units": [
+          337,
+          308
+        ]
+      },
+      {
+        "byte_offset": 908,
+        "color_index": 1,
+        "end_ms": 13473.31905692777,
+        "from_units": [
+          337,
+          308
+        ],
+        "index": 132,
+        "kind": "stitch",
+        "raw": [
+          26,
+          97,
+          3
+        ],
+        "start_ms": 13373.31905692777,
+        "to_units": [
+          330,
+          293
+        ]
+      },
+      {
+        "byte_offset": 911,
+        "color_index": 1,
+        "end_ms": 13573.31905692777,
+        "from_units": [
+          330,
+          293
+        ],
+        "index": 133,
+        "kind": "stitch",
+        "raw": [
+          70,
+          70,
+          3
+        ],
+        "start_ms": 13473.31905692777,
+        "to_units": [
+          362,
+          297
+        ]
+      },
+      {
+        "byte_offset": 914,
+        "color_index": 1,
+        "end_ms": 13673.31905692777,
+        "from_units": [
+          362,
+          297
+        ],
+        "index": 134,
+        "kind": "stitch",
+        "raw": [
+          24,
+          97,
+          3
+        ],
+        "start_ms": 13573.31905692777,
+        "to_units": [
+          356,
+          282
+        ]
+      },
+      {
+        "byte_offset": 917,
+        "color_index": 1,
+        "end_ms": 13674.31905692777,
+        "from_units": [
+          356,
+          282
+        ],
+        "index": 135,
+        "kind": "end",
+        "raw": [
+          0,
+          0,
+          243
+        ],
+        "start_ms": 13673.31905692777,
+        "to_units": [
+          356,
+          282
+        ]
+      }
+    ],
+    "needle_placements": 115,
+    "record_count": 136,
+    "timing": "illustrative only: 600 spm, 100 mm/s jumps, 1 s colour change",
+    "trim_policy": "raw jumps; no trim inference",
+    "units": "0.1 mm; X right; Y down"
+  }
+}

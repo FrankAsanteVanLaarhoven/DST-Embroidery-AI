@@ -1,0 +1,29 @@
+{
+  "record": "Source and binary identity before independent satin underlay edits",
+  "head": "23bd144ac42ef4a6d3cc10088a5ecdd5ef4556d1",
+  "branch": "svg-geometry-intake",
+  "studio_4176": {
+    "pid": 79089,
+    "binary_sha256": "079ebbeb840d32697b51966bb39208935a808f412eb6847e179bb5e6bec205b8",
+    "started": "2026-10-11 18:42:01"
+  },
+  "twin_4181_worker": {
+    "pid": 79091,
+    "binary_sha256": "ccb40ff2c385ccfa6d394e88f81f3f7ffd33827b0a4890817f68fa09dda28209",
+    "started": "2026-10-11 18:42:01"
+  },
+  "not_measured": "Port 4175 node pid 47889 was left running and is not part of this evidence.",
+  "protected_sha256": {
+    "workbook": "d1cd2147c9a282d36a9e0ff6fc812bf9f5a775bb2bac6cf92360c7f82ca32128",
+    "inherited_json": "829295f1095ff5080b454e6b2a8a0893da531d300ad07e790e7383caac687db6",
+    "compatibility_json": "829295f1095ff5080b454e6b2a8a0893da531d300ad07e790e7383caac687db6"
+  },
+  "pre_edit_sources": {
+    "crates/core/src/generators/satin.rs": "70d42f3ded3167b1a34b4eb691295295ecc441642a856eb8d52c0f4a1ef116a4",
+    "crates/core/src/project.rs": "55d5f1555381917d630bbbc2d5a0080729030c38044e1bbdf2be8fcf25c40786",
+    "crates/core/src/capabilities.rs": "979934c6d61edf1664a84e3902c35db293cba3e12ed8f631287d3ede25f1ec46",
+    "crates/twin/src/lib.rs": "9dba5a91231f0c42035488291206994c81ae4ee4827b874d0282a059f17c1b53",
+    "web/studio.js": "22899cdc78b7ef2082be83577ad2184d962cd97a06fe3b6f8b38b78d4bb421c2",
+    "apps/twinlab/public/app.mjs": "0f408ba379fe14c92e850a840af549edc9809e5362516aa278697cf0f7b58b5f"
+  }
+}

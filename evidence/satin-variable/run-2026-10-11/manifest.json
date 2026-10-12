@@ -1,0 +1,137 @@
+{
+  "record": "TwinLab later native compile, widths 2/8 mm",
+  "treatment": "Bound to this exact in-memory artifact. Not the earlier saved 2/6 mm JSON (bf2b2bb9…). The on-disk DST twinlab-variable.dst is this compile.",
+  "captured_before": "independent satin underlay edits",
+  "service": "http://127.0.0.1:4181/",
+  "service_note": "Port 4175 was left running and was not measured. It is not part of this record.",
+  "artifact_id": "ba19d83dd5ae63062f0d8ea6f6f028311c08fdb112e3a51c8d34120d223b0ffc",
+  "design_revision": 6,
+  "new_satin": {
+    "angle_degrees": 30,
+    "compensation_mm": 0.1,
+    "id": 4,
+    "kind": "satin",
+    "label": "New satin",
+    "max_stitch_mm": 3,
+    "points": [
+      {
+        "x": -20,
+        "y": 0
+      },
+      {
+        "x": 20,
+        "y": 0
+      }
+    ],
+    "rgb": [
+      55,
+      112,
+      211
+    ],
+    "spacing_mm": 0.6,
+    "underlay_mm": 0,
+    "width_mm": 3,
+    "widths_mm": [
+      2,
+      8
+    ]
+  },
+  "provenance": {
+    "design_sha256": "849e47d195898e74ab43852049517eae8ab2f56b15a790156b6e4170e9f57b51",
+    "profile_sha256": "cd9b85181c83bdc41acb0d60e28fc841d9cbccc01eda32242ab45718cc00d626",
+    "dst_sha256": "61c472cdbe01a922eded6dddd31ae531b85d0fb4172ade2f80cb24977bcaed77",
+    "trace_sha256": "b120f40fbbbd39fe7d39929fb6a1ebb95ce0e0b8ba0996231ec552c8b816a535",
+    "engine_sha256": "ccb40ff2c385ccfa6d394e88f81f3f7ffd33827b0a4890817f68fa09dda28209"
+  },
+  "kernel": {
+    "base_commit": "98303601416a3b0d68eae37e939031732bd77c45",
+    "export": "embroidery-dst",
+    "generation": "embroidery-core",
+    "mode": "native-rust",
+    "version": "0.1.0"
+  },
+  "profile": {
+    "calibrated": false,
+    "hardware_connected": false,
+    "height_mm": 120,
+    "id": "generic-flat-120-v1",
+    "name": "Generic 6-needle · flat frame",
+    "units": "mm",
+    "width_mm": 120
+  },
+  "protocol": "twinlab-m1/1",
+  "generated_stitch_count": 4300,
+  "warnings": [
+    "Plan starts at (39.12, 22.53) mm rather than the origin. The DST compiler will insert a jump from 0,0."
+  ],
+  "trace_summary": {
+    "record_count": 4462,
+    "needle_placements": 4300,
+    "decoder": "embroidery-dst::decode_record + read_dst_with",
+    "timing": "illustrative only: 600 spm, 100 mm/s jumps, 1 s colour change",
+    "trim_policy": "raw jumps; no trim inference",
+    "units": "0.1 mm; X right; Y down",
+    "duration_ms": 439112.5561623681
+  },
+  "dst_file": "../twinlab-variable.dst",
+  "dst_bytes": 13898,
+  "earlier_saved_json": {
+    "file": "../twinlab-variable.json",
+    "sha256": "bf2b2bb91957eaaa7f4aa391dca33f7ca1c3a52c6823fce99ef4aa819ba1f184",
+    "widths_mm": [
+      2,
+      6
+    ],
+    "note": "Earlier saved design. Do not pair it with dst 61c472cd…."
+  },
+  "browser_pdf": {
+    "status": "not this artifact",
+    "note": "The browser PDF was generated while the open design was still the 2/6 mm compile, then invalidated by the 2/8 mm edit. It is not stored on this artifact and is not paired with dst 61c472cd…."
+  },
+  "preservation_pdf": {
+    "label": "New preservation run created before underlay edits, from the still-resident 2/8 mm artifact. This is not the earlier browser PDF.",
+    "proof_id": "2c6a294e097f07c0d6cc9182cb26d1c7da216e00740034a232fe8a26b1548ac5",
+    "binding": {
+      "schema": "embroideryos-compare-binding/0.2",
+      "artifact_id": "ba19d83dd5ae63062f0d8ea6f6f028311c08fdb112e3a51c8d34120d223b0ffc",
+      "design_revision": 6,
+      "design_sha256": "849e47d195898e74ab43852049517eae8ab2f56b15a790156b6e4170e9f57b51",
+      "dst_sha256": "61c472cdbe01a922eded6dddd31ae531b85d0fb4172ade2f80cb24977bcaed77",
+      "source_sha256": "3499f537b294079f259c0b7c1a04d9485e671e55def24d542a93ed9b7bb3d091",
+      "source_name": "preservation-run-2026-10-11-reference-square.png",
+      "source_role": "original",
+      "width_mm": 14,
+      "height_mm": 14,
+      "x_mm": -2,
+      "y_mm": -2,
+      "page": 1,
+      "pdf_sha256": "52959306ffd0e75dd433c84326e6eaedd50d889285448dd1effbd162388233dc",
+      "kernel_mode_reported": "native-rust",
+      "machine_release_allowed": false,
+      "approval_allowed": false,
+      "coordinate_semantics_independently_verified": false,
+      "historical_source_association_verified": false,
+      "physical_qualification": false,
+      "actual_size_panel": false
+    },
+    "checks": {
+      "dst_hash": true,
+      "record_byte_binding": true,
+      "trace_structure": true,
+      "rust_executed": false,
+      "decoder_semantics_independently_verified": false,
+      "historical_source_association_verified": false,
+      "physical_qualification": false
+    },
+    "source": "apps/twinlab/public/reference-square.png is a constructed 14 mm fixture, not the satin artwork.",
+    "placement": {
+      "width_mm": 14,
+      "x_mm": -2,
+      "y_mm": -2,
+      "page": 1
+    },
+    "pdf_file": "preservation-proof.pdf",
+    "pdf_sha256": "52959306ffd0e75dd433c84326e6eaedd50d889285448dd1effbd162388233dc",
+    "pdf_bytes": 108962
+  }
+}

@@ -7,7 +7,10 @@
 use std::io::Cursor;
 use std::path::PathBuf;
 
+mod batch;
+mod creative;
 mod propose;
+mod svg_import;
 
 use embroidery_core::{parse_project, stamp_geometry_review};
 use embroidery_dst::read_dst;
@@ -55,12 +58,18 @@ pub fn handle_http(raw: &[u8]) -> Vec<u8> {
 
 pub fn route(method: &str, path: &str, body: &[u8]) -> HttpResponse {
     let path = path.split('?').next().unwrap_or(path);
+    if let Some(response) = creative::dispatch(method, path, body) {
+        return response;
+    }
     match (method, path) {
         ("GET", "/") | ("GET", "/index.html") => {
             file_response("text/html; charset=utf-8", "index.html")
         }
         ("GET", "/studio.css") => file_response("text/css; charset=utf-8", "studio.css"),
         ("GET", "/studio.js") => file_response("text/javascript; charset=utf-8", "studio.js"),
+        ("GET", "/batch.js") => file_response("text/javascript; charset=utf-8", "batch.js"),
+        ("GET", "/lettering.js") => file_response("text/javascript; charset=utf-8", "lettering.js"),
+        ("GET", "/creative.js") => file_response("text/javascript; charset=utf-8", "creative.js"),
         ("GET", "/favicon.svg") => file_response("image/svg+xml", "favicon.svg"),
         ("GET", "/twinlab") | ("GET", "/twinlab.html") => {
             file_response("text/html; charset=utf-8", "twinlab.html")
@@ -75,9 +84,15 @@ pub fn route(method: &str, path: &str, body: &[u8]) -> HttpResponse {
         }
         ("POST", "/api/generate") => generate_response(body),
         ("POST", "/api/propose") => propose::response(body),
+        ("POST", "/api/import-svg") => svg_import::response(body),
         ("POST", "/api/review") => review_response(body),
         ("POST", "/api/rehearse") => rehearse_response(body),
         ("POST", "/api/verify") => verify_response(body),
+        ("POST", "/api/batch/prepare") => batch::prepare(body),
+        ("POST", "/api/batch/item") => batch::item(body),
+        ("POST", "/api/batch/finish") => batch::finish(body),
+        ("POST", "/api/batch/cancel") => batch::cancel(body),
+        ("POST", "/api/batch/proof") => batch::proof(body),
         ("GET", _) => html(404, NOT_FOUND_HTML.as_bytes()),
         _ => json_error(
             404,

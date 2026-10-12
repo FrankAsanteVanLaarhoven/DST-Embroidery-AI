@@ -1,0 +1,14 @@
+{
+  "artifact_id": "art-1520fa43dff9824d8f66398d8afa10f4",
+  "byte_length": 77,
+  "dimensional_cad": false,
+  "editable_vector": false,
+  "embroidery_geometry": false,
+  "immutable": true,
+  "layered_art": false,
+  "media_type": "application/octet-stream",
+  "representation": "reference",
+  "role": "reference_input",
+  "schema": "embroideryos-creative-artifact/0.1",
+  "sha256": "f0a544245406a758aaa80be7a143e19dcfea1d3911028efede83f3abff480211"
+}

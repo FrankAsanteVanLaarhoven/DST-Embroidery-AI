@@ -1,0 +1,13 @@
+{
+  "url": "http://127.0.0.1:4181/",
+  "mode": "native-rust",
+  "engine_sha256": "37666818f87fe30aa25847da51aaffdca7e7afb71d7e4a518c014f81485cd3f4",
+  "constant_edge_dst_sha256": "79fc95f2168c816d0d8540eeab199432c8e4400f3efca7d4540d6c85d988ca6f",
+  "taper_design_sha256": "3746826d5430faa7fa4b8b6a0a6cdc855e3e80e381b2f6a73b5aff05f186c3bd",
+  "taper_dst_sha256": "97561291dcefe9776cf85d901816ea0139a72dacd7585049a7b781fb9b8d69fe",
+  "taper_proof_sha256": "6e12f8934aa3e616c9701b5598b805d1bfe8f46fc192422a078ed33b5bc25843",
+  "taper_artifact_id": "af1b78a46ac836bea9402ea431e92361e026aa11bdc0dac2bdae0b7d8e1000f9",
+  "machine_release_allowed": false,
+  "top_sequence_constant_modes_equal": true,
+  "top_sequence_taper_modes_equal": true
+}

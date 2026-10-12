@@ -6,8 +6,9 @@ The repository is [DST-Embroidery-AI](https://github.com/FrankAsanteVanLaarhoven
 
 ## What you can do
 
-- Open a native `embroidery-project` version 1 design, including the Alpine Club badge and the holed club mark.
+- Open a native `embroidery-project` version 1 design, including the Alpine Club badge and the holed club mark. Version 2 adds one editable text object. Version 1 documents stay version 1.
 - Edit running, satin, and fill regions in millimetres. Fill can sew one simple outer ring and explicit holes that sit strictly inside it.
+- Type one to four horizontal lines in one EmbroideryOS Block 01 text object, choose left, centre, or right alignment, a baseline spacing, a cap height, and underlay, and generate it in Rust. The object keeps the entered characters and the pinned font. Version 1 is the default repertoire: A–Z, 0–9, space, hyphen, and a straight apostrophe. Version 2 is a separate pinned recipe, chosen explicitly, with lowercase, U+2019, and a bounded accent set.
 - Generate the stitch plan in Rust, inspect it, record a local geometry review, and download the engineering DST.
 - Rehearse that DST in TwinLab. The 2D and 3D views play the decoded file on a generic fixed-needle frame.
 - Compare original artwork, the editable design, the machine file, a PDF proof, and the twin on one revision.
@@ -15,7 +16,7 @@ The repository is [DST-Embroidery-AI](https://github.com/FrankAsanteVanLaarhoven
 
 ## What stays unavailable
 
-Machine release, a connected machine, and physical validation are unavailable. Motif, applique, zigzag, and lattice fail clearly. Satin underlay is only `centre_run` together with `edge_run`. Fill underlay is only `perpendicular_run`. Running stitch has no underlay.
+Machine release, a connected machine, and physical validation are unavailable. Motif, applique, zigzag, and lattice fail clearly. Satin underlay is `centre_run`, `edge_run`, or both. Each pass has its own maximum stitch length, and an absent length inherits the object's maximum stitch. Lettering uses those same passes. Fill underlay is only `perpendicular_run`. Running stitch has no underlay. Version 1 does not sew lowercase, accents, or U+2019. Version 2 is an explicit selection of one separate pinned recipe with lowercase, U+2019, and a bounded accent set. Curved baselines, automatic wrapping, font import, monograms, and a font catalogue are not in this increment. One to four explicit horizontal lines, with left, centre, or right alignment and a declared baseline spacing, are layout policy `embroideryos-line-layout/1` on the same text object. That policy is not a new font. An unsupported character is rejected and the entered text is left unchanged. A bounded name drop personalises one text object from a table. It does not accept the lettering register.
 
 PES, EXP, JEF, and VP3 are not implemented. The reference EXF document is rejected until a tested adapter exists. General polygon clipping, offsets, and a fabric simulator are not implemented. Hole-aware fill is the bounded case in [docs/m2-g1-holes.md](docs/m2-g1-holes.md). It does not accept a broad requirement row.
 

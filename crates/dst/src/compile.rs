@@ -680,6 +680,99 @@ mod tests {
         assert!(write_dst_vec(&plan).is_ok());
     }
 
+    #[test]
+    fn variable_satin_filtering_adds_no_compiler_travel() {
+        use embroidery_core::{generate_satin_variable, mm_to_units, SatinConfig};
+        let mut plan = StitchPlan::new("Filter");
+        generate_satin_variable(
+            &mut plan,
+            3,
+            0,
+            &[Point::new(0.0, 10.0), Point::new(12.0, 10.0)],
+            &[4.0, 0.05],
+            &SatinConfig {
+                max_column_width_mm: 2.0,
+                density_mm: 4.0,
+                pull_compensation_mm: 0.0,
+                centre_run_mm: Some(2.5),
+                edge_run_mm: Some(2.5),
+            },
+        )
+        .unwrap();
+        assert!(plan
+            .stitches
+            .windows(2)
+            .all(|pair| pair[0].to.distance(pair[1].from) <= 1e-6));
+        assert!(plan
+            .stitches
+            .iter()
+            .any(|stitch| stitch.kind == StitchKind::Satin));
+        assert!(plan
+            .stitches
+            .iter()
+            .any(|stitch| stitch.kind == StitchKind::Running));
+        let bytes = compile_to_vec(&plan, 12.1, 1_000.0).unwrap();
+        let decoded = crate::read_dst(std::io::Cursor::new(bytes)).unwrap();
+        let sewing = |stitches: &[Stitch]| {
+            stitches
+                .iter()
+                .filter(|stitch| stitch.kind.is_sewing())
+                .count()
+        };
+        assert_eq!(sewing(&decoded.stitches), sewing(&plan.stitches));
+        assert_eq!(
+            decoded
+                .stitches
+                .iter()
+                .filter(|stitch| stitch.kind == StitchKind::Jump)
+                .count(),
+            unit_jumps(&plan)
+        );
+        assert!(decoded
+            .stitches
+            .windows(2)
+            .all(|pair| pair[0].to.distance(pair[1].from) <= 1e-6));
+        for stitch in decoded
+            .stitches
+            .iter()
+            .filter(|stitch| stitch.kind.is_sewing())
+        {
+            let dx = (mm_to_units(stitch.to.x).unwrap() - mm_to_units(stitch.from.x).unwrap())
+                .unsigned_abs();
+            let dy = (mm_to_units(stitch.to.y).unwrap() - mm_to_units(stitch.from.y).unwrap())
+                .unsigned_abs();
+            assert!(dx <= 121 && dy <= 121);
+        }
+    }
+
+    fn unit_jumps(plan: &StitchPlan) -> usize {
+        use embroidery_core::mm_to_units;
+        let mut pen = (0, 0);
+        let mut jumps = 0;
+        for stitch in &plan.stitches {
+            let from = (
+                mm_to_units(stitch.from.x).unwrap(),
+                mm_to_units(stitch.from.y).unwrap(),
+            );
+            let to = (
+                mm_to_units(stitch.to.x).unwrap(),
+                mm_to_units(stitch.to.y).unwrap(),
+            );
+            if stitch.kind == StitchKind::Jump {
+                if to != pen {
+                    jumps += 1;
+                }
+                pen = to;
+            } else if stitch.kind.is_sewing() {
+                if from != pen {
+                    jumps += 1;
+                }
+                pen = to;
+            }
+        }
+        jumps
+    }
+
     fn hex_bytes(hex: &str) -> Vec<u8> {
         (0..hex.len())
             .step_by(2)

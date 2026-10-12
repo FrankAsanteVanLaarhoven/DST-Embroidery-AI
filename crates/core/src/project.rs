@@ -11,15 +11,18 @@ use std::collections::BTreeSet;
 use crate::capabilities::check_request;
 use crate::error::PlanError;
 use crate::generators::{
-    generate_fill, generate_fill_with_holes, generate_running, generate_satin, FillConfig,
-    RunningConfig, SatinConfig,
+    generate_fill, generate_fill_with_holes, generate_running, generate_satin,
+    generate_satin_variable, FillConfig, RunningConfig, SatinConfig,
 };
+use crate::lettering::{generate_text, LineLayout, TextRequest};
 use crate::model::{ColorStop, Point, Stitch, StitchKind, StitchPlan};
 use crate::sha256::sha256_hex;
 use crate::validate::{validate, ValidationReport};
 
 const FORMAT: &str = "embroidery-project";
 const FORMAT_VERSION: &str = "1";
+/// A document that contains a text object. Version 1 documents stay version 1.
+const TEXT_FORMAT_VERSION: &str = "2";
 const ENGINE_VERSION: &str = env!("CARGO_PKG_VERSION");
 const MAX_OBJECTS: usize = 500;
 const MAX_POINTS: usize = 10_000;
@@ -50,11 +53,43 @@ pub struct DesignObject {
     pub angle_degrees: f64,
     pub density_mm: f64,
     pub column_width_mm: f64,
+    /// One full column width for each centreline point. Empty keeps `column_width_mm`.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub column_widths_mm: Vec<f64>,
     pub max_stitch_mm: f64,
     pub underlay_spacing_mm: f64,
     pub underlay: Vec<String>,
+    /// Centre-run maximum stitch length. Absent inherits `max_stitch_mm`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub centre_run_max_stitch_mm: Option<f64>,
+    /// Edge-run maximum stitch length. Absent inherits `max_stitch_mm`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub edge_run_max_stitch_mm: Option<f64>,
     pub pull_compensation_mm: f64,
     pub color_index: usize,
+    /// Editable lettering. Omitted on geometry objects so version 1 bytes stay stable.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub text: Option<TextIntent>,
+}
+
+/// Entered text and the font recipe it was pinned to.
+///
+/// Glyph outlines and stitches are derived. They are not stored here.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct TextIntent {
+    pub content: String,
+    pub font_id: String,
+    pub font_version: String,
+    pub font_sha256: String,
+    pub origin_x_mm: f64,
+    pub origin_y_mm: f64,
+    pub cap_height_mm: f64,
+    pub letter_spacing_mm: f64,
+    pub word_spacing_mm: f64,
+    /// Explicit horizontal lines. Absent keeps the historical single-line path.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub layout: Option<LineLayout>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -96,7 +131,7 @@ pub struct Generation {
 pub fn parse_project(text: &str) -> Result<ProjectDocument, PlanError> {
     let value: serde_json::Value = serde_json::from_str(text).map_err(|error| {
         PlanError::new(format!(
-            "Could not read the project JSON ({error}). Save an embroidery-project version 1 document and try again."
+            "Could not read the project JSON ({error}). Save an embroidery-project version 1 or version 2 document and try again."
         ))
     })?;
     let format = value
@@ -110,14 +145,24 @@ pub fn parse_project(text: &str) -> Result<ProjectDocument, PlanError> {
     }
     let project: ProjectDocument = serde_json::from_value(value).map_err(|error| {
         PlanError::new(format!(
-            "The project document does not match version 1 ({error}). Remove unsupported fields and try again."
+            "The project document does not match embroidery-project version 1 or 2 ({error}). Remove unsupported fields and try again."
         ))
     })?;
-    if project.format_version != FORMAT_VERSION {
+    if project.format_version != FORMAT_VERSION && project.format_version != TEXT_FORMAT_VERSION {
         return Err(PlanError::new(format!(
-            "Project format version {} is not supported. This engine reads embroidery-project version {FORMAT_VERSION}.",
+            "Project format version {} is not supported. This engine reads embroidery-project version 1, or version 2 when the design contains a text object.",
             project.format_version
         )));
+    }
+    if project.format_version == FORMAT_VERSION
+        && project
+            .objects
+            .iter()
+            .any(|object| object.kind == "text" || object.text.is_some())
+    {
+        return Err(PlanError::new(
+            "Project format version 1 cannot store a text object. Save the design as embroidery-project version 2 and open it again. The text was not dropped.",
+        ));
     }
     Ok(project)
 }
@@ -215,6 +260,7 @@ pub fn generate_project(project: &ProjectDocument) -> Result<Generation, PlanErr
             )));
         }
         check_numbers(object)?;
+        check_text(object)?;
         ensure_inside_source(project, object)?;
         ensure_color(&mut plan, object.color_index, object.object_id);
         colors.insert(object.color_index);
@@ -232,23 +278,39 @@ pub fn generate_project(project: &ProjectDocument) -> Result<Generation, PlanErr
                 generators.push("running".to_string());
             }
             "satin" => {
-                let underlay = if object.underlay.is_empty() {
-                    0.0
-                } else {
-                    object.max_stitch_mm
+                let config = SatinConfig {
+                    max_column_width_mm: object.column_width_mm,
+                    density_mm: object.density_mm,
+                    pull_compensation_mm: object.pull_compensation_mm,
+                    centre_run_mm: satin_pass_length(
+                        object,
+                        "centre_run",
+                        object.centre_run_max_stitch_mm,
+                    )?,
+                    edge_run_mm: satin_pass_length(
+                        object,
+                        "edge_run",
+                        object.edge_run_max_stitch_mm,
+                    )?,
                 };
-                generate_satin(
-                    &mut plan,
-                    object.object_id,
-                    object.color_index,
-                    &object.points,
-                    &SatinConfig {
-                        max_column_width_mm: object.column_width_mm,
-                        density_mm: object.density_mm,
-                        pull_compensation_mm: object.pull_compensation_mm,
-                        underlay_running_stitch_mm: underlay,
-                    },
-                )?;
+                if object.column_widths_mm.is_empty() {
+                    generate_satin(
+                        &mut plan,
+                        object.object_id,
+                        object.color_index,
+                        &object.points,
+                        &config,
+                    )?;
+                } else {
+                    generate_satin_variable(
+                        &mut plan,
+                        object.object_id,
+                        object.color_index,
+                        &object.points,
+                        &object.column_widths_mm,
+                        &config,
+                    )?;
+                }
                 generators.push("satin".to_string());
             }
             "fill" => {
@@ -283,9 +345,48 @@ pub fn generate_project(project: &ProjectDocument) -> Result<Generation, PlanErr
                 }
                 generators.push("fill".to_string());
             }
+            "text" => {
+                let text = object.text.as_ref().expect("text object checked");
+                generate_text(
+                    &mut plan,
+                    &TextRequest {
+                        object_id: object.object_id,
+                        content: &text.content,
+                        font_id: &text.font_id,
+                        font_version: &text.font_version,
+                        font_sha256: &text.font_sha256,
+                        origin_x_mm: text.origin_x_mm,
+                        origin_y_mm: text.origin_y_mm,
+                        cap_height_mm: text.cap_height_mm,
+                        letter_spacing_mm: text.letter_spacing_mm,
+                        word_spacing_mm: text.word_spacing_mm,
+                        density_mm: object.density_mm,
+                        column_width_mm: object.column_width_mm,
+                        pull_compensation_mm: object.pull_compensation_mm,
+                        max_stitch_mm: object.max_stitch_mm,
+                        centre_run_mm: satin_pass_length(
+                            object,
+                            "centre_run",
+                            object.centre_run_max_stitch_mm,
+                        )?,
+                        edge_run_mm: satin_pass_length(
+                            object,
+                            "edge_run",
+                            object.edge_run_max_stitch_mm,
+                        )?,
+                        color_index: object.color_index,
+                        min_x: 0.0,
+                        min_y: 0.0,
+                        max_x: project.hoop_width_mm,
+                        max_y: project.hoop_height_mm,
+                        layout: text.layout.as_ref(),
+                    },
+                )?;
+                generators.push("lettering".to_string());
+            }
             _ => {
                 return Err(PlanError::new(format!(
-                    "Object {} requests {}, which is not an implemented generator. Choose running, satin, or fill.",
+                    "Object {} requests {}, which is not an implemented generator. Choose running, satin, fill, or text.",
                     object.object_id, object.kind
                 )));
             }
@@ -305,7 +406,16 @@ pub fn generate_project(project: &ProjectDocument) -> Result<Generation, PlanErr
 
     let mut validation = validate(&plan, 12.1, 1000.0);
     append_hoop_errors(project, &plan, &mut validation);
-    let readiness = readiness_for(project, validation.ok());
+    let mut readiness = readiness_for(project, validation.ok());
+    if let Some(summary) = plan.metadata.get("satin_movement_summary") {
+        readiness.notes.push(summary.clone());
+    }
+    if let Some(summary) = plan.metadata.get("satin_phase_summary") {
+        readiness.notes.push(summary.clone());
+    }
+    if let Some(summary) = plan.metadata.get("lettering_summary") {
+        readiness.notes.push(summary.clone());
+    }
     Ok(Generation {
         provenance: Provenance {
             engine: "embroidery-core",
@@ -395,11 +505,49 @@ fn check_numbers(object: &DesignObject) -> Result<(), PlanError> {
             object.object_id
         )));
     }
-    if object.kind == "satin" && !object.underlay.is_empty() && object.max_stitch_mm <= 0.0 {
-        return Err(PlanError::new(format!(
-            "Object {} requests satin underlay but max_stitch_mm is not positive. Set the underlay stitch length or clear the underlay, then generate again.",
-            object.object_id
-        )));
+    if !object.column_widths_mm.is_empty() {
+        if object.kind != "satin" {
+            return Err(PlanError::new(format!(
+                "Object {} carries column widths, which are used only by satin. Remove the widths or change the object to satin, then generate again.",
+                object.object_id
+            )));
+        }
+        if object.column_widths_mm.len() != object.points.len() {
+            return Err(PlanError::new(format!(
+                "Object {} needs one column width for each centreline point. Match the widths to the points and generate again.",
+                object.object_id
+            )));
+        }
+        if object
+            .column_widths_mm
+            .iter()
+            .any(|width| !width.is_finite() || *width <= 0.0 || *width > 48.0)
+        {
+            return Err(PlanError::new(format!(
+                "Object {} has a column width outside 0 to 48 mm. Enter a width in that range and generate again.",
+                object.object_id
+            )));
+        }
+    }
+    for (name, length) in [
+        ("centre_run_max_stitch_mm", object.centre_run_max_stitch_mm),
+        ("edge_run_max_stitch_mm", object.edge_run_max_stitch_mm),
+    ] {
+        if let Some(length) = length {
+            if object.kind != "satin" && object.kind != "text" {
+                return Err(PlanError::new(format!(
+                    "Object {} carries {name}, which belongs only on satin or text. Remove it or change the object, then generate again.",
+                    object.object_id
+                )));
+            }
+            if !length.is_finite() || length <= 0.0 || length > crate::DST_MAX_STITCH_MM {
+                return Err(PlanError::new(format!(
+                    "Object {} has a {name} outside 0 to {:.1} mm. Reduce that length or remove it, then generate again.",
+                    object.object_id,
+                    crate::DST_MAX_STITCH_MM
+                )));
+            }
+        }
     }
     if object.kind == "fill" && !object.underlay.is_empty() && object.underlay_spacing_mm <= 0.0 {
         return Err(PlanError::new(format!(
@@ -408,6 +556,86 @@ fn check_numbers(object: &DesignObject) -> Result<(), PlanError> {
         )));
     }
     Ok(())
+}
+
+fn check_text(object: &DesignObject) -> Result<(), PlanError> {
+    if object.kind == "text" {
+        let Some(text) = object.text.as_ref() else {
+            return Err(PlanError::new(format!(
+                "Object {} is text and has no lettering intent. Enter the text and pin the font. An outline was not inferred.",
+                object.object_id
+            )));
+        };
+        if !object.points.is_empty() || !object.column_widths_mm.is_empty() {
+            return Err(PlanError::new(format!(
+                "Object {} is text and carries geometry. Lettering stores the entered string, not an outline. Remove the points and column widths, then generate again.",
+                object.object_id
+            )));
+        }
+        if object.angle_degrees.abs() > 1e-9 {
+            let message = if text.layout.is_some() {
+                format!(
+                    "Object {} sets a text angle. Horizontal lines are not rotated. Set the angle to 0 and generate again.",
+                    object.object_id
+                )
+            } else {
+                format!(
+                    "Object {} sets a text angle. This lettering step sews one horizontal line. Set the angle to 0 and generate again.",
+                    object.object_id
+                )
+            };
+            return Err(PlanError::new(message));
+        }
+        if let Some(layout) = text.layout.as_ref() {
+            crate::lettering_layout::validate_layout(object.object_id, layout)?;
+        }
+        if object.underlay_spacing_mm != 0.0 {
+            return Err(PlanError::new(format!(
+                "Object {} sets underlay spacing. Lettering uses centre-run and edge-run lengths. Set underlay spacing to 0 and generate again.",
+                object.object_id
+            )));
+        }
+        for (name, value) in [
+            ("origin_x_mm", text.origin_x_mm),
+            ("origin_y_mm", text.origin_y_mm),
+            ("cap_height_mm", text.cap_height_mm),
+            ("letter_spacing_mm", text.letter_spacing_mm),
+            ("word_spacing_mm", text.word_spacing_mm),
+        ] {
+            if !value.is_finite() {
+                return Err(PlanError::new(format!(
+                    "Object {} has a non-finite {name}. Enter a finite number and generate again.",
+                    object.object_id
+                )));
+            }
+        }
+        return Ok(());
+    }
+    if object.text.is_some() {
+        return Err(PlanError::new(format!(
+            "Object {} carries text. Text belongs on a text object. Remove it or change the object to text, then generate again. The text was not dropped.",
+            object.object_id
+        )));
+    }
+    Ok(())
+}
+
+fn satin_pass_length(
+    object: &DesignObject,
+    name: &str,
+    specific: Option<f64>,
+) -> Result<Option<f64>, PlanError> {
+    if !object.underlay.iter().any(|item| item == name) {
+        return Ok(None);
+    }
+    let length = specific.unwrap_or(object.max_stitch_mm);
+    if !length.is_finite() || length <= 0.0 {
+        return Err(PlanError::new(format!(
+            "Object {} requests {name} but that pass has no positive maximum stitch length. Set the length or clear the pass, then generate again. The plan was not changed.",
+            object.object_id
+        )));
+    }
+    Ok(Some(length))
 }
 
 fn ensure_inside_source(project: &ProjectDocument, object: &DesignObject) -> Result<(), PlanError> {
@@ -506,11 +734,15 @@ mod tests {
                 angle_degrees: 0.0,
                 density_mm: 2.5,
                 column_width_mm: 2.0,
+                column_widths_mm: Vec::new(),
                 max_stitch_mm: 2.5,
                 underlay_spacing_mm: 0.0,
                 underlay: Vec::new(),
+                centre_run_max_stitch_mm: None,
+                edge_run_max_stitch_mm: None,
                 pull_compensation_mm: 0.0,
                 color_index: 0,
+                text: None,
             }],
             review: None,
         }
@@ -586,6 +818,30 @@ mod tests {
         value.as_object_mut().unwrap().remove("review");
         let canonical = serde_json::to_string(&value).unwrap();
         assert!(!canonical.contains("holes"));
+        assert!(!canonical.contains("column_widths_mm"));
+    }
+
+    #[test]
+    fn variable_satin_widths_round_trip_and_keep_release_disabled() {
+        let text = r#"{"format":"embroidery-project","format_version":"1","name":"Taper","hoop_width_mm":80.0,"hoop_height_mm":80.0,"objects":[{"object_id":1,"label":"Column","kind":"satin","points":[{"x":10.0,"y":20.0},{"x":40.0,"y":20.0}],"angle_degrees":0.0,"density_mm":5.0,"column_width_mm":2.0,"column_widths_mm":[2.0,8.0],"max_stitch_mm":3.0,"underlay_spacing_mm":0.0,"underlay":["centre_run","edge_run"],"pull_compensation_mm":0.0,"color_index":0}],"review":null}"#;
+        let project = parse_project(text).unwrap();
+        assert_eq!(project.objects[0].column_widths_mm, vec![2.0, 8.0]);
+        let generation = generate_project(&project).unwrap();
+        assert!(
+            generation.validation.ok(),
+            "{}",
+            generation.validation.errors.join("; ")
+        );
+        assert!(generation.readiness.engineering_export_allowed);
+        assert!(!generation.readiness.machine_release_allowed);
+        assert!(generation.plan.sewing_stitch_count() > 0);
+        let stored = serde_json::to_string(&project).unwrap();
+        assert!(stored.contains("column_widths_mm"));
+        let mut cleared = project.clone();
+        cleared.objects[0].column_widths_mm.clear();
+        assert!(!serde_json::to_string(&cleared)
+            .unwrap()
+            .contains("column_widths_mm"));
     }
 
     #[test]
@@ -620,5 +876,96 @@ mod tests {
         assert!(error
             .message()
             .contains("Holes are supported only on a fill"));
+    }
+
+    fn text_object(content: &str) -> DesignObject {
+        let hash = crate::font_content_sha256();
+        DesignObject {
+            object_id: 4,
+            label: "Lettering".to_string(),
+            kind: "text".to_string(),
+            points: Vec::new(),
+            holes: Vec::new(),
+            angle_degrees: 0.0,
+            density_mm: 1.5,
+            column_width_mm: 1.92,
+            column_widths_mm: Vec::new(),
+            max_stitch_mm: 3.0,
+            underlay_spacing_mm: 0.0,
+            underlay: Vec::new(),
+            centre_run_max_stitch_mm: None,
+            edge_run_max_stitch_mm: None,
+            pull_compensation_mm: 0.0,
+            color_index: 1,
+            text: Some(TextIntent {
+                content: content.to_string(),
+                font_id: crate::FONT_ID.to_string(),
+                font_version: crate::FONT_VERSION.to_string(),
+                font_sha256: hash,
+                origin_x_mm: 18.0,
+                origin_y_mm: 30.0,
+                cap_height_mm: 12.0,
+                letter_spacing_mm: 0.8,
+                word_spacing_mm: 3.6,
+                layout: None,
+            }),
+        }
+    }
+
+    #[test]
+    fn version_two_text_round_trips_and_version_one_rejects_it() {
+        assert!(!serde_json::to_string(&line_project())
+            .unwrap()
+            .contains("\"text\""));
+        let mut project = line_project();
+        project.format_version = TEXT_FORMAT_VERSION.to_string();
+        project.hoop_width_mm = 160.0;
+        project.hoop_height_mm = 160.0;
+        project.objects.push(text_object("ALPINE 08"));
+        let stored = serde_json::to_string(&project).unwrap();
+        let parsed = parse_project(&stored).unwrap();
+        assert_eq!(
+            parsed.objects[1].text.as_ref().unwrap().content,
+            "ALPINE 08"
+        );
+        assert_eq!(
+            parsed.objects[1].text.as_ref().unwrap().font_sha256,
+            crate::font_content_sha256()
+        );
+        let generation = generate_project(&parsed).unwrap();
+        assert!(generation.plan.metadata["lettering_text"].contains("ALPINE 08"));
+        assert!(generation.plan.metadata["lettering_trace"].contains("U+0041"));
+        assert!(generation.plan.metadata["lettering_trace"].contains("U+0020 space"));
+        assert!(generation.plan.metadata["lettering_trace"].contains("U+0038"));
+        assert_eq!(
+            generation.provenance.generators,
+            vec!["running".to_string(), "lettering".to_string()]
+        );
+        assert!(!generation.readiness.machine_release_allowed);
+        assert!(generation.readiness.engineering_export_allowed);
+        let again = generate_project(&parsed).unwrap();
+        assert_eq!(generation.plan.stitches, again.plan.stitches);
+        assert_eq!(generation.revision, again.revision);
+
+        let mut changed = parsed.clone();
+        changed.objects[1].text.as_mut().unwrap().content = "ALPINE 09".to_string();
+        assert_ne!(revision_of(&changed), generation.revision);
+        let next = generate_project(&changed).unwrap();
+        assert!(next.plan.metadata["lettering_text"].contains("ALPINE 09"));
+        assert_ne!(next.plan.stitches, generation.plan.stitches);
+
+        let mut version_one = project.clone();
+        version_one.format_version = FORMAT_VERSION.to_string();
+        let rejected = parse_project(&serde_json::to_string(&version_one).unwrap()).unwrap_err();
+        assert!(rejected.message().contains("version 1"));
+        assert!(rejected.message().contains("was not dropped"));
+
+        let mut lowercase = parsed.clone();
+        lowercase.objects[1].text.as_mut().unwrap().content = "Alpine".to_string();
+        let before = serde_json::to_string(&lowercase).unwrap();
+        let error = generate_project(&lowercase).unwrap_err();
+        assert_eq!(serde_json::to_string(&lowercase).unwrap(), before);
+        assert!(error.message().contains("U+006C"));
+        assert!(error.message().contains("left unchanged"));
     }
 }

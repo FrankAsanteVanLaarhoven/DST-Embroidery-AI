@@ -1,0 +1,42 @@
+{
+  "schema": "embroideryos-creative-c1a-live-cases/0.1",
+  "authorised_live_calls": 0,
+  "provider_endpoint": "https://api.x.ai/v1/images/generations",
+  "configured_image_model": "grok-imagine-image-2.0",
+  "geometry_model_not_used": "grok-4.7",
+  "block": "XAI_API_KEY was absent. EMBROIDERY_CREATIVE_LIVE was absent. The proof store policy has transmit_permitted false and remaining_calls 0. No budget was invented and no key was copied from another process. No prompt was sent.",
+  "cases": [
+    {
+      "id": "cartoon",
+      "art_direction": "cartoon",
+      "request": "Create an original friendly exploration robot, illustrated as a colourful cartoon character. Use a clean background and keep the silhouette readable.",
+      "status": "BLOCKED",
+      "live_image": false,
+      "reason": "Live generation is not authorised in this process. The browser stored a local test raster for this same sentence. That raster is a checkerboard PNG, not an illustration of the robot, and it is not this case's result."
+    },
+    {
+      "id": "portrait",
+      "art_direction": "portrait",
+      "request": "Portrait treatment of a supplied person",
+      "status": "BLOCKED",
+      "live_image": false,
+      "reason": "No authorised reference likeness was supplied. The generation adapter refuses a portrait with no reference and refuses any reference image, because editing is a separate operation. evidence/creative-c1a/reference.png is an 8 by 8 RGB block, not a person, and it was not sent to a provider. No likeness was invented."
+    },
+    {
+      "id": "renaissance-drawing",
+      "art_direction": "renaissance-drawing",
+      "request": "A Renaissance-style drawing of the requested subject.",
+      "status": "BLOCKED",
+      "live_image": false,
+      "reason": "No authorised live generation. A unit test stored a separate local raster for a short courtyard prompt. That file is not this drawing."
+    },
+    {
+      "id": "painterly-landscape",
+      "art_direction": "painterly-landscape",
+      "request": "A painterly landscape of the requested place, light, and season.",
+      "status": "BLOCKED",
+      "live_image": false,
+      "reason": "No authorised live generation. A unit test stored a separate local raster for a short dusk-hills prompt. That file is not this landscape."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "command": "/usr/bin/time -l target/debug/deps/embroidery_core-cb3161a744bbe7a8 batch::tests::twenty_names_and_duplicate_text_are_all_kept --exact",
+  "profile": "debug, unoptimized",
+  "result": "1 passed",
+  "real_seconds": 0.03,
+  "user_seconds": 0.02,
+  "sys_seconds": 0.00,
+  "maximum_resident_set_bytes": 4997120,
+  "peak_memory_footprint_bytes": 2917184,
+  "scope": "One process generated ALPINE 01 through ALPINE 20 and then the four-row duplicate-text check. This is one debug run, not a performance percentile.",
+  "core_suite_seconds": 0.11
+}

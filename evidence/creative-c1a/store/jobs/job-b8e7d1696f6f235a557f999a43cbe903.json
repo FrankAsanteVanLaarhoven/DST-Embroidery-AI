@@ -1,0 +1,45 @@
+{
+  "application": "none",
+  "artifact_ids": [],
+  "attempts": 0,
+  "billable": false,
+  "billable_uncertain": false,
+  "brief": {
+    "agents": [
+      "creative-director"
+    ],
+    "art_direction": "portrait",
+    "embroidery_geometry": false,
+    "height": 64,
+    "preserves_subject": true,
+    "profile_instruction": "Treat the subject as a portrait of the supplied reference. Keep that identity. Do not invent a different person.",
+    "provider_prompt": "Treat the subject as a portrait of the supplied reference. Keep that identity. Do not invent a different person.\n\nSubject and direction, kept as requested:\nPortrait treatment of a supplied person\n\nOutput a single 64 by 64 pixel raster image. Preserve the requested subject, artistic direction, and output dimensions. Do not convert the image into embroidery geometry, a stitch plan, vector paths, or a simplified mark unless the request itself asks for that.",
+    "reference_hashes": [
+      "f0a544245406a758aaa80be7a143e19dcfea1d3911028efede83f3abff480211"
+    ],
+    "width": 64
+  },
+  "cancel_requested": false,
+  "client_request_id": "c1a-mv4lhxjv-fe4gv5",
+  "code": "reference_not_supported",
+  "embroidery_project_changed": false,
+  "error": "This generation adapter does not accept reference images. Reference editing was not called. No likeness was invented and nothing was sent.",
+  "exact_request": "Portrait treatment of a supplied person",
+  "execution": "failed",
+  "job_id": "job-b8e7d1696f6f235a557f999a43cbe903",
+  "machine_release_allowed": false,
+  "prompt_transmitted": false,
+  "provider": {
+    "endpoint": "",
+    "id": "test_image",
+    "live": false,
+    "model": "test-raster",
+    "operation": "generate",
+    "script": "png"
+  },
+  "provider_stop_confirmed": false,
+  "schema": "embroideryos-creative-job/0.1",
+  "source_revision": "1-09bdc436be1fd57c55d4b7ff6c6aabb5",
+  "stale_artifact_ids": [],
+  "transmit_requested": false
+}

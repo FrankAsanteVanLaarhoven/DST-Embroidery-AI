@@ -1,0 +1,11 @@
+{
+  "schema": "embroideryos-creative-policy/0.1",
+  "provider": "test_image",
+  "model": "test-raster",
+  "operation": "generate",
+  "remaining_calls": 0,
+  "transmit_permitted": false,
+  "test_script": "png",
+  "timeout_ms": 90000,
+  "max_stored_bytes": 8388608
+}

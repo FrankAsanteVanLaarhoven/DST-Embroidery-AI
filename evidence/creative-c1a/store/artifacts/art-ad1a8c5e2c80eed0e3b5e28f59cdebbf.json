@@ -1,0 +1,19 @@
+{
+  "alpha_inspected": true,
+  "artifact_id": "art-ad1a8c5e2c80eed0e3b5e28f59cdebbf",
+  "byte_length": 12420,
+  "dimensional_cad": false,
+  "editable_vector": false,
+  "embroidery_geometry": false,
+  "has_alpha": false,
+  "height": 64,
+  "immutable": true,
+  "job_id": "job-f603612fdf3f2763f19fdd737ef4bc9e",
+  "layered_art": false,
+  "media_type": "image/png",
+  "representation": "raster",
+  "role": "provider_output",
+  "schema": "embroideryos-creative-artifact/0.1",
+  "sha256": "97ec83a5205e3283b546991e6573b32aaf4234fc439fd22e52cbddf09e358422",
+  "width": 64
+}

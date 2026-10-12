@@ -1,0 +1,17 @@
+{
+  "url": "http://127.0.0.1:4176/",
+  "studio_binary_sha256": "323aff13e424bb0581e1dc700c7e9cbb1e2a2e53662d9c851df433efe425bf34",
+  "alpine_08_revision": "a30438072d75cfaf5f696deb2636adec8208dc529e1dc3fd27c66420f783505f",
+  "alpine_08_dst_sha256": "f4c4c078f6b8415e1de8cb68692d158eb5deea01038666807a5ab99644a013b5",
+  "alpine_09_revision": "a4507ca9e5d037cfacd2b70ae2d554d0001f79219f78886d08ef2e7b8fd5e0bb",
+  "alpine_09_dst_sha256": "f5ee1c34edc29e3570d2e6b818acf148523c0a99e34c2425f8f5d68b6aa5cf40",
+  "restored_08_matches_08": true,
+  "top_sequence_equal_across_underlay": true,
+  "oneil_revision": "b53795583a6bf1ef597fcdda661b2ffbbe17d71e3bab3926201b018f5c45ed5d",
+  "oneil_dst_sha256": "445b00aad88c3b180046c29410743f17c55b8a5f7d081c8ab0cca35e217c6a81",
+  "font_id": "embroideryos-block-01",
+  "font_sha256": "aca657de98489950e35cb72d7c802d9a4d81958f2915b93307af7b9a4ca028bd",
+  "machine_release_allowed": false,
+  "lowercase_rejected": "U+006C",
+  "accent_rejected": "U+00C9"
+}

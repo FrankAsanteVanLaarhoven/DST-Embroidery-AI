@@ -35,14 +35,14 @@ pub fn underlay_rules() -> &'static [UnderlayRule] {
         UnderlayRule {
             id: "centre_run",
             status: CapabilityStatus::Available,
-            stitch_types: &["satin"],
-            detail: "Available only together with edge_run.",
+            stitch_types: &["satin", "text"],
+            detail: "Selectable on satin or text by itself or with edge_run.",
         },
         UnderlayRule {
             id: "edge_run",
             status: CapabilityStatus::Available,
-            stitch_types: &["satin"],
-            detail: "Available only together with centre_run.",
+            stitch_types: &["satin", "text"],
+            detail: "Selectable on satin or text by itself or with centre_run.",
         },
         UnderlayRule {
             id: "perpendicular_run",
@@ -75,7 +75,7 @@ pub fn capability_manifest() -> &'static [Capability] {
         Capability {
             id: "satin",
             status: CapabilityStatus::Available,
-            detail: "Constant-width column. Underlay is available only as centre_run and edge_run together.",
+            detail: "Column satin. An empty width list uses one column width and still rejects a rung past one DST record. A width on every centreline point varies the column, miters a sharp corner up to twice the half-width, splits a sewing movement wider than 12 mm on an axis, and omits a satin segment shorter than 0.2 mm. A reversed, folded, or crossing column is rejected. Centre-run and edge-run underlay can be selected alone or together.",
         },
         Capability {
             id: "fill",
@@ -101,6 +101,11 @@ pub fn capability_manifest() -> &'static [Capability] {
             id: "underlay.lattice",
             status: CapabilityStatus::Planned,
             detail: "Lattice underlay is not implemented.",
+        },
+        Capability {
+            id: "lettering",
+            status: CapabilityStatus::Available,
+            detail: "One text object in EmbroideryOS Block 01. Version 1 is the default repertoire: A–Z, 0–9, space, hyphen, and a straight apostrophe. Version 2 is a separate pinned recipe, chosen explicitly, adding lowercase, U+2019, and a bounded set of accented letters. Cap height is a software size, not the full line height or a measured sewing limit. One to four horizontal lines are an explicit layout policy, embroideryos-line-layout/1, chosen separately from the font. Curves, font import, and a font catalogue are not implemented.",
         },
         Capability {
             id: "machine_release",
@@ -131,7 +136,7 @@ pub(crate) fn check_request(
     };
 
     match kind {
-        "running" | "satin" | "fill" => {}
+        "running" | "satin" | "fill" | "text" => {}
         "motif" | "applique" => {
             return Err(PlanError::new(format!(
                 "{name} requests {kind}, which is planned and unavailable. Choose running, satin, or fill, then generate again."
@@ -163,7 +168,9 @@ pub(crate) fn check_request(
     names.sort();
     let allowed = match kind {
         "running" => names.is_empty(),
-        "satin" => names.is_empty() || same(&names, &["centre_run", "edge_run"]),
+        "satin" | "text" => names
+            .iter()
+            .all(|name| name == "centre_run" || name == "edge_run"),
         "fill" => names.is_empty() || same(&names, &["perpendicular_run"]),
         _ => false,
     };
@@ -173,7 +180,7 @@ pub(crate) fn check_request(
 
     let supported = match kind {
         "running" => "no underlay",
-        "satin" => "no underlay, or centre_run together with edge_run",
+        "satin" | "text" => "no underlay, centre_run, edge_run, or both",
         "fill" => "no underlay, or perpendicular_run",
         _ => "a supported stitch type",
     };
